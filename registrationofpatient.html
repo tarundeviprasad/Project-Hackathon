@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration | AarogyaConnect</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-indigo: #1E2A5A;
+            --rich-teal: #0F766E;
+            --soft-aqua: #CFF7F2;
+            --soft-ivory: #F8F7F4;
+            --pure-white: #FFFFFF;
+            --charcoal-navy: #172033;
+            --slate-gray: #667085;
+            --soft-border: #E6E8EE;
+            --error-red: #DC2626;
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--soft-ivory);
+            color: var(--charcoal-navy);
+            line-height: 1.6;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            background: var(--pure-white);
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            border-bottom: 1px solid var(--soft-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--deep-indigo);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--deep-indigo);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: white;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .login-link {
+            color: var(--slate-gray);
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .btn-login {
+            padding: 10px 24px;
+            border: 1.5px solid var(--deep-indigo);
+            border-radius: 100px;
+            color: var(--deep-indigo);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-login:hover {
+            background: var(--deep-indigo);
+            color: white;
+        }
+
+        /* --- Main Layout --- */
+        .registration-container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header i {
+            color: var(--rich-teal);
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: var(--deep-indigo);
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--slate-gray);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* --- Progress Indicator --- */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--soft-border);
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            background: var(--soft-ivory);
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--pure-white);
+            border: 2px solid var(--soft-border);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--slate-gray);
+            transition: var(--transition);
+        }
+
+        .step.active .step-circle {
+            background: var(--deep-indigo);
+            border-color: var(--deep-indigo);
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            background: var(--rich-teal);
+            border-color: var(--rich-teal);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--slate-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step.active .step-label { color: var(--deep-indigo); }
+
+        /* --- Form Card --- */
+        .form-card {
+            background: var(--pure-white);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(30, 42, 90, 0.04);
+            border: 1px solid var(--soft-border);
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .section-heading {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--deep-indigo);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- Input Fields --- */
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--charcoal-navy);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--slate-gray);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 1.5px solid var(--soft-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--rich-teal);
+            box-shadow: 0 0 0 4px var(--soft-aqua);
+        }
+
+        .gender-selection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .gender-option {
+            border: 1.5px solid var(--soft-border);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .gender-option.selected {
+            background: var(--soft-aqua);
+            border-color: var(--rich-teal);
+            color: var(--rich-teal);
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 100px;
+            padding-left: 16px;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* --- Summary Section --- */
+        .summary-box {
+            background: var(--soft-ivory);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--soft-border);
+            padding-bottom: 8px;
+        }
+
+        .summary-header h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--slate-gray);
+        }
+
+        .btn-edit {
+            background: none;
+            border: none;
+            color: var(--rich-teal);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .summary-item label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--slate-gray);
+        }
+
+        .summary-item p {
+            font-weight: 600;
+            color: var(--deep-indigo);
+        }
+
+        /* --- Actions --- */
+        .form-actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            flex: 2;
+            background: var(--deep-indigo);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: var(--pure-white);
+            color: var(--slate-gray);
+            border: 1.5px solid var(--soft-border);
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* --- Success Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 42, 90, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            place-items: center;
+            z-index: 1000;
+        }
+
+        .success-modal {
+            background: white;
+            padding: 48px;
+            border-radius: 32px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: modalPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--soft-aqua);
+            color: var(--rich-teal);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 24px;
+        }
+
+        .patient-id-card {
+            background: var(--deep-indigo);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 24px 0;
+        }
+
+        .patient-id-card span {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .patient-id-card h2 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        @media (max-width: 600px) {
+            .summary-grid { grid-template-columns: 1fr; }
+            .form-card { padding: 24px; }
+            .gender-selection { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo-area">
+            <div class="logo-icon"><i data-lucide="plus"></i></div>
+            AarogyaConnect
+        </a>
+        <div class="nav-right">
+            <select id="languageSelector" onchange="updateLanguage(this.value)" style="border: 1px solid var(--soft-border); background: white; border-radius: 10px; padding: 8px 12px; font-weight: 600; cursor: pointer; color: var(--deep-indigo);">
+                <option value="en">🌐 English</option>
+                <option value="hi">🌐 हिन्दी</option>
+                <option value="te">🌐 తెలుగు</option>
+                <option value="mr">🌐 मराठी</option>
+            </select>
+            <span class="login-link" data-i18n="alreadyRegistered">Already registered?</span>
+            <a href="loginpage.html" class="btn-login" data-i18n="loginBtn">Login</a>
+        </div>
+    </nav>
+
+    <div class="registration-container">
+        <header class="page-header">
+            <i data-lucide="user-plus" size="48"></i>
+            <h1 data-i18n="pageTitle">Register New Patient</h1>
+            <p data-i18n="pageSubtitle">Create your patient profile to access appointments, health records, and other healthcare services.</p>
+        </header>
+
+        <div class="progress-bar">
+            <div class="step active" id="step1-indicator">
+                <div class="step-circle">1</div>
+                <span class="step-label" data-i18n="stepPersonal">Personal</span>
+            </div>
+            <div class="step" id="step2-indicator">
+                <div class="step-circle">2</div>
+                <span class="step-label" data-i18n="stepContact">Contact</span>
+            </div>
+            <div class="step" id="step3-indicator">
+                <div class="step-circle">3</div>
+                <span class="step-label" data-i18n="stepConfirm">Confirm</span>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <!-- Section 1: Personal Details -->
+            <div class="form-section active" id="section1">
+                <h3 class="section-heading"><i data-lucide="user"></i> <span data-i18n="personalInfoTitle">Personal Information</span></h3>
+                
+                <div class="input-group">
+                    <label data-i18n="fullNameLabel">Full Name</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="user"></i>
+                        <input type="text" id="full_name" data-i18n-placeholder="fullNamePlaceholder" placeholder="Enter your full name">
+                    </div>
+                    <p class="error-message" id="err_name" data-i18n="errName">Please enter your full name</p>
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="dobLabel">Date of Birth</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="calendar"></i>
+                        <input type="date" id="dob">
+                    </div>
+                    <p class="error-message" id="err_dob" data-i18n="errDob">Please enter a valid date of birth</p>
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="genderLabel">Gender</label>
+                    <div class="gender-selection">
+                        <div class="gender-option" onclick="selectGender('Male', this)" data-i18n="male">Male</div>
+                        <div class="gender-option" onclick="selectGender('Female', this)" data-i18n="female">Female</div>
+                        <div class="gender-option" onclick="selectGender('Other', this)" data-i18n="otherGender">Other</div>
+                        <div class="gender-option" onclick="selectGender('None', this)" data-i18n="preferNotToSay">Prefer not to say</div>
+                    </div>
+                    <input type="hidden" id="gender">
+                    <p class="error-message" id="err_gender" data-i18n="errGender">Please select your gender</p>
+                </div>
+            </div>
+
+            <!-- Section 2: Contact & Location -->
+            <div class="form-section" id="section2">
+                <h3 class="section-heading"><i data-lucide="map-pin"></i> <span data-i18n="contactTitle">Contact &amp; Location</span></h3>
+                
+                <div class="input-group">
+                    <label data-i18n="mobileLabel">Mobile Number</label>
+                    <div class="phone-input">
+                        <select class="country-code">
+                            <option>+91 (IN)</option>
+                        </select>
+                        <div class="input-wrapper phone-number">
+                            <i data-lucide="phone"></i>
+                            <input type="tel" id="phone" data-i18n-placeholder="phonePlaceholder" placeholder="10-digit number">
+                        </div>
+                    </div>
+                    <p class="error-message" id="err_phone" data-i18n="errPhone">Enter a valid 10-digit mobile number</p>
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="addressLabel">Full Address</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="home"></i>
+                        <input type="text" id="address" data-i18n-placeholder="addressPlaceholder" placeholder="House no, Street name...">
+                    </div>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="input-group">
+                        <label data-i18n="villageLabel">Village / Town</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="map"></i>
+                            <input type="text" id="village" data-i18n-placeholder="villagePlaceholder" placeholder="Name of village">
+                        </div>
+                        <p class="error-message" id="err_village" data-i18n="errRequired">Required field</p>
+                    </div>
+                    <div class="input-group">
+                        <label data-i18n="districtLabel">District</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="navigation"></i>
+                            <input type="text" id="district" data-i18n-placeholder="districtPlaceholder" placeholder="Name of district">
+                        </div>
+                        <p class="error-message" id="err_district" data-i18n="errRequired">Required field</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Confirmation -->
+            <div class="form-section" id="section3">
+                <h3 class="section-heading"><i data-lucide="check-square"></i> <span data-i18n="confirmTitle">Review &amp; Confirm</span></h3>
+                
+                <div class="summary-box">
+                    <div class="summary-header">
+                        <h4 data-i18n="summaryPersonal">Personal Details</h4>
+                        <button class="btn-edit" onclick="goToStep(1)" data-i18n="editBtn">Edit</button>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-item"><label data-i18n="summaryFullName">Full Name</label><p id="sum_name">-</p></div>
+                        <div class="summary-item"><label data-i18n="summaryDob">DOB</label><p id="sum_dob">-</p></div>
+                        <div class="summary-item"><label data-i18n="summaryGender">Gender</label><p id="sum_gender">-</p></div>
+                    </div>
+                </div>
+
+                <div class="summary-box">
+                    <div class="summary-header">
+                        <h4 data-i18n="summaryContact">Contact &amp; Location</h4>
+                        <button class="btn-edit" onclick="goToStep(2)" data-i18n="editBtn">Edit</button>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-item"><label data-i18n="summaryPhone">Phone</label><p id="sum_phone">-</p></div>
+                        <div class="summary-item"><label data-i18n="summaryVillage">Village</label><p id="sum_village">-</p></div>
+                        <div class="summary-item"><label data-i18n="summaryDistrict">District</label><p id="sum_district">-</p></div>
+                    </div>
+                </div>
+
+                <p class="helper-text" style="text-align: center; margin-top: 20px;">
+                    <i data-lucide="info" size="14" style="vertical-align: middle;"></i>
+                    <span data-i18n="idGeneratedText">Your unique Patient ID will be automatically generated after registration.</span>
+                </p>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-secondary" id="prevBtn" onclick="prevStep()" data-i18n="backBtn">Back</button>
+                <button class="btn-primary" id="nextBtn" onclick="nextStep()" data-i18n="continueBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="success-modal">
+            <div class="success-icon"><i data-lucide="check" size="40"></i></div>
+            <h2 style="color: var(--deep-indigo);" data-i18n="successTitle">Registration Successful!</h2>
+            <p style="color: var(--slate-gray); margin-top: 8px;" data-i18n="successSubtitle">Your patient profile has been successfully created.</p>
+            
+            <div class="patient-id-card">
+                <span data-i18n="patientNameLabel">PATIENT NAME</span>
+                <h3 id="final_name" style="margin-bottom: 12px; letter-spacing: 0.05em;">VINAY KUMAR</h3>
+                <span data-i18n="patientIdLabel">PATIENT ID</span>
+                <h2 id="final_id" style="letter-spacing: 0.1em;">AC-2024-8821</h2>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn-primary" style="width: 100%;" onclick="window.location.href='patient_portal.html'" data-i18n="goToPortalBtn">Go to Patient Portal</button>
+                <button class="btn-secondary" style="width: 100%; border: none;" onclick="window.location.href='patient_portal.html'" data-i18n="bookAppointmentBtn">Book First Appointment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                alreadyRegistered: 'Already registered?',
+                loginBtn: 'Login',
+                pageTitle: 'Register New Patient',
+                pageSubtitle: 'Create your patient profile to access appointments, health records, and other healthcare services.',
+                stepPersonal: 'Personal',
+                stepContact: 'Contact',
+                stepConfirm: 'Confirm',
+                personalInfoTitle: 'Personal Information',
+                fullNameLabel: 'Full Name',
+                fullNamePlaceholder: 'Enter your full name',
+                errName: 'Please enter your full name',
+                dobLabel: 'Date of Birth',
+                errDob: 'Please enter a valid date of birth',
+                genderLabel: 'Gender',
+                male: 'Male',
+                female: 'Female',
+                otherGender: 'Other',
+                preferNotToSay: 'Prefer not to say',
+                errGender: 'Please select your gender',
+                contactTitle: 'Contact & Location',
+                mobileLabel: 'Mobile Number',
+                phonePlaceholder: '10-digit number',
+                errPhone: 'Enter a valid 10-digit mobile number',
+                addressLabel: 'Full Address',
+                addressPlaceholder: 'House no, Street name...',
+                villageLabel: 'Village / Town',
+                villagePlaceholder: 'Name of village',
+                districtLabel: 'District',
+                districtPlaceholder: 'Name of district',
+                errRequired: 'Required field',
+                confirmTitle: 'Review & Confirm',
+                summaryPersonal: 'Personal Details',
+                summaryContact: 'Contact & Location',
+                summaryFullName: 'Full Name',
+                summaryDob: 'DOB',
+                summaryGender: 'Gender',
+                summaryPhone: 'Phone',
+                summaryVillage: 'Village',
+                summaryDistrict: 'District',
+                idGeneratedText: 'Your unique Patient ID will be automatically generated after registration.',
+                editBtn: 'Edit',
+                backBtn: 'Back',
+                continueBtn: 'Continue',
+                registerPatientBtn: 'Register Patient',
+                successTitle: 'Registration Successful!',
+                successSubtitle: 'Your patient profile has been successfully created.',
+                patientNameLabel: 'PATIENT NAME',
+                patientIdLabel: 'UNIQUE PATIENT ID',
+                goToPortalBtn: 'Go to Patient Portal',
+                bookAppointmentBtn: 'Book First Appointment'
+            },
+            hi: {
+                alreadyRegistered: 'पहले से पंजीकृत हैं?',
+                loginBtn: 'लॉगिन',
+                pageTitle: 'नया रोगी पंजीकरण',
+                pageSubtitle: 'अपॉइंटमेंट, स्वास्थ्य रिकॉर्ड और अन्य सेवाओं के लिए अपना प्रोफाइल बनाएं।',
+                stepPersonal: 'व्यक्तिगत',
+                stepContact: 'संपर्क',
+                stepConfirm: 'पुष्टि',
+                personalInfoTitle: 'व्यक्तिगत जानकारी',
+                fullNameLabel: 'पूरा नाम',
+                fullNamePlaceholder: 'अपना पूरा नाम दर्ज करें',
+                errName: 'कृपया अपना पूरा नाम दर्ज करें',
+                dobLabel: 'जन्म तिथि',
+                errDob: 'कृपया सही जन्म तिथि दर्ज करें',
+                genderLabel: 'लिंग',
+                male: 'पुरुष',
+                female: 'महिला',
+                otherGender: 'अन्य',
+                preferNotToSay: 'बताना नहीं चाहते',
+                errGender: 'कृपया अपना लिंग चुनें',
+                contactTitle: 'संपर्क और स्थान',
+                mobileLabel: 'मोबाइल नंबर',
+                phonePlaceholder: '10 अंकों का नंबर',
+                errPhone: 'मान्य मोबाइल नंबर दर्ज करें',
+                addressLabel: 'पूरा पता',
+                addressPlaceholder: 'मकान नंबर, गली...',
+                villageLabel: 'गाँव / शहर',
+                villagePlaceholder: 'गाँव का नाम',
+                districtLabel: 'जिला',
+                districtPlaceholder: 'जिले का नाम',
+                errRequired: 'आवश्यक फ़ील्ड',
+                confirmTitle: 'समीक्षा और पुष्टि',
+                summaryPersonal: 'व्यक्तिगत विवरण',
+                summaryContact: 'संपर्क और स्थान',
+                summaryFullName: 'पूरा नाम',
+                summaryDob: 'जन्म तिथि',
+                summaryGender: 'लिंग',
+                summaryPhone: 'फोन',
+                summaryVillage: 'गाँव',
+                summaryDistrict: 'जिला',
+                idGeneratedText: 'पंजीकरण के बाद आपका पेशेंट आईडी अपने आप बन जाएगा।',
+                editBtn: 'बदलें',
+                backBtn: 'पीछे',
+                continueBtn: 'जारी रखें',
+                registerPatientBtn: 'रजिस्टर करें',
+                successTitle: 'पंजीकरण सफल!',
+                successSubtitle: 'आपका रोगी प्रोफ़ाइल सफलतापूर्वक बनाया गया है।',
+                patientNameLabel: 'रोगी का नाम',
+                patientIdLabel: 'यूनिक पेशेंट आईडी',
+                goToPortalBtn: 'पेशेंट पोर्टल पर जाएं',
+                bookAppointmentBtn: 'पहला अपॉइंटमेंट बुक करें'
+            },
+            te: {
+                alreadyRegistered: 'ఇప్పటికే నమోదు చేసుకున్నారా?',
+                loginBtn: 'లాగిన్',
+                pageTitle: 'కొత్త రోగి నమోదు',
+                pageSubtitle: 'అపాయింట్‌మెంట్‌లు మరియు ఆరోగ్య రికార్డుల కోసం మీ ప్రొఫైల్‌ను సృష్టించండి.',
+                stepPersonal: 'వ్యక్తిగత',
+                stepContact: 'సంప్రదింపు',
+                stepConfirm: 'నిర్ధారణ',
+                personalInfoTitle: 'వ్యక్తిగత సమాచారం',
+                fullNameLabel: 'పూర్తి పేరు',
+                fullNamePlaceholder: 'మీ పూర్తి పేరును నమోదు చేయండి',
+                errName: 'దయచేసి మీ పూర్తి పేరును నమోదు చేయండి',
+                dobLabel: 'పుట్టిన తేదీ',
+                errDob: 'సరైన పుట్టిన తేదీని నమోదు చేయండి',
+                genderLabel: 'లింగం',
+                male: 'పురుషుడు',
+                female: 'స్త్రీ',
+                otherGender: 'ఇతర',
+                preferNotToSay: 'చెప్పడానికి ఇష్టపడలేదు',
+                errGender: 'దయచేసి మీ లింగాన్ని ఎంచుకోండి',
+                contactTitle: 'సంప్రదింపు & స్థానం',
+                mobileLabel: 'మొబైల్ సంఖ్య',
+                phonePlaceholder: '10 అంకెల సంఖ్య',
+                errPhone: 'సరైన మొబైల్ సంఖ్యను నమోదు చేయండి',
+                addressLabel: 'పూర్తి చిరునామా',
+                addressPlaceholder: 'ఇంటి నంబర్, వీధి...',
+                villageLabel: 'గ్రామం / పట్టణం',
+                villagePlaceholder: 'గ్రామం పేరు',
+                districtLabel: 'జిల్లా',
+                districtPlaceholder: 'జిల్లా పేరు',
+                errRequired: 'తప్పనిసరి',
+                confirmTitle: 'సమీక్ష & నిర్ధారణ',
+                summaryPersonal: 'వ్యక్తిగత వివరాలు',
+                summaryContact: 'సంప్రదింపు & స్థానం',
+                summaryFullName: 'పూర్తి పేరు',
+                summaryDob: 'పుట్టిన తేదీ',
+                summaryGender: 'లింగం',
+                summaryPhone: 'ఫోన్',
+                summaryVillage: 'గ్రామం',
+                summaryDistrict: 'జిల్లా',
+                idGeneratedText: 'నమోదు తర్వాత మీ పేషెంట్ ఐడి ఆటోమేటిక్‌గా వస్తుంది.',
+                editBtn: 'సవరించు',
+                backBtn: 'వెనుకకు',
+                continueBtn: 'కొనసాగించు',
+                registerPatientBtn: 'నమోదు చేయండి',
+                successTitle: 'నమోదు విజయవంతమైంది!',
+                successSubtitle: 'మీ పేషెంట్ ప్రొఫైల్ విజయవంతంగా సృష్టించబడింది.',
+                patientNameLabel: 'రోగి పేరు',
+                patientIdLabel: 'పేషెంట్ ఐడి',
+                goToPortalBtn: 'పేషెంట్ పోర్టల్‌కు వెళ్లండి',
+                bookAppointmentBtn: 'మొదటి అపాయింట్‌మెంట్ బుక్ చేయండి'
+            },
+            mr: {
+                alreadyRegistered: 'आधीच नोंदणी केली आहे का?',
+                loginBtn: 'लॉगिन',
+                pageTitle: 'नवीन रुग्ण नोंदणी',
+                pageSubtitle: 'अपॉइंटमेंट आणि आरोग्य रेकॉर्डसाठी तुमचे प्रोफाइल तयार करा.',
+                stepPersonal: 'वैयक्तिक',
+                stepContact: 'संपर्क',
+                stepConfirm: 'पुष्टी',
+                personalInfoTitle: 'वैयक्तिक माहिती',
+                fullNameLabel: 'पूर्ण नाव',
+                fullNamePlaceholder: 'तुमचे पूर्ण नाव टाका',
+                errName: 'कृपया तुमचे पूर्ण नाव टाका',
+                dobLabel: 'जन्मतारीख',
+                errDob: 'कृपया वैध जन्मतारीख टाका',
+                genderLabel: 'लिंग',
+                male: 'पुरुष',
+                female: 'स्त्री',
+                otherGender: 'इतर',
+                preferNotToSay: 'सांगू इच्छित नाही',
+                errGender: 'कृपया तुमचे लिंग निवडा',
+                contactTitle: 'संपर्क आणि स्थान',
+                mobileLabel: 'मोबाईल नंबर',
+                phonePlaceholder: '10 अंकी नंबर',
+                errPhone: 'वैध मोबाईल नंबर टाका',
+                addressLabel: 'पूर्ण पत्ता',
+                addressPlaceholder: 'घर क्रमांक, रस्ता...',
+                villageLabel: 'गाव / शहर',
+                villagePlaceholder: 'गावाचे नाव',
+                districtLabel: 'जिल्हा',
+                districtPlaceholder: 'जिल्ह्याचे नाव',
+                errRequired: 'आवश्यक',
+                confirmTitle: 'तपासणी आणि पुष्टी',
+                summaryPersonal: 'वैयक्तिक तपशील',
+                summaryContact: 'संपर्क आणि स्थान',
+                summaryFullName: 'पूर्ण नाव',
+                summaryDob: 'जन्मतारीख',
+                summaryGender: 'लिंग',
+                summaryPhone: 'फोन',
+                summaryVillage: 'गाव',
+                summaryDistrict: 'जिल्हा',
+                idGeneratedText: 'नोंदणीनंतर तुमचा पेशंट आयडी आपोआप तयार होईल.',
+                editBtn: 'बदला',
+                backBtn: 'मागे',
+                continueBtn: 'पुढे जा',
+                registerPatientBtn: 'नोंदणी करा',
+                successTitle: 'नोंदणी यशस्वी!',
+                successSubtitle: 'तुमचा रुग्ण प्रोफाइल यशस्वीरित्या तयार झाला आहे.',
+                patientNameLabel: 'रुग्णाचे नाव',
+                patientIdLabel: 'पेशेंट आयडी',
+                goToPortalBtn: 'पेशेंट पोर्टलवर जा',
+                bookAppointmentBtn: 'पहिली अपॉइंटमेंट बुक करा'
+            }
+        };
+
+        function updateLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) {
+                    el.setAttribute('placeholder', translations[lang][key]);
+                }
+            });
+
+            // Update the main button text specifically if on step 3
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentStep === 3) {
+                nextBtn.innerText = translations[lang].registerPatientBtn;
+            } else {
+                nextBtn.innerText = translations[lang].continueBtn;
+            }
+
+            localStorage.setItem('selectedLanguage', lang);
+        }
+
+        lucide.createIcons();
+
+        let currentStep = 1;
+
+        function selectGender(val, el) {
+            document.querySelectorAll('.gender-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('gender').value = val;
+            document.getElementById('err_gender').style.display = 'none';
+        }
+
+        function updateSummary() {
+            document.getElementById('sum_name').innerText = document.getElementById('full_name').value || '-';
+            document.getElementById('sum_dob').innerText = document.getElementById('dob').value || '-';
+            document.getElementById('sum_gender').innerText = document.getElementById('gender').value || '-';
+            document.getElementById('sum_phone').innerText = document.getElementById('phone').value || '-';
+            document.getElementById('sum_village').innerText = document.getElementById('village').value || '-';
+            document.getElementById('sum_district').innerText = document.getElementById('district').value || '-';
+        }
+
+        function validateStep(step) {
+            let isValid = true;
+            if (step === 1) {
+                if (!document.getElementById('full_name').value) {
+                    document.getElementById('err_name').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_name').style.display = 'none'; }
+                
+                if (!document.getElementById('dob').value) {
+                    document.getElementById('err_dob').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_dob').style.display = 'none'; }
+
+                if (!document.getElementById('gender').value) {
+                    document.getElementById('err_gender').style.display = 'block';
+                    isValid = false;
+                }
+            }
+            if (step === 2) {
+                const phone = document.getElementById('phone').value;
+                if (!phone || phone.length < 10) {
+                    document.getElementById('err_phone').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_phone').style.display = 'none'; }
+                
+                if (!document.getElementById('village').value) {
+                    document.getElementById('err_village').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_village').style.display = 'none'; }
+
+                if (!document.getElementById('district').value) {
+                    document.getElementById('err_district').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_district').style.display = 'none'; }
+            }
+            return isValid;
+        }
+
+        function nextStep() {
+            if (!validateStep(currentStep)) return;
+
+            if (currentStep < 3) {
+                document.getElementById(`section${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('completed');
+                currentStep++;
+                document.getElementById(`section${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('active');
+                
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                if (currentStep === 3) {
+                    updateSummary();
+                    document.getElementById('nextBtn').innerText = translations[lang].registerPatientBtn;
+                } else {
+                    document.getElementById('nextBtn').innerText = translations[lang].continueBtn;
+                }
+                updateBtnVisibility();
+            } else {
+                showSuccess();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`section${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`section${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep+1}-indicator`).classList.remove('completed');
+                
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                document.getElementById('nextBtn').innerText = translations[lang].continueBtn;
+                updateBtnVisibility();
+            }
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.step').forEach((s, idx) => {
+                if (idx + 1 > step) s.classList.remove('active', 'completed');
+            });
+            currentStep = step;
+            document.getElementById(`section${step}`).classList.add('active');
+            
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            if (currentStep === 3) {
+                document.getElementById('nextBtn').innerText = translations[lang].registerPatientBtn;
+            } else {
+                document.getElementById('nextBtn').innerText = translations[lang].continueBtn;
+            }
+            updateBtnVisibility();
+        }
+
+        function updateBtnVisibility() {
+            document.getElementById('prevBtn').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+        }
+
+        function showSuccess() {
+            const patientName = document.getElementById('full_name').value.trim();
+            const formattedName = patientName
+                .split(/\s+/)
+                .filter(Boolean)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ')
+                .toUpperCase();
+            const randomID = "AC-" + new Date().getFullYear() + "-" + Math.floor(1000 + Math.random() * 9000);
+
+            localStorage.setItem('patientProfile', JSON.stringify({
+                name: formattedName || 'PATIENT',
+                id: randomID,
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                village: document.getElementById('village').value,
+                district: document.getElementById('district').value,
+                language: localStorage.getItem('selectedLanguage') || 'en'
+            }));
+
+            document.getElementById('final_name').innerText = formattedName || 'PATIENT';
+            document.getElementById('final_id').innerText = randomID;
+            document.getElementById('successModal').style.display = 'grid';
+        }
+
+        const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
+        updateLanguage(savedLanguage);
+        updateBtnVisibility();
+    </script>
+</body>
+</html>
+--- END OF FILE Paste August 26, 2026 - 3:14PM ---

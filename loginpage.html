@@ -248,19 +248,19 @@
 
                     <!-- Segmented Selector -->
                     <div class="flex p-1.5 bg-[#F8F7F4] rounded-2xl mb-10 border border-[#E6E8EE]">
-                        <button class="segmented-btn active flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300" data-i18n="passwordLogin">Password Login</button>
-                        <button class="segmented-btn flex-1 py-3 text-sm font-bold text-[#667085] rounded-xl transition-all duration-300" data-i18n="mobileOTP">Mobile OTP</button>
+                        <button type="button" class="segmented-btn active flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300" data-mode="email" data-i18n="passwordLogin">Password Login</button>
+                        <button type="button" class="segmented-btn flex-1 py-3 text-sm font-bold text-[#667085] rounded-xl transition-all duration-300" data-mode="mobile" data-i18n="mobileOTP">Mobile OTP</button>
                     </div>
 
-                    <form class="space-y-6">
+                    <form class="space-y-6" action="patient_portal.html">
                         <!-- Email Field -->
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-[#172033] ml-1" data-i18n="emailLabel">Email or Mobile Number</label>
+                            <label id="loginMethodLabel" class="text-sm font-bold text-[#172033] ml-1" data-i18n="emailLabel">Email ID</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-[#667085] group-focus-within:text-[#0F766E] transition-colors">
-                                    <i data-lucide="mail" class="w-5 h-5"></i>
+                                    <i id="loginMethodIcon" data-lucide="mail" class="w-5 h-5"></i>
                                 </span>
-                                <input type="text" data-i18n-placeholder="emailPlaceholder" placeholder="Enter your email or mobile number" 
+                                <input id="loginMethodInput" type="email" data-i18n-placeholder="emailPlaceholder" placeholder="Enter your email ID" 
                                     class="w-full pl-12 pr-4 py-4 bg-white border border-[#E6E8EE] rounded-2xl outline-none transition-all input-focus text-[#172033] font-medium placeholder:text-[#B0B8C1]">
                             </div>
                         </div>
@@ -293,22 +293,12 @@
                             <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </button>
 
-                        <div class="relative flex items-center justify-center my-8">
-                            <div class="flex-grow border-t border-[#E6E8EE]"></div>
-                            <span class="flex-shrink mx-4 text-xs font-extrabold text-[#B0B8C1] uppercase tracking-widest" data-i18n="orText">OR</span>
-                            <div class="flex-grow border-t border-[#E6E8EE]"></div>
-                        </div>
-
-                        <button type="button" class="w-full py-4 bg-white border-2 border-[#E6E8EE] hover:border-[#1E2A5A] hover:bg-[#F8F7F4] text-[#1E2A5A] font-bold rounded-2xl transition-all flex items-center justify-center gap-2" data-i18n="continueOTP">
-                            <i data-lucide="smartphone" class="w-5 h-5"></i>
-                            Continue with Mobile OTP
-                        </button>
                     </form>
 
                     <div class="mt-10 text-center">
                         <p class="text-[#667085] font-semibold">
                             <span data-i18n="newToAarogya">New to AarogyaConnect?</span>
-                            <a href="#" class="text-[#0F766E] font-extrabold hover:underline ml-1" data-i18n="createAccount">Create Account</a>
+                            <a href="registrationofpatient.html" class="text-[#0F766E] font-extrabold hover:underline ml-1" data-i18n="createAccount">Create Account</a>
                         </p>
                     </div>
 
@@ -336,7 +326,8 @@
                 heroDescription: 'One secure platform connecting patients with doctors, healthcare services, appointments, medical records and essential health resources.',
                 welcomeText: 'Welcome', welcomeBack: 'Back', welcomeDescription: 'Sign in securely to access your healthcare services.',
                 passwordLogin: 'Password Login', mobileOTP: 'Mobile OTP',
-                emailLabel: 'Email or Mobile Number', emailPlaceholder: 'Enter your email or mobile number',
+                emailLabel: 'Email ID', emailPlaceholder: 'Enter your email ID',
+                mobileLabel: 'Mobile Number', mobilePlaceholder: 'Enter your mobile number',
                 passwordLabel: 'Password', passwordPlaceholder: 'Enter your password',
                 rememberMe: 'Remember me', forgotPassword: 'Forgot Password?', signIn: 'Sign In',
                 orText: 'OR', continueOTP: 'Continue with Mobile OTP',
@@ -349,7 +340,8 @@
                 heroDescription: 'एक सुरक्षित प्लेटफॉर्म जो रोगियों को डॉक्टरों, स्वास्थ्य सेवाओं, अपॉइंटमेंट, मेडिकल रिकॉर्ड और आवश्यक स्वास्थ्य संसाधनों से जोड़ता है।',
                 welcomeText: 'स्वागत', welcomeBack: 'है', welcomeDescription: 'अपनी स्वास्थ्य सेवाओं तक सुरक्षित रूप से पहुँचें।',
                 passwordLogin: 'पासवर्ड लॉगिन', mobileOTP: 'मोबाइल OTP',
-                emailLabel: 'ईमेल या मोबाइल नंबर', emailPlaceholder: 'अपना ईमेल या मोबाइल नंबर दर्ज करें',
+                emailLabel: 'ईमेल आईडी', emailPlaceholder: 'अपनी ईमेल आईडी दर्ज करें',
+                mobileLabel: 'मोबाइल नंबर', mobilePlaceholder: 'अपना मोबाइल नंबर दर्ज करें',
                 passwordLabel: 'पासवर्ड', passwordPlaceholder: 'अपना पासवर्ड दर्ज करें',
                 rememberMe: 'मुझे याद रखें', forgotPassword: 'पासवर्ड भूल गए?', signIn: 'साइन इन',
                 orText: 'या', continueOTP: 'मोबाइल OTP से जारी रखें',
@@ -362,7 +354,8 @@
                 heroDescription: 'రోగులను వైద్యులు, ఆరోగ్య సేవలు, అపాయింట్‌మెంట్లు, మెడికల్ రికార్డులు మరియు ముఖ్యమైన ఆరోగ్య వనరులతో కలిపే సురక్షిత ప్లాట్‌ఫారమ్.',
                 welcomeText: 'స్వాగతం', welcomeBack: 'మీకు', welcomeDescription: 'మీ ఆరోగ్య సేవలను సురక్షితంగా ప్రవేశించండి.',
                 passwordLogin: 'పాస్వర్డ్ లాగిన్', mobileOTP: 'మొబైల్ OTP',
-                emailLabel: 'ఇమెయిల్ లేదా మొబైల్ నంబర్', emailPlaceholder: 'మీ ఇమెయిల్ లేదా మొబైల్ నంబర్ నమోదు చేయండి',
+                emailLabel: 'ఇమెయిల్ ఐడీ', emailPlaceholder: 'మీ ఇమెయిల్ ఐడీ నమోదు చేయండి',
+                mobileLabel: 'మొబైల్ నంబర్', mobilePlaceholder: 'మీ మొబైల్ నంబర్ నమోదు చేయండి',
                 passwordLabel: 'పాస్వర్డ్', passwordPlaceholder: 'మీ పాస్వర్డ్ నమోదు చేయండి',
                 rememberMe: 'నన్ను గుర్తుంచుకో', forgotPassword: 'పాస్వర్డ్ మరిచిపోయారా?', signIn: 'సైన్ ఇన్',
                 orText: 'లేదా', continueOTP: 'మొబైల్ OTPతో కొనసాగించండి',
@@ -375,7 +368,8 @@
                 heroDescription: 'रुग्णांना डॉक्टर, आरोग्य सेवा, अपॉइंटमेंट, मेडिकल रेकॉर्ड आणि आवश्यक आरोग्य संसाधनांशी जोडणारा सुरक्षित प्लॅटफॉर्म.',
                 welcomeText: 'स्वागत', welcomeBack: 'असाल', welcomeDescription: 'तुमच्या आरोग्य सेवांमध्ये सुरक्षितपणे साइन इन करा.',
                 passwordLogin: 'पासवर्ड लॉगिन', mobileOTP: 'मोबाइल OTP',
-                emailLabel: 'ईमेल किंवा मोबाइल नंबर', emailPlaceholder: 'तुमचा ईमेल किंवा मोबाइल नंबर प्रविष्ट करा',
+                emailLabel: 'ईमेल आयडी', emailPlaceholder: 'तुमचा ईमेल आयडी प्रविष्ट करा',
+                mobileLabel: 'मोबाइल नंबर', mobilePlaceholder: 'तुमचा मोबाइल नंबर प्रविष्ट करा',
                 passwordLabel: 'पासवर्ड', passwordPlaceholder: 'तुमचा पासवर्ड प्रविष्ट करा',
                 rememberMe: 'मला लक्षात ठेवा', forgotPassword: 'पासवर्ड विसरलात?', signIn: 'साइन इन',
                 orText: 'किंवा', continueOTP: 'मोबाइल OTP वापरून पुढे जा',
@@ -400,7 +394,29 @@
                     el.setAttribute('placeholder', translations[lang][key]);
                 }
             });
+
+            localStorage.setItem("selectedLanguage", lang);
+            const languageSelector = document.getElementById('languageSelector');
+            if (languageSelector) languageSelector.value = lang;
+            updateLoginMethod();
         }
+
+        function updateLoginMethod() {
+            const activeButton = document.querySelector('.segmented-btn.active');
+            const isMobile = activeButton?.dataset.mode === 'mobile';
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            const dictionary = translations[lang] || translations.en;
+            const input = document.getElementById('loginMethodInput');
+            document.getElementById('loginMethodLabel').textContent = isMobile ? dictionary.mobileLabel : dictionary.emailLabel;
+            input.placeholder = isMobile ? dictionary.mobilePlaceholder : dictionary.emailPlaceholder;
+            input.type = isMobile ? 'tel' : 'email';
+            input.inputMode = isMobile ? 'numeric' : 'email';
+            document.getElementById('loginMethodIcon').setAttribute('data-lucide', isMobile ? 'smartphone' : 'mail');
+            lucide.createIcons();
+        }
+
+        const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
+        updateLanguage(savedLanguage);
 
         // Initialize Lucide Icons
         lucide.createIcons();
@@ -413,6 +429,7 @@
                 buttons.forEach(b => b.classList.add('text-[#667085]'));
                 btn.classList.add('active');
                 btn.classList.remove('text-[#667085]');
+                updateLoginMethod();
             });
         });
     </script>

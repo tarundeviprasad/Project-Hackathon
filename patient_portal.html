@@ -324,7 +324,7 @@
             <a href="#" data-i18n="navMed">Medicines</a>
         </div>
         <div class="nav-right">
-            <select onchange="updateLanguage(this.value)" style="border: none; background: transparent; font-weight: 600; cursor: pointer;">
+            <select id="portalLanguageSelector" onchange="updateLanguage(this.value)" style="border: none; background: transparent; font-weight: 600; cursor: pointer;">
                 <option value="en">🌐 English</option>
                 <option value="hi">🌐 हिन्दी</option>
                 <option value="te">🌐 తెలుగు</option>
@@ -398,7 +398,7 @@
                     <span style="color: var(--slate-gray);">25 Aug</span>
                 </div>
             </div>
-            <button class="btn btn-outline" data-i18n="viewRec">View Records →</button>
+            <a href="digital_health_record.html" class="btn btn-outline" data-i18n="viewRec">View Records →</a>
         </div>
 
         <!-- Queue Status -->
@@ -549,9 +549,16 @@
         function updateLanguage(lang) {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) el.innerText = translations[lang][key];
+                if (translations[lang] && translations[lang][key]) el.innerText = translations[lang][key];
             });
+
+            localStorage.setItem("selectedLanguage", lang);
+            const portalLanguageSelector = document.getElementById("portalLanguageSelector");
+            if (portalLanguageSelector) portalLanguageSelector.value = lang;
         }
+
+        const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
+        updateLanguage(savedLanguage);
 
         // --- SOS & Geolocation ---
         function openSOS() { document.getElementById('sosModal').style.display = 'grid'; }
