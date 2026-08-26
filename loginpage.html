@@ -253,6 +253,8 @@
                     </div>
 
                     <form method="POST" action="{% url 'patient_login' %}" class="space-y-6">
+                        
+                            {% csrf_token %}
                         <!-- Email Field -->
                         <div class="space-y-2">
                             <label id="loginMethodLabel" class="text-sm font-bold text-[#172033] ml-1" data-i18n="emailLabel">Email ID</label>
