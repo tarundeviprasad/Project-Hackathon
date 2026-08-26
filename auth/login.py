@@ -1,98 +1,104 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-''' 
-login authentication code for 
-doctor ,patient, and admin
-'''
-#HOMEPAGE
-def home(request):
-    return render(request, "home.html")
-
-# PATIENT LOGIN
-def patient_login(request):
-
-    if request.method == "POST":
-
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
-
-        if user is not None and user.role == "PATIENT":
-
-            login(request, user)
-
-            return redirect("patient_dashboard")
-
-        else:
-            return render(
-                request,
-                "patient/login.html",
-                {"error": "Invalid patient username or password"}
-            )
-
-    return render(request, "patient/login.html")
+from django.views.decorators.csrf import csrf_protect
+from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from .models import User
 
 
-# DOCTOR LOGIN
-def doctor_login(request):
+@csrf_protect
+def patient_signup(request):
 
     if request.method == "POST":
 
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        try:
+            username = request.POST.get("username")
+            email = request.POST.get("email")
+            password = request.POST.get("password")
 
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
+            # USERNAME VALIDATION
+            if not username:
+                return render(
+                    request,
+                    "patient/signup.html",
+                    {"error": "Username is required"}
+                )
 
-        if user is not None and user.role == "DOCTOR":
+            if User.objects.filter(username=username).exists():
+                return render(
+                    request,
+                    "patient/signup.html",
+                    {"error": "Username already exists"}
+                )
 
-            login(request, user)
+            # EMAIL VALIDATION
+            if not email:
+                return render(
+                    request,
+                    "patient/signup.html",
+                    {"error": "Email is required"}
+                )
 
-            return redirect("doctor_dashboard")
+            try:
+                validate_email(email)
 
-        else:
-            return render(
-                request,
-                "doctor/login.html",
-                {"error": "Invalid doctor username or password"}
+            except ValidationError:
+                return render(
+                    request,
+                    "patient/signup.html",
+                    {"error": "Please enter a valid email address"}
+                )
+
+            if User.objects.filter(email=email).exists():
+                return render(
+                    request,
+                    "patient/signup.html",
+                    {"error": "Email already exists"}
+                )
+
+            # PASSWORD VALIDATION
+            if not password:
+                return render(
+                    request,
+                    "patient/signup.html",
+                    {"error": "Password is required"}
+                )
+
+            try:
+                validate_password(password)
+
+            except ValidationError as error:
+                return render(
+                    request,
+                    "patient/signup.html",
+                    {"error": error.messages}
+                )
+
+            # CREATE ACCOUNT
+            User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                role="PATIENT"
             )
 
-    return render(request, "doctor/login.html")
+            return redirect("patient_login")
 
-
-# ADMIN LOGIN
-def admin_login(request):
-
-    if request.method == "POST":
-
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
-
-        if user is not None and user.role == "ADMIN":
-
-            login(request, user)
-
-            return redirect("admin_dashboard")
-
-        else:
+        # Database-related error
+        except IntegrityError:
             return render(
                 request,
-                "admin/login.html",
-                {"error": "Invalid admin username or password"}
+                "patient/signup.html",
+                {"error": "Unable to create account. Please try again."}
             )
 
-    return render(request, "admin/login.html")
+        # Any unexpected error
+        except Exception:
+            return render(
+                request,
+                "patient/signup.html",
+                {"error": "Something went wrong. Please try again later."}
+            )
+
+    return render(request, "patient/signup.html")
