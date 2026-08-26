@@ -78,6 +78,26 @@
             color: white;
         }
 
+        .hero-title {
+            font-size: clamp(2.5rem, 4.5vw, 5.5rem);
+            line-height: 0.96;
+            letter-spacing: -0.06em;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: normal;
+        }
+
+        .hero-title span {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: clamp(2.6rem, 8vw, 4.2rem);
+                line-height: 1.02;
+            }
+        }
+
         /* Custom Input Styling */
         .input-focus:focus {
             border-color: var(--rich-teal);
@@ -111,16 +131,16 @@
 
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E6E8EE] text-[#0F766E] text-xs font-bold tracking-wider uppercase mb-8 animate-fade-up delay-150 shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-[#0F766E] animate-pulse"></span>
-                    Smart Digital Healthcare
+                    <span data-i18n="heroBadge">Smart Digital Healthcare</span>
                 </div>
 
-                <h1 class="text-5xl lg:text-7xl font-extrabold leading-[1.1] mb-8 animate-fade-up delay-300">
-                    <span class="text-[#1E2A5A]">Healthcare.</span><br/>
-                    <span class="text-[#0F766E]">Connected.</span><br/>
-                    <span class="text-[#1E2A5A]">Simplified.</span>
+                <h1 class="hero-title font-extrabold mb-8 animate-fade-up delay-300">
+                    <span class="text-[#1E2A5A]" data-i18n="heroHeading1">Healthcare.</span>
+                    <span class="text-[#0F766E]" data-i18n="heroHeading2">Connected.</span>
+                    <span class="text-[#1E2A5A]" data-i18n="heroHeading3">Simplified.</span>
                 </h1>
                 
-                <p class="text-[#667085] text-lg max-w-md leading-relaxed animate-fade-up delay-500">
+                <p class="text-[#667085] text-lg max-w-md leading-relaxed animate-fade-up delay-500" data-i18n="heroDescription">
                     One secure platform connecting patients with doctors, healthcare services, appointments, medical records and essential health resources.
                 </p>
             </div>
@@ -186,7 +206,7 @@
                 <div class="flex items-center gap-3">
                     <i data-lucide="building-2" class="w-5 h-5 text-[#0F766E]"></i>
                     <div>
-                        <div class="text-xl font-bold text-[#1E2A5A]">200+</div>
+                        <div class="text-xl font-bold text-[#1E2A5A]">100+</div>
                         <div class="text-[10px] font-bold text-[#667085] uppercase tracking-widest">Centers</div>
                     </div>
                 </div>
@@ -212,38 +232,47 @@
                         <i data-lucide="shield-check" class="w-7 h-7 text-[#0F766E]"></i>
                     </div>
 
+                    <div class="flex justify-end mb-4">
+                        <select id="languageSelector" onchange="updateLanguage(this.value)" class="border border-[#E6E8EE] rounded-xl bg-white px-3 py-2 text-sm font-semibold text-[#172033] outline-none focus:border-[#0F766E]">
+                            <option value="en">🌐 English</option>
+                            <option value="hi">🌐 हिन्दी</option>
+                            <option value="te">🌐 తెలుగు</option>
+                            <option value="mr">🌐 मराठी</option>
+                        </select>
+                    </div>
+
                     <div class="text-center mt-4 mb-10">
-                        <h2 class="text-3xl font-bold text-[#172033]">Welcome <span class="text-[#0F766E]">Back</span></h2>
-                        <p class="text-[#667085] mt-2 font-medium">Sign in securely to access your healthcare services.</p>
+                        <h2 class="text-3xl font-bold text-[#172033]"><span data-i18n="welcomeText">Welcome</span> <span class="text-[#0F766E]" data-i18n="welcomeBack">Back</span></h2>
+                        <p class="text-[#667085] mt-2 font-medium" data-i18n="welcomeDescription">Sign in securely to access your healthcare services.</p>
                     </div>
 
                     <!-- Segmented Selector -->
                     <div class="flex p-1.5 bg-[#F8F7F4] rounded-2xl mb-10 border border-[#E6E8EE]">
-                        <button class="segmented-btn active flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300">Password Login</button>
-                        <button class="segmented-btn flex-1 py-3 text-sm font-bold text-[#667085] rounded-xl transition-all duration-300">Mobile OTP</button>
+                        <button class="segmented-btn active flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300" data-i18n="passwordLogin">Password Login</button>
+                        <button class="segmented-btn flex-1 py-3 text-sm font-bold text-[#667085] rounded-xl transition-all duration-300" data-i18n="mobileOTP">Mobile OTP</button>
                     </div>
 
                     <form class="space-y-6">
                         <!-- Email Field -->
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-[#172033] ml-1">Email or Mobile Number</label>
+                            <label class="text-sm font-bold text-[#172033] ml-1" data-i18n="emailLabel">Email or Mobile Number</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-[#667085] group-focus-within:text-[#0F766E] transition-colors">
                                     <i data-lucide="mail" class="w-5 h-5"></i>
                                 </span>
-                                <input type="text" placeholder="Enter your email or mobile number" 
+                                <input type="text" data-i18n-placeholder="emailPlaceholder" placeholder="Enter your email or mobile number" 
                                     class="w-full pl-12 pr-4 py-4 bg-white border border-[#E6E8EE] rounded-2xl outline-none transition-all input-focus text-[#172033] font-medium placeholder:text-[#B0B8C1]">
                             </div>
                         </div>
 
                         <!-- Password Field -->
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-[#172033] ml-1">Password</label>
+                            <label class="text-sm font-bold text-[#172033] ml-1" data-i18n="passwordLabel">Password</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-[#667085] group-focus-within:text-[#0F766E] transition-colors">
                                     <i data-lucide="lock" class="w-5 h-5"></i>
                                 </span>
-                                <input type="password" placeholder="Enter your password" 
+                                <input type="password" data-i18n-placeholder="passwordPlaceholder" placeholder="Enter your password" 
                                     class="w-full pl-12 pr-12 py-4 bg-white border border-[#E6E8EE] rounded-2xl outline-none transition-all input-focus text-[#172033] font-medium placeholder:text-[#B0B8C1]">
                                 <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-[#667085] hover:text-[#0F766E]">
                                     <i data-lucide="eye-off" class="w-5 h-5"></i>
@@ -254,23 +283,23 @@
                         <div class="flex items-center justify-between px-1">
                             <label class="flex items-center gap-2 cursor-pointer group">
                                 <input type="checkbox" class="w-4 h-4 rounded border-[#E6E8EE] text-[#0F766E] focus:ring-[#0F766E]">
-                                <span class="text-sm font-semibold text-[#667085] group-hover:text-[#172033] transition-colors">Remember me</span>
+                                <span class="text-sm font-semibold text-[#667085] group-hover:text-[#172033] transition-colors" data-i18n="rememberMe">Remember me</span>
                             </label>
-                            <a href="#" class="text-sm font-bold text-[#1E2A5A] hover:text-[#0F766E] transition-colors">Forgot Password?</a>
+                            <a href="#" class="text-sm font-bold text-[#1E2A5A] hover:text-[#0F766E] transition-colors" data-i18n="forgotPassword">Forgot Password?</a>
                         </div>
 
-                        <button type="submit" class="w-full py-4 bg-[#1E2A5A] hover:bg-[#2a3a7a] text-white font-bold rounded-2xl transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-xl shadow-[#1E2A5A]/10 mt-4">
+                        <button type="submit" class="w-full py-4 bg-[#1E2A5A] hover:bg-[#2a3a7a] text-white font-bold rounded-2xl transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-xl shadow-[#1E2A5A]/10 mt-4" data-i18n="signIn">
                             Sign In
                             <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </button>
 
                         <div class="relative flex items-center justify-center my-8">
                             <div class="flex-grow border-t border-[#E6E8EE]"></div>
-                            <span class="flex-shrink mx-4 text-xs font-extrabold text-[#B0B8C1] uppercase tracking-widest">OR</span>
+                            <span class="flex-shrink mx-4 text-xs font-extrabold text-[#B0B8C1] uppercase tracking-widest" data-i18n="orText">OR</span>
                             <div class="flex-grow border-t border-[#E6E8EE]"></div>
                         </div>
 
-                        <button type="button" class="w-full py-4 bg-white border-2 border-[#E6E8EE] hover:border-[#1E2A5A] hover:bg-[#F8F7F4] text-[#1E2A5A] font-bold rounded-2xl transition-all flex items-center justify-center gap-2">
+                        <button type="button" class="w-full py-4 bg-white border-2 border-[#E6E8EE] hover:border-[#1E2A5A] hover:bg-[#F8F7F4] text-[#1E2A5A] font-bold rounded-2xl transition-all flex items-center justify-center gap-2" data-i18n="continueOTP">
                             <i data-lucide="smartphone" class="w-5 h-5"></i>
                             Continue with Mobile OTP
                         </button>
@@ -278,8 +307,8 @@
 
                     <div class="mt-10 text-center">
                         <p class="text-[#667085] font-semibold">
-                            New to AarogyaConnect? 
-                            <a href="#" class="text-[#0F766E] font-extrabold hover:underline ml-1">Create Account</a>
+                            <span data-i18n="newToAarogya">New to AarogyaConnect?</span>
+                            <a href="#" class="text-[#0F766E] font-extrabold hover:underline ml-1" data-i18n="createAccount">Create Account</a>
                         </p>
                     </div>
 
@@ -288,7 +317,7 @@
                         <div class="p-2 bg-[#CFF7F2] rounded-lg">
                             <i data-lucide="shield-check" class="w-4 h-4 text-[#0F766E]"></i>
                         </div>
-                        <span class="text-xs font-bold tracking-tight">Your health information is securely protected.</span>
+                        <span class="text-xs font-bold tracking-tight" data-i18n="securityMessage">Your health information is securely protected.</span>
                     </div>
                 </div>
 
@@ -300,6 +329,79 @@
     </div>
 
     <script>
+        const translations = {
+            en: {
+                heroBadge: 'Smart Digital Healthcare',
+                heroHeading1: 'Healthcare.', heroHeading2: 'Connected.', heroHeading3: 'Simplified.',
+                heroDescription: 'One secure platform connecting patients with doctors, healthcare services, appointments, medical records and essential health resources.',
+                welcomeText: 'Welcome', welcomeBack: 'Back', welcomeDescription: 'Sign in securely to access your healthcare services.',
+                passwordLogin: 'Password Login', mobileOTP: 'Mobile OTP',
+                emailLabel: 'Email or Mobile Number', emailPlaceholder: 'Enter your email or mobile number',
+                passwordLabel: 'Password', passwordPlaceholder: 'Enter your password',
+                rememberMe: 'Remember me', forgotPassword: 'Forgot Password?', signIn: 'Sign In',
+                orText: 'OR', continueOTP: 'Continue with Mobile OTP',
+                newToAarogya: 'New to AarogyaConnect?', createAccount: 'Create Account',
+                securityMessage: 'Your health information is securely protected.'
+            },
+            hi: {
+                heroBadge: 'स्मार्ट डिजिटल हेल्थकेयर',
+                heroHeading1: 'स्वास्थ्य।', heroHeading2: 'जुड़ा हुआ।', heroHeading3: 'सरल।',
+                heroDescription: 'एक सुरक्षित प्लेटफॉर्म जो रोगियों को डॉक्टरों, स्वास्थ्य सेवाओं, अपॉइंटमेंट, मेडिकल रिकॉर्ड और आवश्यक स्वास्थ्य संसाधनों से जोड़ता है।',
+                welcomeText: 'स्वागत', welcomeBack: 'है', welcomeDescription: 'अपनी स्वास्थ्य सेवाओं तक सुरक्षित रूप से पहुँचें।',
+                passwordLogin: 'पासवर्ड लॉगिन', mobileOTP: 'मोबाइल OTP',
+                emailLabel: 'ईमेल या मोबाइल नंबर', emailPlaceholder: 'अपना ईमेल या मोबाइल नंबर दर्ज करें',
+                passwordLabel: 'पासवर्ड', passwordPlaceholder: 'अपना पासवर्ड दर्ज करें',
+                rememberMe: 'मुझे याद रखें', forgotPassword: 'पासवर्ड भूल गए?', signIn: 'साइन इन',
+                orText: 'या', continueOTP: 'मोबाइल OTP से जारी रखें',
+                newToAarogya: 'AarogyaConnect में नए हैं?', createAccount: 'अकाउंट बनाएं',
+                securityMessage: 'आपकी स्वास्थ्य जानकारी सुरक्षित रूप से संरक्षित है।'
+            },
+            te: {
+                heroBadge: 'స్మార్ట్ డిజిటల్ హెల్త్‌కేర్',
+                heroHeading1: 'ఆరోగ్యం.', heroHeading2: 'అనుసంధానించబడింది.', heroHeading3: 'సులభతరంగా.',
+                heroDescription: 'రోగులను వైద్యులు, ఆరోగ్య సేవలు, అపాయింట్‌మెంట్లు, మెడికల్ రికార్డులు మరియు ముఖ్యమైన ఆరోగ్య వనరులతో కలిపే సురక్షిత ప్లాట్‌ఫారమ్.',
+                welcomeText: 'స్వాగతం', welcomeBack: 'మీకు', welcomeDescription: 'మీ ఆరోగ్య సేవలను సురక్షితంగా ప్రవేశించండి.',
+                passwordLogin: 'పాస్వర్డ్ లాగిన్', mobileOTP: 'మొబైల్ OTP',
+                emailLabel: 'ఇమెయిల్ లేదా మొబైల్ నంబర్', emailPlaceholder: 'మీ ఇమెయిల్ లేదా మొబైల్ నంబర్ నమోదు చేయండి',
+                passwordLabel: 'పాస్వర్డ్', passwordPlaceholder: 'మీ పాస్వర్డ్ నమోదు చేయండి',
+                rememberMe: 'నన్ను గుర్తుంచుకో', forgotPassword: 'పాస్వర్డ్ మరిచిపోయారా?', signIn: 'సైన్ ఇన్',
+                orText: 'లేదా', continueOTP: 'మొబైల్ OTPతో కొనసాగించండి',
+                newToAarogya: 'AarogyaConnect కు కొత్తారా?', createAccount: 'ఖాతా సృష్టించండి',
+                securityMessage: 'మీ ఆరోగ్య సమాచారం సురక్షితంగా రక్షించబడుతుంది.'
+            },
+            mr: {
+                heroBadge: 'स्मार्ट डिजिटल हेल्थकेअर',
+                heroHeading1: 'आरोग्य.', heroHeading2: 'जोडलेले.', heroHeading3: 'सोपे.',
+                heroDescription: 'रुग्णांना डॉक्टर, आरोग्य सेवा, अपॉइंटमेंट, मेडिकल रेकॉर्ड आणि आवश्यक आरोग्य संसाधनांशी जोडणारा सुरक्षित प्लॅटफॉर्म.',
+                welcomeText: 'स्वागत', welcomeBack: 'असाल', welcomeDescription: 'तुमच्या आरोग्य सेवांमध्ये सुरक्षितपणे साइन इन करा.',
+                passwordLogin: 'पासवर्ड लॉगिन', mobileOTP: 'मोबाइल OTP',
+                emailLabel: 'ईमेल किंवा मोबाइल नंबर', emailPlaceholder: 'तुमचा ईमेल किंवा मोबाइल नंबर प्रविष्ट करा',
+                passwordLabel: 'पासवर्ड', passwordPlaceholder: 'तुमचा पासवर्ड प्रविष्ट करा',
+                rememberMe: 'मला लक्षात ठेवा', forgotPassword: 'पासवर्ड विसरलात?', signIn: 'साइन इन',
+                orText: 'किंवा', continueOTP: 'मोबाइल OTP वापरून पुढे जा',
+                newToAarogya: 'AarogyaConnect मध्ये नवीन आहात?', createAccount: 'खाते तयार करा',
+                securityMessage: 'तुमची आरोग्य माहिती सुरक्षितपणे संरक्षित आहे.'
+            }
+        };
+
+        function updateLanguage(lang) {
+            const entries = document.querySelectorAll('[data-i18n]');
+            entries.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            const placeholderEntries = document.querySelectorAll('[data-i18n-placeholder]');
+            placeholderEntries.forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) {
+                    el.setAttribute('placeholder', translations[lang][key]);
+                }
+            });
+        }
+
         // Initialize Lucide Icons
         lucide.createIcons();
 
@@ -313,7 +415,8 @@
                 btn.classList.remove('text-[#667085]');
             });
         });
+    </script>
     <script src="patientportal.js"></script>
-
+    
 </body>
 </html>
