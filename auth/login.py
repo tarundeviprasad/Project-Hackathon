@@ -4,6 +4,9 @@ from django.contrib.auth import authenticate, login
 login authentication code for 
 doctor ,patient, and admin
 '''
+#HOMEPAGE
+def home(request):
+    return render(request, "home.html")
 
 # PATIENT LOGIN
 def patient_login(request):

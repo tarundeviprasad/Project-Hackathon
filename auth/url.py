@@ -1,24 +1,42 @@
 from django.urls import path
-from .. import views
+from . import login
+from .logout import user_logout
 
 urlpatterns = [
 
+    # PATIENT LOGIN
+    path(
+        "patient/login/",
+        login.patient_login,
+        name="patient_login"
+    ),
+
+    # DOCTOR LOGIN
     path(
         "doctor/login/",
-        views.doctor_login,
+        login.doctor_login,
         name="doctor_login"
     ),
 
+    # ADMIN LOGIN
     path(
         "admin/login/",
-        views.admin_login,
+        login.admin_login,
         name="admin_login"
     ),
 
+    # LOGOUT FOR EVERYONE
     path(
         "logout/",
-        views.user_logout,
+        user_logout,
         name="logout"
+    ),
+
+    # HOMEPAGE
+    path(
+        "",
+        login.home,
+        name="home"
     ),
 
 ]
