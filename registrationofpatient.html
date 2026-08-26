@@ -242,6 +242,31 @@
             color: var(--slate-gray);
         }
 
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--slate-gray);
+            border-radius: 10px;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+        }
+
+        .password-toggle:hover {
+            background: rgba(15, 118, 110, 0.08);
+            color: var(--rich-teal);
+        }
+
         input, select, textarea {
             width: 100%;
             padding: 14px 16px 14px 48px;
@@ -250,6 +275,10 @@
             font-size: 1rem;
             outline: none;
             transition: var(--transition);
+        }
+
+        .password-wrapper input {
+            padding-right: 52px;
         }
 
         input:focus, select:focus {
@@ -407,6 +436,16 @@
             animation: modalPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        .security-note {
+            background: linear-gradient(135deg, rgba(15, 118, 110, 0.09), rgba(30, 42, 90, 0.04));
+            border: 1px solid rgba(15, 118, 110, 0.15);
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: var(--deep-indigo);
+            font-size: 0.88rem;
+            margin-top: 8px;
+        }
+
         .success-icon {
             width: 80px;
             height: 80px;
@@ -485,7 +524,7 @@
             </div>
             <div class="step" id="step3-indicator">
                 <div class="step-circle">3</div>
-                <span class="step-label" data-i18n="stepConfirm">Confirm</span>
+                <span class="step-label" data-i18n="stepAccount">Account</span>
             </div>
         </div>
 
@@ -571,38 +610,51 @@
                 </div>
             </div>
 
-            <!-- Section 3: Confirmation -->
+            <!-- Section 3: Account Security -->
             <div class="form-section" id="section3">
-                <h3 class="section-heading"><i data-lucide="check-square"></i> <span data-i18n="confirmTitle">Review &amp; Confirm</span></h3>
-                
-                <div class="summary-box">
-                    <div class="summary-header">
-                        <h4 data-i18n="summaryPersonal">Personal Details</h4>
-                        <button class="btn-edit" onclick="goToStep(1)" data-i18n="editBtn">Edit</button>
+                <h3 class="section-heading"><i data-lucide="shield-check"></i> <span data-i18n="accountTitle">Secure Your Account</span></h3>
+
+                <div class="input-group">
+                    <label data-i18n="emailLabel">Email Address</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="email" data-i18n-placeholder="emailPlaceholder" placeholder="Enter your email address">
                     </div>
-                    <div class="summary-grid">
-                        <div class="summary-item"><label data-i18n="summaryFullName">Full Name</label><p id="sum_name">-</p></div>
-                        <div class="summary-item"><label data-i18n="summaryDob">DOB</label><p id="sum_dob">-</p></div>
-                        <div class="summary-item"><label data-i18n="summaryGender">Gender</label><p id="sum_gender">-</p></div>
-                    </div>
+                    <p class="error-message" id="err_email" data-i18n="errEmail">Please enter a valid email address</p>
                 </div>
 
-                <div class="summary-box">
-                    <div class="summary-header">
-                        <h4 data-i18n="summaryContact">Contact &amp; Location</h4>
-                        <button class="btn-edit" onclick="goToStep(2)" data-i18n="editBtn">Edit</button>
+                <div class="input-group">
+                    <label data-i18n="passwordLabel">Password</label>
+                    <div class="password-wrapper">
+                        <div class="input-wrapper" style="width:100%;">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="password" data-i18n-placeholder="passwordPlaceholder" placeholder="Create a secure password">
+                        </div>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Show password">
+                            <i data-lucide="eye"></i>
+                        </button>
                     </div>
-                    <div class="summary-grid">
-                        <div class="summary-item"><label data-i18n="summaryPhone">Phone</label><p id="sum_phone">-</p></div>
-                        <div class="summary-item"><label data-i18n="summaryVillage">Village</label><p id="sum_village">-</p></div>
-                        <div class="summary-item"><label data-i18n="summaryDistrict">District</label><p id="sum_district">-</p></div>
-                    </div>
+                    <p class="error-message" id="err_password" data-i18n="errPassword">Password must be at least 8 characters long</p>
                 </div>
 
-                <p class="helper-text" style="text-align: center; margin-top: 20px;">
-                    <i data-lucide="info" size="14" style="vertical-align: middle;"></i>
-                    <span data-i18n="idGeneratedText">Your unique Patient ID will be automatically generated after registration.</span>
-                </p>
+                <div class="input-group">
+                    <label data-i18n="confirmPasswordLabel">Confirm Password</label>
+                    <div class="password-wrapper">
+                        <div class="input-wrapper" style="width:100%;">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="confirm_password" data-i18n-placeholder="confirmPasswordPlaceholder" placeholder="Re-enter your password">
+                        </div>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', this)" aria-label="Show password">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                    <p class="error-message" id="err_confirm_password" data-i18n="errConfirmPassword">Passwords do not match</p>
+                </div>
+
+                <div class="security-note">
+                    <strong data-i18n="accountSecurityTitle">Why secure your account?</strong>
+                    <div style="margin-top: 6px;" data-i18n="accountSecurityText">Your email and password protect your health record access and appointment history.</div>
+                </div>
             </div>
 
             <div class="form-actions">
@@ -642,7 +694,7 @@
                 pageSubtitle: 'Create your patient profile to access appointments, health records, and other healthcare services.',
                 stepPersonal: 'Personal',
                 stepContact: 'Contact',
-                stepConfirm: 'Confirm',
+                stepAccount: 'Account',
                 personalInfoTitle: 'Personal Information',
                 fullNameLabel: 'Full Name',
                 fullNamePlaceholder: 'Enter your full name',
@@ -666,17 +718,18 @@
                 districtLabel: 'District',
                 districtPlaceholder: 'Name of district',
                 errRequired: 'Required field',
-                confirmTitle: 'Review & Confirm',
-                summaryPersonal: 'Personal Details',
-                summaryContact: 'Contact & Location',
-                summaryFullName: 'Full Name',
-                summaryDob: 'DOB',
-                summaryGender: 'Gender',
-                summaryPhone: 'Phone',
-                summaryVillage: 'Village',
-                summaryDistrict: 'District',
-                idGeneratedText: 'Your unique Patient ID will be automatically generated after registration.',
-                editBtn: 'Edit',
+                accountTitle: 'Secure Your Account',
+                emailLabel: 'Email Address',
+                emailPlaceholder: 'Enter your email address',
+                errEmail: 'Please enter a valid email address',
+                passwordLabel: 'Password',
+                passwordPlaceholder: 'Create a secure password',
+                errPassword: 'Password must be at least 8 characters long',
+                confirmPasswordLabel: 'Confirm Password',
+                confirmPasswordPlaceholder: 'Re-enter your password',
+                errConfirmPassword: 'Passwords do not match',
+                accountSecurityTitle: 'Why secure your account?',
+                accountSecurityText: 'Your email and password protect your health record access and appointment history.',
                 backBtn: 'Back',
                 continueBtn: 'Continue',
                 registerPatientBtn: 'Register Patient',
@@ -694,7 +747,7 @@
                 pageSubtitle: 'अपॉइंटमेंट, स्वास्थ्य रिकॉर्ड और अन्य सेवाओं के लिए अपना प्रोफाइल बनाएं।',
                 stepPersonal: 'व्यक्तिगत',
                 stepContact: 'संपर्क',
-                stepConfirm: 'पुष्टि',
+                stepAccount: 'खाता',
                 personalInfoTitle: 'व्यक्तिगत जानकारी',
                 fullNameLabel: 'पूरा नाम',
                 fullNamePlaceholder: 'अपना पूरा नाम दर्ज करें',
@@ -718,17 +771,18 @@
                 districtLabel: 'जिला',
                 districtPlaceholder: 'जिले का नाम',
                 errRequired: 'आवश्यक फ़ील्ड',
-                confirmTitle: 'समीक्षा और पुष्टि',
-                summaryPersonal: 'व्यक्तिगत विवरण',
-                summaryContact: 'संपर्क और स्थान',
-                summaryFullName: 'पूरा नाम',
-                summaryDob: 'जन्म तिथि',
-                summaryGender: 'लिंग',
-                summaryPhone: 'फोन',
-                summaryVillage: 'गाँव',
-                summaryDistrict: 'जिला',
-                idGeneratedText: 'पंजीकरण के बाद आपका पेशेंट आईडी अपने आप बन जाएगा।',
-                editBtn: 'बदलें',
+                accountTitle: 'अपने खाते की सुरक्षा करें',
+                emailLabel: 'ईमेल पता',
+                emailPlaceholder: 'अपना ईमेल पता दर्ज करें',
+                errEmail: 'कृपया सही ईमेल पता दर्ज करें',
+                passwordLabel: 'पासवर्ड',
+                passwordPlaceholder: 'सुरक्षित पासवर्ड बनाएं',
+                errPassword: 'पासवर्ड कम से कम 8 वर्णों का होना चाहिए',
+                confirmPasswordLabel: 'पासवर्ड की पुष्टि करें',
+                confirmPasswordPlaceholder: 'पासवर्ड फिर से लिखें',
+                errConfirmPassword: 'पासवर्ड मेल नहीं खाते',
+                accountSecurityTitle: 'अपने खाते को सुरक्षित क्यों रखें?',
+                accountSecurityText: 'आपका ईमेल और पासवर्ड आपके स्वास्थ्य रिकॉर्ड और अपॉइंटमेंट हिस्ट्री की सुरक्षा करता है।',
                 backBtn: 'पीछे',
                 continueBtn: 'जारी रखें',
                 registerPatientBtn: 'रजिस्टर करें',
@@ -746,7 +800,7 @@
                 pageSubtitle: 'అపాయింట్‌మెంట్‌లు మరియు ఆరోగ్య రికార్డుల కోసం మీ ప్రొఫైల్‌ను సృష్టించండి.',
                 stepPersonal: 'వ్యక్తిగత',
                 stepContact: 'సంప్రదింపు',
-                stepConfirm: 'నిర్ధారణ',
+                stepAccount: 'ఖాతా',
                 personalInfoTitle: 'వ్యక్తిగత సమాచారం',
                 fullNameLabel: 'పూర్తి పేరు',
                 fullNamePlaceholder: 'మీ పూర్తి పేరును నమోదు చేయండి',
@@ -770,17 +824,18 @@
                 districtLabel: 'జిల్లా',
                 districtPlaceholder: 'జిల్లా పేరు',
                 errRequired: 'తప్పనిసరి',
-                confirmTitle: 'సమీక్ష & నిర్ధారణ',
-                summaryPersonal: 'వ్యక్తిగత వివరాలు',
-                summaryContact: 'సంప్రదింపు & స్థానం',
-                summaryFullName: 'పూర్తి పేరు',
-                summaryDob: 'పుట్టిన తేదీ',
-                summaryGender: 'లింగం',
-                summaryPhone: 'ఫోన్',
-                summaryVillage: 'గ్రామం',
-                summaryDistrict: 'జిల్లా',
-                idGeneratedText: 'నమోదు తర్వాత మీ పేషెంట్ ఐడి ఆటోమేటిక్‌గా వస్తుంది.',
-                editBtn: 'సవరించు',
+                accountTitle: 'ఖాతాను సురక్షితంగా ఉంచండి',
+                emailLabel: 'ఈమెయిల్ అడ్రస్',
+                emailPlaceholder: 'మీ ఈమెయిల్ అడ్రస్‌ను నమోదు చేయండి',
+                errEmail: 'దయచేసి సరైన ఈమెయిల్ అడ్రస్‌ని నమోదు చేయండి',
+                passwordLabel: 'పాస్వర్డ్',
+                passwordPlaceholder: 'సురక్షిత పాస్వర్డ్ సృష్టించండి',
+                errPassword: 'పాస్వర్డ్ కనీసం 8 అక్షరాల పొడవు ఉండాలి',
+                confirmPasswordLabel: 'పాస్వర్డ్‌ను నిర్ధారించండి',
+                confirmPasswordPlaceholder: 'మీ పాస్వర్డ్‌ను మళ్ళీ నమోదు చేయండి',
+                errConfirmPassword: 'పాస్వర్డ్‌లు సరిపోలడం లేదు',
+                accountSecurityTitle: 'ఖాతాను ఎందుకు సురక్షితంగా ఉంచాలి?',
+                accountSecurityText: 'మీ ఈమెయిల్ మరియు పాస్వర్డ్ మీ ఆరోగ్య నమోదులు మరియు అపాయింట్‌మెంట్ చరిత్రను రక్షిస్తాయి.',
                 backBtn: 'వెనుకకు',
                 continueBtn: 'కొనసాగించు',
                 registerPatientBtn: 'నమోదు చేయండి',
@@ -798,7 +853,7 @@
                 pageSubtitle: 'अपॉइंटमेंट आणि आरोग्य रेकॉर्डसाठी तुमचे प्रोफाइल तयार करा.',
                 stepPersonal: 'वैयक्तिक',
                 stepContact: 'संपर्क',
-                stepConfirm: 'पुष्टी',
+                stepAccount: 'खाते',
                 personalInfoTitle: 'वैयक्तिक माहिती',
                 fullNameLabel: 'पूर्ण नाव',
                 fullNamePlaceholder: 'तुमचे पूर्ण नाव टाका',
@@ -822,17 +877,18 @@
                 districtLabel: 'जिल्हा',
                 districtPlaceholder: 'जिल्ह्याचे नाव',
                 errRequired: 'आवश्यक',
-                confirmTitle: 'तपासणी आणि पुष्टी',
-                summaryPersonal: 'वैयक्तिक तपशील',
-                summaryContact: 'संपर्क आणि स्थान',
-                summaryFullName: 'पूर्ण नाव',
-                summaryDob: 'जन्मतारीख',
-                summaryGender: 'लिंग',
-                summaryPhone: 'फोन',
-                summaryVillage: 'गाव',
-                summaryDistrict: 'जिल्हा',
-                idGeneratedText: 'नोंदणीनंतर तुमचा पेशंट आयडी आपोआप तयार होईल.',
-                editBtn: 'बदला',
+                accountTitle: 'तुमचे खाते सुरक्षित करा',
+                emailLabel: 'ईमेल पत्ता',
+                emailPlaceholder: 'तुमचा ईमेल पत्ता टाका',
+                errEmail: 'कृपया वैध ईमेल पत्ता टाका',
+                passwordLabel: 'पासवर्ड',
+                passwordPlaceholder: 'सुरक्षित पासवर्ड तयार करा',
+                errPassword: 'पासवर्ड कमीत कमी 8 वर्णांचा असावा',
+                confirmPasswordLabel: 'पासवर्डची पुष्टी करा',
+                confirmPasswordPlaceholder: 'पासवर्ड पुन्हा टाका',
+                errConfirmPassword: 'पासवर्ड जुळत नाहीत',
+                accountSecurityTitle: 'खाते का सुरक्षित ठेवावे?',
+                accountSecurityText: 'तुमचा ईमेल आणि पासवर्ड तुमच्या आरोग्य रेकॉर्ड आणि अपॉइंटमेंट इतिहासला सुरक्षित ठेवतो.',
                 backBtn: 'मागे',
                 continueBtn: 'पुढे जा',
                 registerPatientBtn: 'नोंदणी करा',
@@ -860,7 +916,6 @@
                 }
             });
 
-            // Update the main button text specifically if on step 3
             const nextBtn = document.getElementById('nextBtn');
             if (currentStep === 3) {
                 nextBtn.innerText = translations[lang].registerPatientBtn;
@@ -882,6 +937,15 @@
             document.getElementById('err_gender').style.display = 'none';
         }
 
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('svg');
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            icon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+            lucide.createIcons();
+        }
+
         function updateSummary() {
             document.getElementById('sum_name').innerText = document.getElementById('full_name').value || '-';
             document.getElementById('sum_dob').innerText = document.getElementById('dob').value || '-';
@@ -889,6 +953,19 @@
             document.getElementById('sum_phone').innerText = document.getElementById('phone').value || '-';
             document.getElementById('sum_village').innerText = document.getElementById('village').value || '-';
             document.getElementById('sum_district').innerText = document.getElementById('district').value || '-';
+        }
+
+        function syncProgressUI() {
+            document.querySelectorAll('.step').forEach(stepEl => {
+                stepEl.classList.remove('active', 'completed');
+            });
+
+            for (let i = 1; i <= 3; i++) {
+                const stepEl = document.getElementById(`step${i}-indicator`);
+                if (!stepEl) continue;
+                if (i < currentStep) stepEl.classList.add('completed');
+                if (i === currentStep) stepEl.classList.add('active');
+            }
         }
 
         function validateStep(step) {
@@ -926,6 +1003,26 @@
                     isValid = false;
                 } else { document.getElementById('err_district').style.display = 'none'; }
             }
+            if (step === 3) {
+                const emailValue = document.getElementById('email').value.trim();
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(emailValue)) {
+                    document.getElementById('err_email').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_email').style.display = 'none'; }
+
+                const password = document.getElementById('password').value;
+                if (password.length < 8) {
+                    document.getElementById('err_password').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_password').style.display = 'none'; }
+
+                const confirmPassword = document.getElementById('confirm_password').value;
+                if (password !== confirmPassword || !confirmPassword) {
+                    document.getElementById('err_confirm_password').style.display = 'block';
+                    isValid = false;
+                } else { document.getElementById('err_confirm_password').style.display = 'none'; }
+            }
             return isValid;
         }
 
@@ -933,19 +1030,12 @@
             if (!validateStep(currentStep)) return;
 
             if (currentStep < 3) {
-                document.getElementById(`section${currentStep}`).classList.remove('active');
-                document.getElementById(`step${currentStep}-indicator`).classList.add('completed');
                 currentStep++;
+                document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
                 document.getElementById(`section${currentStep}`).classList.add('active');
-                document.getElementById(`step${currentStep}-indicator`).classList.add('active');
-                
+                syncProgressUI();
                 const lang = localStorage.getItem('selectedLanguage') || 'en';
-                if (currentStep === 3) {
-                    updateSummary();
-                    document.getElementById('nextBtn').innerText = translations[lang].registerPatientBtn;
-                } else {
-                    document.getElementById('nextBtn').innerText = translations[lang].continueBtn;
-                }
+                document.getElementById('nextBtn').innerText = currentStep === 3 ? translations[lang].registerPatientBtn : translations[lang].continueBtn;
                 updateBtnVisibility();
             } else {
                 showSuccess();
@@ -954,12 +1044,10 @@
 
         function prevStep() {
             if (currentStep > 1) {
-                document.getElementById(`section${currentStep}`).classList.remove('active');
-                document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
                 currentStep--;
+                document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
                 document.getElementById(`section${currentStep}`).classList.add('active');
-                document.getElementById(`step${currentStep+1}-indicator`).classList.remove('completed');
-                
+                syncProgressUI();
                 const lang = localStorage.getItem('selectedLanguage') || 'en';
                 document.getElementById('nextBtn').innerText = translations[lang].continueBtn;
                 updateBtnVisibility();
@@ -967,19 +1055,12 @@
         }
 
         function goToStep(step) {
-            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.step').forEach((s, idx) => {
-                if (idx + 1 > step) s.classList.remove('active', 'completed');
-            });
             currentStep = step;
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             document.getElementById(`section${step}`).classList.add('active');
-            
+            syncProgressUI();
             const lang = localStorage.getItem('selectedLanguage') || 'en';
-            if (currentStep === 3) {
-                document.getElementById('nextBtn').innerText = translations[lang].registerPatientBtn;
-            } else {
-                document.getElementById('nextBtn').innerText = translations[lang].continueBtn;
-            }
+            document.getElementById('nextBtn').innerText = currentStep === 3 ? translations[lang].registerPatientBtn : translations[lang].continueBtn;
             updateBtnVisibility();
         }
 
