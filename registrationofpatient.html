@@ -997,6 +997,16 @@
                 .toUpperCase();
             const randomID = "AC-" + new Date().getFullYear() + "-" + Math.floor(1000 + Math.random() * 9000);
 
+            localStorage.setItem('patientProfile', JSON.stringify({
+                name: formattedName || 'PATIENT',
+                id: randomID,
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                village: document.getElementById('village').value,
+                district: document.getElementById('district').value,
+                language: localStorage.getItem('selectedLanguage') || 'en'
+            }));
+
             document.getElementById('final_name').innerText = formattedName || 'PATIENT';
             document.getElementById('final_id').innerText = randomID;
             document.getElementById('successModal').style.display = 'grid';
