@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect – Smart Symptom Checker</title>
+    <style>
+        /* 
+        ==================================================
+        1. CSS VARIABLES & BASE STYLES
+        ==================================================
+        */
+        :root {
+            --primary-indigo: #1e2a5a;
+            --primary-teal: #0f766e;
+            --secondary-teal: #14b8a6;
+            --light-aqua: #cffafe;
+            --bg-color: #f5f8fb;
+            --white: #ffffff;
+            --dark-text: #172033;
+            --secondary-text: #64748b;
+            --border-color: #e2e8f0;
+            --warning: #f59e0b;
+            --emergency: #dc2626;
+            --success: #16a34a;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--dark-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 
+        ==================================================
+        2. LOW CONNECTIVITY MODE OVERRIDES
+        ==================================================
+        */
+        body.low-bandwidth {
+            --shadow: none;
+            background-color: #fff;
+        }
+
+        body.low-bandwidth .hero-visual,
+        body.low-bandwidth .decorative,
+        body.low-bandwidth .animation-container {
+            display: none !important;
+        }
+
+        body.low-bandwidth * {
+            animation: none !important;
+            transition: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+
+        /* 
+        ==================================================
+        3. HEADER & NAVIGATION
+        ==================================================
+        */
+        .top-strip {
+            background-color: var(--primary-indigo);
+            color: var(--white);
+            padding: 8px 5%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.4rem;
+            color: var(--primary-indigo);
+            line-height: 1;
+        }
+
+        .logo-text span {
+            font-size: 0.8rem;
+            color: var(--primary-teal);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--secondary-text);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary-teal);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        select.lang-selector {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            cursor: pointer;
+        }
+
+        /* 
+        ==================================================
+        4. HERO SECTION
+        ==================================================
+        */
+        .hero {
+            padding: 60px 5%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 40px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+        }
+
+        .hero-content .badge {
+            display: inline-block;
+            background: var(--light-aqua);
+            color: var(--primary-teal);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            margin-bottom: 15px;
+        }
+
+        .hero-content h2 {
+            font-size: 3rem;
+            color: var(--primary-indigo);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--secondary-text);
+            margin-bottom: 25px;
+            max-width: 550px;
+        }
+
+        .disclaimer-small {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+            font-style: italic;
+            border-left: 3px solid var(--warning);
+            padding-left: 10px;
+        }
+
+        .hero-visual svg {
+            width: 100%;
+            height: auto;
+            max-width: 500px;
+        }
+
+        /* 
+        ==================================================
+        5. ACCESSIBILITY NOTICE
+        ==================================================
+        */
+        .access-bar {
+            background: var(--white);
+            margin: -30px 5% 40px;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+            border: 1px solid var(--border-color);
+        }
+
+        .access-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .access-item {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--primary-teal);
+            font-weight: 500;
+        }
+
+        .bandwidth-toggle {
+            background: var(--light-aqua);
+            color: var(--primary-indigo);
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 
+        ==================================================
+        6. SYMPTOM CHECKER WIZARD
+        ==================================================
+        */
+        .wizard-container {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .wizard-header {
+            padding: 30px;
+            background: var(--primary-indigo);
+            color: var(--white);
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            z-index: 1;
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-indigo);
+            border: 2px solid rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step.active {
+            background: var(--secondary-teal);
+            border-color: var(--secondary-teal);
+        }
+
+        .step.completed {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .progress-bar-container {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-teal);
+            width: 25%;
+            transition: width 0.5s ease;
+        }
+
+        .wizard-body {
+            padding: 40px;
+            min-height: 450px;
+        }
+
+        .wizard-step-content {
+            display: none;
+        }
+
+        .wizard-step-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 
+        ==================================================
+        7. SYMPTOM SELECTION (STEP 1)
+        ==================================================
+        */
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border-radius: 30px;
+            border: 2px solid var(--border-color);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-teal);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-text);
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-color);
+        }
+
+        .common-symptoms {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .symptom-card {
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #fff;
+        }
+
+        .symptom-card:hover {
+            border-color: var(--primary-teal);
+            background: var(--light-aqua);
+        }
+
+        .symptom-card.selected {
+            background: var(--primary-teal);
+            color: var(--white);
+            border-color: var(--primary-teal);
+        }
+
+        .symptom-card i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .selected-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            min-height: 40px;
+            padding: 10px;
+            background: var(--bg-color);
+            border-radius: 8px;
+        }
+
+        .chip {
+            background: var(--primary-indigo);
+            color: var(--white);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chip span {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* 
+        ==================================================
+        8. PATIENT DETAILS (STEP 2)
+        ==================================================
+        */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .radio-btn {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .radio-btn.active {
+            background: var(--primary-teal);
+            color: #fff;
+            border-color: var(--primary-teal);
+        }
+
+        /* 
+        ==================================================
+        9. TRIAGE & RESULTS (STEP 3 & 4)
+        ==================================================
+        */
+        .emergency-banner {
+            background: #fef2f2;
+            border: 2px solid var(--emergency);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .emergency-banner h3 {
+            color: var(--emergency);
+            margin-bottom: 10px;
+        }
+
+        .emergency-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .urgency-meter {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .meter-track {
+            height: 12px;
+            background: #eee;
+            border-radius: 6px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .meter-segments {
+            display: flex;
+            height: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .segment { flex: 1; }
+        .seg-low { background: var(--success); }
+        .seg-mod { background: var(--warning); }
+        .seg-high { background: #ea580c; }
+        .seg-em { background: var(--emergency); }
+
+        .meter-pointer {
+            position: absolute;
+            top: -10px;
+            width: 4px;
+            height: 32px;
+            background: var(--primary-indigo);
+            left: 25%;
+            transition: left 1s ease;
+        }
+
+        .pathway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .pathway-card {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: var(--radius);
+            border-left: 5px solid var(--primary-teal);
+        }
+
+        .pathway-card h4 {
+            color: var(--primary-indigo);
+            margin-bottom: 10px;
+        }
+
+        .explanation-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .explanation-card .freq {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* 
+        ==================================================
+        10. FOOTER
+        ==================================================
+        */
+        footer {
+            background: var(--primary-indigo);
+            color: var(--white);
+            padding: 60px 5% 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            margin-bottom: 20px;
+            color: var(--secondary-teal);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* 
+        ==================================================
+        11. UTILITIES
+        ==================================================
+        */
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .btn-main {
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .btn-primary { background: var(--primary-teal); color: var(--white); }
+        .btn-primary:hover { background: var(--secondary-teal); transform: translateY(-2px); }
+        .btn-secondary { background: var(--border-color); color: var(--dark-text); }
+        .btn-emergency { background: var(--emergency); color: var(--white); }
+
+        .btn-outline {
+            border: 2px solid var(--primary-teal);
+            background: transparent;
+            color: var(--primary-teal);
+        }
+
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+
+        /* Timeline styles */
+        .timeline {
+            margin: 20px 0;
+            padding-left: 20px;
+            border-left: 2px solid var(--primary-teal);
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            background: var(--white);
+            border: 2px solid var(--primary-teal);
+            border-radius: 50%;
+        }
+
+        /* 
+        ==================================================
+        12. RESPONSIVE
+        ==================================================
+        */
+        @media (max-width: 768px) {
+            .hero { grid-template-columns: 1fr; text-align: center; }
+            .hero-content p { margin: 0 auto 25px; }
+            header { flex-direction: column; gap: 15px; }
+            nav ul { gap: 10px; font-size: 0.8rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .wizard-body { padding: 20px; }
+            .stepper { display: none; } /* Hide on mobile to save space */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP INFORMATION STRIP -->
+    <div class="top-strip">
+        <div data-i18n="top-gateway">AarogyaConnect | Digital Healthcare Gateway</div>
+        <div class="nav-right">
+            <span data-i18n="emergency-108">Emergency: 108</span>
+            <span data-i18n="help">Help</span>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <div class="logo-text">
+                <h1>AarogyaConnect</h1>
+                <span data-i18n="healthcare-gateway">Healthcare Gateway</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" data-i18n="nav-home">Home</a></li>
+                <li><a href="#" class="active" data-i18n="nav-symptom">Symptom Checker</a></li>
+                <li><a href="#" data-i18n="nav-doctor">Find Doctor</a></li>
+                <li><a href="#" data-i18n="nav-apt">Appointments</a></li>
+                <li><a href="#" data-i18n="nav-records">Health Records</a></li>
+                <li><a href="#" data-i18n="nav-referrals">Referrals</a></li>
+            </ul>
+        </nav>
+        <div class="nav-right">
+            <select class="lang-selector" id="languageSelect">
+                <option value="en">English</option>
+                <option value="hi">हिंदी</option>
+                <option value="te">తెలుగు</option>
+                <option value="mr">मराठी</option>
+            </select>
+            <button class="btn-main btn-secondary" style="padding: 8px 15px; font-size: 0.8rem;" data-i18n="profile">Profile</button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge" data-i18n="digital-triage">DIGITAL HEALTH TRIAGE</div>
+            <h2 data-i18n="hero-h1">Check Your Symptoms</h2>
+            <p data-i18n="hero-sub">Understand your symptoms, identify the appropriate level of care, and find the right next step — even when specialist healthcare is far away.</p>
+            <div class="disclaimer-small" data-i18n="hero-disclaimer">
+                This tool provides general health guidance and does not replace a medical diagnosis.
+            </div>
+        </div>
+        <div class="hero-visual">
+            <!-- INLINE SVG CONCEPT -->
+            <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="200" rx="20" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+                <circle cx="100" cy="100" r="20" fill="#cffafe"/>
+                <path d="M90 100h20M100 90v20" stroke="#0f766e" stroke-width="3"/>
+                <rect x="140" y="90" width="180" height="10" rx="5" fill="#e2e8f0"/>
+                <rect x="140" y="110" width="120" height="10" rx="5" fill="#e2e8f0"/>
+                <circle cx="200" cy="200" r="40" fill="#1e2a5a"/>
+                <path d="M190 200l7 7 13-13" stroke="#14b8a6" stroke-width="4" fill="none"/>
+                <path d="M120 100c40 0 40 100 80 100" stroke="#14b8a6" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ACCESSIBILITY BAR -->
+    <div class="access-bar">
+        <div class="access-info">
+            <div class="access-item">✓ <span data-i18n="acc-simple">Simple language</span></div>
+            <div class="access-item">✓ <span data-i18n="acc-multi">Multilingual support</span></div>
+            <div class="access-item">✓ <span data-i18n="acc-low">Low-bandwidth friendly</span></div>
+            <div class="access-item">✓ <span data-i18n="acc-rural">Designed for rural communities</span></div>
+        </div>
+        <button class="bandwidth-toggle" id="bandwidthToggle">
+            <span id="bandwidthLabel" data-i18n="acc-low-mode">Low-bandwidth mode available</span>
+        </button>
+    </div>
+
+    <!-- MAIN WIZARD -->
+    <main class="wizard-container">
+        <div class="wizard-header">
+            <div class="stepper">
+                <div class="step active" id="stepIndicator-1">1</div>
+                <div class="step" id="stepIndicator-2">2</div>
+                <div class="step" id="stepIndicator-3">3</div>
+                <div class="step" id="stepIndicator-4">4</div>
+            </div>
+            <h3 id="wizardTitle" data-i18n="step1-title">Tell us about your symptoms</h3>
+            <div class="progress-bar-container mt-20">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="wizard-body">
+            
+            <!-- STEP 1: SYMPTOM SELECTION -->
+            <div class="wizard-step-content active" id="step-1">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="symptomSearch" placeholder="Search or describe your symptom..." data-i18n-placeholder="search-ph">
+                    <div class="search-icon">🔍</div>
+                    <div class="suggestions" id="searchSuggestions"></div>
+                </div>
+
+                <h4 class="mb-20" data-i18n="common-symp">Common Symptoms</h4>
+                <div class="common-symptoms" id="commonSymptomsGrid">
+                    <!-- Dynamic -->
+                </div>
+
+                <h4 class="mb-20" data-i18n="selected-symp">Your Selected Symptoms</h4>
+                <div class="selected-chips" id="selectedChipsContainer">
+                    <span data-i18n="no-symp">No symptoms selected yet.</span>
+                </div>
+                <button class="btn-main btn-secondary" style="padding: 5px 15px; font-size: 0.75rem;" id="clearAllBtn" data-i18n="clear-all">Clear all</button>
+
+                <div class="btn-container">
+                    <div></div>
+                    <button class="btn-main btn-primary" id="nextBtn-1" data-i18n="continue">Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: PATIENT DETAILS -->
+            <div class="wizard-step-content" id="step-2">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label data-i18n="label-age">Age</label>
+                        <input type="number" class="form-control" id="patientAge" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="label-sex">Sex</label>
+                        <div class="radio-group" id="sexGroup">
+                            <div class="radio-btn" data-value="male" data-i18n="male">Male</div>
+                            <div class="radio-btn" data-value="female" data-i18n="female">Female</div>
+                            <div class="radio-btn" data-value="other" data-i18n="other">Other</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="label-dur">Symptom duration</label>
+                        <select class="form-control" id="duration">
+                            <option value="1" data-i18n="dur-1">Less than 1 day</option>
+                            <option value="3" data-i18n="dur-3">1–3 days</option>
+                            <option value="7" data-i18n="dur-7">4–7 days</option>
+                            <option value="14" data-i18n="dur-14">More than 1 week</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="label-sev">Severity</label>
+                        <div class="radio-group" id="severityGroup">
+                            <div class="radio-btn" data-value="mild" data-i18n="sev-mild">Mild</div>
+                            <div class="radio-btn" data-value="moderate" data-i18n="sev-mod">Moderate</div>
+                            <div class="radio-btn" data-value="severe" data-i18n="sev-sev">Severe</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="near-facility">Are you currently near a healthcare facility?</label>
+                    <div class="radio-group" id="locationGroup">
+                        <div class="radio-btn" data-value="yes" data-i18n="yes">Yes, nearby</div>
+                        <div class="radio-btn" data-value="no" data-i18n="no">No, far away</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="internet">How is your internet connection?</label>
+                    <div class="radio-group" id="internetGroup">
+                        <div class="radio-btn" data-value="good" data-i18n="int-good">Good</div>
+                        <div class="radio-btn" data-value="limited" data-i18n="int-lim">Limited</div>
+                    </div>
+                </div>
+
+                <div id="dynamicQuestions" class="mt-20">
+                    <!-- Dynamic Questions Based on Symptoms -->
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn-main btn-secondary" id="backBtn-2" data-i18n="back">Back</button>
+                    <button class="btn-main btn-primary" id="nextBtn-2" data-i18n="analyze">Analyze Symptoms</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: TRIAGE ANALYSIS (ANIMATION) -->
+            <div class="wizard-step-content" id="step-3">
+                <div class="text-center animation-container">
+                    <div id="analysisLoader">
+                        <h3 class="mb-20" data-i18n="reviewing">Reviewing your responses...</h3>
+                        <div class="timeline" style="max-width: 400px; margin: 0 auto; text-align: left;">
+                            <div class="timeline-item" id="task-1">✓ <span data-i18n="task1">Checking symptom patterns</span></div>
+                            <div class="timeline-item" id="task-2" style="opacity: 0.3">✓ <span data-i18n="task2">Assessing urgency</span></div>
+                            <div class="timeline-item" id="task-3" style="opacity: 0.3">✓ <span data-i18n="task3">Identifying care pathway</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: GUIDANCE & RESULTS -->
+            <div class="wizard-step-content" id="step-4">
+                <!-- EMERGENCY BANNER -->
+                <div class="emergency-banner" id="emergencyBanner">
+                    <h3 data-i18n="em-title">Emergency Medical Attention May Be Required</h3>
+                    <p data-i18n="em-desc">Your responses indicate symptoms that may require urgent medical attention. Do not rely on this symptom checker for emergency care.</p>
+                    <div class="emergency-actions">
+                        <a href="tel:108" class="btn-main btn-emergency" style="text-decoration: none;" data-i18n="call-108">Call 108</a>
+                        <button class="btn-main btn-outline" data-i18n="find-em">Find Nearest Emergency Facility</button>
+                    </div>
+                </div>
+
+                <div id="normalResults">
+                    <div class="urgency-meter">
+                        <h4 data-i18n="care-urgency">Care Urgency</h4>
+                        <h2 id="urgencyText">MODERATE</h2>
+                        <div class="meter-track">
+                            <div class="meter-segments">
+                                <div class="segment seg-low"></div>
+                                <div class="segment seg-mod"></div>
+                                <div class="segment seg-high"></div>
+                                <div class="segment seg-em"></div>
+                            </div>
+                            <div class="meter-pointer" id="meterPointer"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: bold;">
+                            <span data-i18n="low">LOW</span>
+                            <span data-i18n="mod">MODERATE</span>
+                            <span data-i18n="high">HIGH</span>
+                            <span data-i18n="emergency">EMERGENCY</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div>
+                            <h4 class="mb-20" data-i18n="possible-exp">Possible Explanations</h4>
+                            <div id="explanationsList">
+                                <!-- Dynamic -->
+                            </div>
+                            <p class="disclaimer-small mt-20" data-i18n="result-disclaimer">Only a qualified healthcare professional can determine the cause.</p>
+                        </div>
+                        <div>
+                            <h4 class="mb-20" data-i18n="care-path">Recommended Care Path</h4>
+                            <div class="pathway-grid" id="carePathway">
+                                <!-- Dynamic -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-20">
+                        <div class="pathway-card mb-20" id="teleCard">
+                            <h4 data-i18n="tele-title">Specialist unavailable nearby?</h4>
+                            <p data-i18n="tele-desc">You may be able to consult a healthcare professional remotely instead of travelling long distances.</p>
+                            <div class="mt-20">
+                                <button class="btn-main btn-primary" data-i18n="start-tele">Start Teleconsultation</button>
+                                <span style="font-size: 0.8rem; margin-left: 10px; color: var(--success);">● <span data-i18n="doc-avail">Doctors available (~15 min)</span></span>
+                            </div>
+                        </div>
+
+                        <div class="pathway-card" id="referralCard">
+                            <h4 data-i18n="ref-guidance">Referral Guidance</h4>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                                <div>
+                                    <span data-i18n="current-fac">Current Facility:</span> <strong data-i18n="phc">Primary Health Centre</strong><br>
+                                    <span data-i18n="rec-fac">Recommended:</span> <strong data-i18n="dist-hosp">District Hospital</strong>
+                                </div>
+                                <div class="text-center">
+                                    <span class="freq" style="background: var(--light-aqua); color: var(--primary-teal);" data-i18n="ref-ready">Digital Referral Ready</span><br>
+                                    <button class="btn-main btn-secondary mt-20" style="padding: 5px 10px; font-size: 0.7rem;" data-i18n="track-ref">Track Referral</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn-main btn-secondary" id="startAgainBtn" data-i18n="start-again">Start Again</button>
+                    <div>
+                        <button class="btn-main btn-outline" id="downloadBtn" data-i18n="download">Download Summary</button>
+                        <button class="btn-main btn-primary" id="printBtn" data-i18n="print">Print Summary</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- HEALTH JOURNEY PREVIEW -->
+    <section style="max-width: 900px; margin: 0 auto 60px; padding: 0 20px;">
+        <h3 class="mb-20" data-i18n="health-journey">Your Health Journey</h3>
+        <div class="pathway-card" style="background: var(--white);">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong data-i18n="journey-today">Today</strong><br>
+                    <span data-i18n="journey-symp">Symptom Check Completed</span>
+                </div>
+                <div class="timeline-item" style="opacity: 0.6">
+                    <strong data-i18n="journey-prev">Previous Visit</strong><br>
+                    <span data-i18n="journey-phc">PHC Consultation</span>
+                </div>
+                <div class="timeline-item" style="opacity: 0.6">
+                    <strong data-i18n="journey-ref">Referral</strong><br>
+                    <span data-i18n="journey-dist">District Hospital</span>
+                </div>
+            </div>
+            <button class="btn-main btn-outline" style="font-size: 0.8rem; padding: 8px 15px;" data-i18n="view-records">View Health Records</button>
+        </div>
+    </section>
+
+    <!-- FIND FACILITY CTA -->
+    <section style="background: var(--primary-indigo); color: white; padding: 60px 5%; text-align: center;">
+        <h2 class="mb-20" data-i18n="need-nearby">Need healthcare nearby?</h2>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn-main btn-primary" data-i18n="find-phc">Find Nearest PHC</button>
+            <button class="btn-main btn-primary" data-i18n="find-hosp">Find Hospital</button>
+            <button class="btn-main btn-primary" data-i18n="find-doc">Find Doctor</button>
+        </div>
+        <div class="pathway-grid mt-20" style="max-width: 800px; margin-left: auto; margin-right: auto; text-align: left;">
+            <div class="pathway-card" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                <h4 style="color: var(--secondary-teal)">Primary Health Centre</h4>
+                <p>2.4 km • <span data-i18n="open">Open Now</span></p>
+            </div>
+            <div class="pathway-card" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                <h4 style="color: var(--secondary-teal)">District Hospital</h4>
+                <p>24 km • <span data-i18n="open">Open Now</span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4 data-i18n="footer-brand">AarogyaConnect</h4>
+                <p style="font-size: 0.8rem; opacity: 0.7;" data-i18n="footer-desc">Digital Healthcare Gateway for rural and underserved communities.</p>
+            </div>
+            <div class="footer-col">
+                <h4 data-i18n="f-services">Services</h4>
+                <ul>
+                    <li><a href="#" data-i18n="nav-symptom">Symptom Checker</a></li>
+                    <li><a href="#" data-i18n="nav-doctor">Find Doctor</a></li>
+                    <li><a href="#" data-i18n="nav-apt">Appointments</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 data-i18n="f-support">Support</h4>
+                <ul>
+                    <li><a href="#" data-i18n="help">Help Center</a></li>
+                    <li><a href="#" data-i18n="privacy">Privacy Policy</a></li>
+                    <li><a href="#" data-i18n="terms">Terms of Use</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 data-i18n="emergency-108">Emergency: 108</h4>
+                <p style="font-size: 0.8rem; opacity: 0.7;" data-i18n="footer-disclaimer">For informational and healthcare-navigation purposes only.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2024 AarogyaConnect. Smart India Hackathon Prototype.</div>
+            <div data-i18n="demo-logic">Demonstration triage logic — not a clinical diagnostic system.</div>
+        </div>
+    </footer>
+
+    <script>
+        /* 
+        ==================================================
+        13. JAVASCRIPT: LANGUAGE SYSTEM
+        ==================================================
+        */
+        const translations = {
+            en: {
+                "top-gateway": "AarogyaConnect | Digital Healthcare Gateway",
+                "emergency-108": "Emergency: 108",
+                "help": "Help",
+                "healthcare-gateway": "Healthcare Gateway",
+                "nav-home": "Home",
+                "nav-symptom": "Symptom Checker",
+                "nav-doctor": "Find Doctor",
+                "nav-apt": "Appointments",
+                "nav-records": "Health Records",
+                "nav-referrals": "Referrals",
+                "profile": "Profile",
+                "digital-triage": "DIGITAL HEALTH TRIAGE",
+                "hero-h1": "Check Your Symptoms",
+                "hero-sub": "Understand your symptoms, identify the appropriate level of care, and find the right next step — even when specialist healthcare is far away.",
+                "hero-disclaimer": "This tool provides general health guidance and does not replace a medical diagnosis.",
+                "acc-simple": "Simple language",
+                "acc-multi": "Multilingual support",
+                "acc-low": "Low-bandwidth friendly",
+                "acc-rural": "Designed for rural communities",
+                "acc-low-mode": "Low-bandwidth mode available",
+                "step1-title": "Tell us about your symptoms",
+                "step2-title": "Tell us a little more",
+                "step3-title": "Digital Triage",
+                "step4-title": "Your Care Guidance",
+                "search-ph": "Search or describe your symptom...",
+                "common-symp": "Common Symptoms",
+                "selected-symp": "Your Selected Symptoms",
+                "no-symp": "No symptoms selected yet.",
+                "clear-all": "Clear all",
+                "continue": "Continue",
+                "label-age": "Age",
+                "label-sex": "Sex",
+                "male": "Male",
+                "female": "Female",
+                "other": "Other",
+                "label-dur": "Symptom duration",
+                "dur-1": "Less than 1 day",
+                "dur-3": "1–3 days",
+                "dur-7": "4–7 days",
+                "dur-14": "More than 1 week",
+                "label-sev": "Severity",
+                "sev-mild": "Mild",
+                "sev-mod": "Moderate",
+                "sev-sev": "Severe",
+                "near-facility": "Are you currently near a healthcare facility?",
+                "yes": "Yes, nearby",
+                "no": "No, far away",
+                "internet": "How is your internet connection?",
+                "int-good": "Good",
+                "int-lim": "Limited",
+                "back": "Back",
+                "analyze": "Analyze Symptoms",
+                "reviewing": "Reviewing your responses...",
+                "task1": "Checking symptom patterns",
+                "task2": "Assessing urgency",
+                "task3": "Identifying care pathway",
+                "em-title": "Emergency Medical Attention May Be Required",
+                "em-desc": "Your responses indicate symptoms that may require urgent medical attention. Do not rely on this symptom checker for emergency care.",
+                "call-108": "Call 108",
+                "find-em": "Find Nearest Emergency Facility",
+                "care-urgency": "Care Urgency",
+                "low": "LOW",
+                "mod": "MODERATE",
+                "high": "HIGH",
+                "emergency": "EMERGENCY",
+                "possible-exp": "Possible Explanations",
+                "result-disclaimer": "Only a qualified healthcare professional can determine the cause.",
+                "care-path": "Recommended Care Path",
+                "tele-title": "Specialist unavailable nearby?",
+                "tele-desc": "You may be able to consult a healthcare professional remotely instead of travelling long distances.",
+                "start-tele": "Start Teleconsultation",
+                "doc-avail": "Doctors available (~15 min)",
+                "ref-guidance": "Referral Guidance",
+                "current-fac": "Current Facility:",
+                "rec-fac": "Recommended:",
+                "phc": "Primary Health Centre",
+                "dist-hosp": "District Hospital",
+                "ref-ready": "Digital Referral Ready",
+                "track-ref": "Track Referral",
+                "start-again": "Start Again",
+                "download": "Download Summary",
+                "print": "Print Summary",
+                "health-journey": "Your Health Journey",
+                "journey-today": "Today",
+                "journey-symp": "Symptom Check Completed",
+                "journey-prev": "Previous Visit",
+                "journey-phc": "PHC Consultation",
+                "journey-ref": "Referral",
+                "journey-dist": "District Hospital",
+                "view-records": "View Health Records",
+                "need-nearby": "Need healthcare nearby?",
+                "find-phc": "Find Nearest PHC",
+                "find-hosp": "Find Hospital",
+                "find-doc": "Find Doctor",
+                "open": "Open Now",
+                "footer-brand": "AarogyaConnect",
+                "footer-desc": "Digital Healthcare Gateway for rural and underserved communities.",
+                "f-services": "Services",
+                "f-support": "Support",
+                "privacy": "Privacy Policy",
+                "terms": "Terms of Use",
+                "footer-disclaimer": "For informational and healthcare-navigation purposes only.",
+                "demo-logic": "Demonstration triage logic — not a clinical diagnostic system.",
+                "q-chills": "Do you have chills?",
+                "q-breath": "Are you experiencing difficulty breathing?",
+                "q-stomach-loc": "Where is the pain located?",
+                "q-chest-start": "When did the pain start?",
+                "q-faint": "Have you fainted or nearly fainted?"
+            },
+            hi: {
+                "top-gateway": "आरोग्यकनेक्ट | डिजिटल स्वास्थ्य गेटवे",
+                "emergency-108": "आपातकालीन: 108",
+                "help": "सहायता",
+                "healthcare-gateway": "स्वास्थ्य गेटवे",
+                "nav-home": "होम",
+                "nav-symptom": "लक्षण जांच",
+                "nav-doctor": "डॉक्टर खोजें",
+                "nav-apt": "अपॉइंटमेंट",
+                "nav-records": "स्वास्थ्य रिकॉर्ड",
+                "nav-referrals": "रेफरल",
+                "profile": "प्रोफ़ाइल",
+                "digital-triage": "डिजिटल स्वास्थ्य ट्राइएज",
+                "hero-h1": "अपने लक्षणों की जांच करें",
+                "hero-sub": "अपने लक्षणों को समझें, देखभाल के उचित स्तर की पहचान करें और सही अगला कदम उठाएं - तब भी जब विशेषज्ञ स्वास्थ्य सेवा दूर हो।",
+                "hero-disclaimer": "यह उपकरण सामान्य स्वास्थ्य मार्गदर्शन प्रदान करता है और चिकित्सा निदान का विकल्प नहीं है।",
+                "acc-simple": "सरल भाषा",
+                "acc-multi": "बहुभाषी समर्थन",
+                "acc-low": "कम बैंडविड्थ अनुकूल",
+                "acc-rural": "ग्रामीण समुदायों के लिए डिज़ाइन किया गया",
+                "acc-low-mode": "कम बैंडविड्थ मोड उपलब्ध है",
+                "step1-title": "हमें अपने लक्षणों के बारे में बताएं",
+                "step2-title": "हमें थोड़ा और बताएं",
+                "step3-title": "डिजिटल ट्राइएज",
+                "step4-title": "आपका देखभाल मार्गदर्शन",
+                "search-ph": "अपने लक्षण को खोजें या वर्णन करें...",
+                "common-symp": "सामान्य लक्षण",
+                "selected-symp": "आपके चयनित लक्षण",
+                "no-symp": "अभी तक कोई लक्षण नहीं चुना गया।",
+                "clear-all": "सभी साफ़ करें",
+                "continue": "जारी रखें",
+                "label-age": "आयु",
+                "label-sex": "लिंग",
+                "male": "पुरुष",
+                "female": "महिला",
+                "other": "अन्य",
+                "label-dur": "लक्षणों की अवधि",
+                "dur-1": "1 दिन से कम",
+                "dur-3": "1–3 दिन",
+                "dur-7": "4–7 दिन",
+                "dur-14": "1 सप्ताह से अधिक",
+                "label-sev": "गंभीरता",
+                "sev-mild": "हल्का",
+                "sev-mod": "मध्यम",
+                "sev-sev": "गंभीर",
+                "near-facility": "क्या आप वर्तमान में किसी स्वास्थ्य सुविधा के पास हैं?",
+                "yes": "हाँ, पास में",
+                "no": "नहीं, दूर",
+                "internet": "आपका इंटरनेट कनेक्शन कैसा है?",
+                "int-good": "अच्छा",
+                "int-lim": "सीमित",
+                "back": "पीछे",
+                "analyze": "लक्षणों का विश्लेषण करें",
+                "reviewing": "आपकी प्रतिक्रियाओं की समीक्षा की जा रही है...",
+                "task1": "लक्षण पैटर्न की जाँच",
+                "task2": "तत्परता का आकलन",
+                "task3": "देखभाल पथ की पहचान",
+                "em-title": "आपातकालीन चिकित्सा ध्यान आवश्यक हो सकता है",
+                "em-desc": "आपकी प्रतिक्रियाएं उन लक्षणों की ओर इशारा करती हैं जिनके लिए तत्काल चिकित्सा ध्यान देने की आवश्यकता हो सकती है।",
+                "call-108": "108 पर कॉल करें",
+                "find-em": "निकटतम आपातकालीन सुविधा खोजें",
+                "care-urgency": "देखभाल की तत्परता",
+                "low": "कम",
+                "mod": "मध्यम",
+                "high": "उच्च",
+                "emergency": "आपातकालीन",
+                "possible-exp": "संभावित स्पष्टीकरण",
+                "result-disclaimer": "केवल एक योग्य स्वास्थ्य देखभाल पेशेवर ही कारण निर्धारित कर सकता है।",
+                "care-path": "अनुशंसित देखभाल पथ",
+                "tele-title": "पास में विशेषज्ञ उपलब्ध नहीं है?",
+                "tele-desc": "आप लंबी दूरी की यात्रा करने के बजाय दूर से स्वास्थ्य देखभाल पेशेवर से परामर्श कर सकते हैं।",
+                "start-tele": "टेली-परामर्श शुरू करें",
+                "doc-avail": "डॉक्टर उपलब्ध हैं (~15 मिनट)",
+                "ref-guidance": "रेफरल मार्गदर्शन",
+                "current-fac": "वर्तमान सुविधा:",
+                "rec-fac": "अनुशंसित:",
+                "phc": "प्राथमिक स्वास्थ्य केंद्र",
+                "dist-hosp": "जिला अस्पताल",
+                "ref-ready": "डिजिटल रेफरल तैयार",
+                "track-ref": "रेफरल ट्रैक करें",
+                "start-again": "फिर से शुरू करें",
+                "download": "सारांश डाउनलोड करें",
+                "print": "सारांश प्रिंट करें",
+                "health-journey": "आपकी स्वास्थ्य यात्रा",
+                "journey-today": "आज",
+                "journey-symp": "लक्षण जांच पूरी हुई",
+                "journey-prev": "पिछली यात्रा",
+                "journey-phc": "प्राथमिक स्वास्थ्य केंद्र परामर्श",
+                "journey-ref": "रेफरल",
+                "journey-dist": "जिला अस्पताल",
+                "view-records": "स्वास्थ्य रिकॉर्ड देखें",
+                "need-nearby": "पास में स्वास्थ्य सेवा चाहिए?",
+                "find-phc": "निकटतम PHC खोजें",
+                "find-hosp": "अस्पताल खोजें",
+                "find-doc": "डॉक्टर खोजें",
+                "open": "अभी खुला है",
+                "footer-brand": "आरोग्यकनेक्ट",
+                "footer-desc": "ग्रामीण और वंचित समुदायों के लिए डिजिटल स्वास्थ्य गेटवे।",
+                "f-services": "सेवाएं",
+                "f-support": "सहायता",
+                "privacy": "गोपनीयता नीति",
+                "terms": "उपयोग की शर्तें",
+                "footer-disclaimer": "केवल सूचनात्मक और स्वास्थ्य सेवा-नेविगेशन उद्देश्यों के लिए।",
+                "demo-logic": "प्रदर्शन ट्राइएज लॉजिक - नैदानिक निदान प्रणाली नहीं।",
+                "q-chills": "क्या आपको ठंड लग रही है?",
+                "q-breath": "क्या आपको सांस लेने में कठिनाई हो रही है?",
+                "q-stomach-loc": "दर्द कहाँ स्थित है?",
+                "q-chest-start": "दर्द कब शुरू हुआ?",
+                "q-faint": "क्या आप बेहोश हुए हैं या लगभग बेहोश हुए हैं?"
+            },
+            te: {
+              "top-gateway": "ఆరోగ్య కనెక్ట్ | డిజిటల్ హెల్త్ కేర్ గేట్‌వే",
+              "emergency-108": "అత్యవసర: 108",
+              "help": "సహాయం",
+              "healthcare-gateway": "హెల్త్ కేర్ గేట్‌వే",
+              "nav-home": "హోమ్",
+              "nav-symptom": "లక్షణాల తనిఖీ",
+              "nav-doctor": "వైద్యుడిని వెతకండి",
+              "nav-apt": "అపాయింట్‌మెంట్‌లు",
+              "nav-records": "ఆరోగ్య రికార్డులు",
+              "nav-referrals": "రిఫరల్స్",
+              "profile": "ప్రొఫైల్",
+              "digital-triage": "డిజిటల్ హెల్త్ ట్రయేజ్",
+              "hero-h1": "మీ లక్షణాలను తనిఖీ చేయండి",
+              "hero-sub": "మీ లక్షణాలను అర్థం చేసుకోండి, తగిన స్థాయి సంరక్షణను గుర్తించండి మరియు సరైన తదుపరి దశను కనుగొనండి.",
+              "hero-disclaimer": "ఈ సాధనం సాధారణ ఆరోగ్య మార్గదర్శకత్వాన్ని అందిస్తుంది మరియు వైద్య నిర్ధారణకు ప్రత్యామ్నాయం కాదు.",
+              "acc-simple": "సరళమైన భాష",
+              "acc-multi": "బహుభాషా మద్దతు",
+              "acc-low": "తక్కువ బ్యాండ్‌విడ్త్ అనుకూలం",
+              "acc-rural": "గ్రామీణ వర్గాల కోసం రూపొందించబడింది",
+              "acc-low-mode": "తక్కువ బ్యాండ్‌విడ్త్ మోడ్ అందుబాటులో ఉంది",
+              "step1-title": "మీ లక్షణాల గురించి మాకు చెప్పండి",
+              "step2-title": "మాకు మరికొంచెం చెప్పండి",
+              "step3-title": "డిజిటల్ ట్రయేజ్",
+              "step4-title": "మీ సంరక్షణ మార్గదర్శకత్వం",
+              "search-ph": "మీ లక్షణాన్ని వెతకండి లేదా వివరించండి...",
+              "common-symp": "సాధారణ లక్షణాలు",
+              "selected-symp": "మీరు ఎంచుకున్న లక్షణాలు",
+              "no-symp": "ఇంకా ఏ లక్షణాలు ఎంచుకోలేదు.",
+              "clear-all": "అన్నీ క్లియర్ చేయండి",
+              "continue": "కొనసాగించండి",
+              "label-age": "వయస్సు",
+              "label-sex": "లింగం",
+              "male": "పురుషుడు",
+              "female": "స్త్రీ",
+              "other": "ఇతర",
+              "label-dur": "లక్షణాల కాల వ్యవధి",
+              "dur-1": "1 రోజు కంటే తక్కువ",
+              "dur-3": "1–3 రోజులు",
+              "dur-7": "4–7 రోజులు",
+              "dur-14": "1 వారం కంటే ఎక్కువ",
+              "label-sev": "తీవ్రత",
+              "sev-mild": "తక్కువ",
+              "sev-mod": "మధ్యస్థం",
+              "sev-sev": "తీవ్రమైన",
+              "near-facility": "మీరు ప్రస్తుతం ఆరోగ్య కేంద్రానికి సమీపంలో ఉన్నారా?",
+              "yes": "అవును, సమీపంలో",
+              "no": "లేదు, దూరంగా",
+              "internet": "మీ ఇంటర్నెట్ కనెక్షన్ ఎలా ఉంది?",
+              "int-good": "బాగుంది",
+              "int-lim": "పరిమితంగా ఉంది",
+              "back": "వెనుకకు",
+              "analyze": "లక్షణాలను విశ్లేషించండి",
+              "reviewing": "మీ సమాధానాలను సమీక్షిస్తున్నాము...",
+              "task1": "లక్షణాల నమూనాలను తనిఖీ చేయడం",
+              "task2": "అత్యవసరతను అంచనా వేయడం",
+              "task3": "సంరక్షణ మార్గాన్ని గుర్తించడం",
+              "em-title": "అత్యవసర వైద్య సహాయం అవసరం కావచ్చు",
+              "em-desc": "మీ సమాధానాలు తక్షణ వైద్య సహాయం అవసరమయ్యే లక్షణాలను సూచిస్తున్నాయి.",
+              "call-108": "108కి కాల్ చేయండి",
+              "find-em": "సమీప అత్యవసర కేంద్రాన్ని కనుగొనండి",
+              "care-urgency": "సంరక్షణ అత్యవసరత",
+              "low": "తక్కువ",
+              "mod": "మధ్యస్థం",
+              "high": "ఎక్కువ",
+              "emergency": "అత్యవసరం",
+              "possible-exp": "సాధ్యమయ్యే కారణాలు",
+              "result-disclaimer": "అర్హత కలిగిన ఆరోగ్య సంరక్షణ నిపుణులు మాత్రమే కారణాన్ని గుర్తించగలరు.",
+              "care-path": "సిఫార్సు చేయబడిన సంరక్షణ మార్గం",
+              "tele-title": "సమీపంలో నిపుణులు అందుబాటులో లేరా?",
+              "tele-desc": "మీరు దూర ప్రయాణం చేయకుండా రిమోట్‌గా ఆరోగ్య నిపుణులను సంప్రదించవచ్చు.",
+              "start-tele": "టెలికన్సల్టేషన్ ప్రారంభించండి",
+              "doc-avail": "వైద్యులు అందుబాటులో ఉన్నారు (~15 నిమిషాలు)",
+              "ref-guidance": "రిఫరల్ మార్గదర్శకత్వం",
+              "current-fac": "ప్రస్తుత కేంద్రం:",
+              "rec-fac": "సిఫార్సు చేయబడినది:",
+              "phc": "ప్రాథమిక ఆరోగ్య కేంద్రం",
+              "dist-hosp": "జిల్లా ఆసుపత్రి",
+              "ref-ready": "డిజిటల్ రిఫరల్ సిద్ధంగా ఉంది",
+              "track-ref": "రిఫరల్‌ను ట్రాక్ చేయండి",
+              "start-again": "మళ్ళీ ప్రారంభించండి",
+              "download": "సారాంశాన్ని డౌన్‌లోడ్ చేయండి",
+              "print": "సారాంశాన్ని ప్రింట్ చేయండి",
+              "health-journey": "మీ ఆరోగ్య ప్రయాణం",
+              "journey-today": "ఈరోజు",
+              "journey-symp": "లక్షణాల తనిఖీ పూర్తయింది",
+              "journey-prev": "మునుపటి సందర్శన",
+              "journey-phc": "PHC సంప్రదింపులు",
+              "journey-ref": "రిఫరల్",
+              "journey-dist": "జిల్లా ఆసుపత్రి",
+              "view-records": "ఆరోగ్య రికార్డులను చూడండి",
+              "need-nearby": "సమీపంలో ఆరోగ్య సంరక్షణ కావాలా?",
+              "find-phc": "సమీప PHCని కనుగొనండి",
+              "find-hosp": "ఆసుపత్రిని కనుగొనండి",
+              "find-doc": "వైద్యుడిని కనుగొనండి",
+              "open": "ప్రస్తుతం తెరిచి ఉంది",
+              "footer-brand": "ఆరోగ్య కనెక్ట్",
+              "footer-desc": "గ్రామీణ ప్రాంతాల కోసం డిజిటల్ హెల్త్ కేర్ గేట్‌వే.",
+              "f-services": "సేవలు",
+              "f-support": "మద్దతు",
+              "privacy": "గోప్యతా విధానం",
+              "terms": "నిబంధనలు",
+              "footer-disclaimer": "సమాచారం మరియు ఆరోగ్య నావిగేషన్ ప్రయోజనాల కోసం మాత్రమే.",
+              "demo-logic": "ప్రదర్శన ట్రయేజ్ లాజిక్ - ఇది క్లినికల్ డయాగ్నస్టిక్ సిస్టమ్ కాదు.",
+              "q-chills": "మీకు చలిగా ఉందా?",
+              "q-breath": "మీరు శ్వాస తీసుకోవడంలో ఇబ్బంది పడుతున్నారా?",
+              "q-stomach-loc": "నొప్పి ఎక్కడ ఉంది?",
+              "q-chest-start": "నొప్పి ఎప్పుడు ప్రారంభమైంది?",
+              "q-faint": "మీరు స్పృహ తప్పి పడిపోయారా?"
+            },
+            mr: {
+              "top-gateway": "आरोग्यकनेक्ट | डिजिटल हेल्थकेअर गेटवे",
+              "emergency-108": "आणीबाणी: 108",
+              "help": "मदत",
+              "healthcare-gateway": "हेल्थकेअर गेटवे",
+              "nav-home": "होम",
+              "nav-symptom": "लक्षण तपासणी",
+              "nav-doctor": "डॉक्टर शोधा",
+              "nav-apt": "अपॉइंटमेंट",
+              "nav-records": "आरोग्य रेकॉर्ड",
+              "nav-referrals": "रेफरल्स",
+              "profile": "प्रोफाइल",
+              "digital-triage": "डिजिटल हेल्थ ट्रायज",
+              "hero-h1": "तुमची लक्षणे तपासा",
+              "hero-sub": "तुमची लक्षणे समजून घ्या, योग्य स्तरावरील काळजी ओळखा आणि योग्य पुढचे पाऊल शोधा.",
+              "hero-disclaimer": "हे साधन सामान्य आरोग्य मार्गदर्शन प्रदान करते आणि वैद्यकीय निदानाची जागा घेत नाही.",
+              "acc-simple": "सोपी भाषा",
+              "acc-multi": "बहुभाषिक समर्थन",
+              "acc-low": "कमी बँडविड्थ अनुकूल",
+              "acc-rural": "ग्रामीण समुदायांसाठी डिझाइन केलेले",
+              "acc-low-mode": "कमी बँडविड्थ मोड उपलब्ध",
+              "step1-title": "आम्हाला तुमच्या लक्षणांबद्दल सांगा",
+              "step2-title": "आम्हाला थोडे अधिक सांगा",
+              "step3-title": "डिजिटल ट्रायज",
+              "step4-title": "तुमचे काळजी मार्गदर्शन",
+              "search-ph": "लक्षण शोधा किंवा वर्णन करा...",
+              "common-symp": "सामान्य लक्षणे",
+              "selected-symp": "तुमची निवडलेली लक्षणे",
+              "no-symp": "अद्याप कोणतीही लक्षणे निवडलेली नाहीत.",
+              "clear-all": "सर्व साफ करा",
+              "continue": "पुढे जा",
+              "label-age": "वय",
+              "label-sex": "लिंग",
+              "male": "पुरुष",
+              "female": "स्त्री",
+              "other": "इतर",
+              "label-dur": "लक्षणांचा कालावधी",
+              "dur-1": "१ दिवसापेक्षा कमी",
+              "dur-3": "१–३ दिवस",
+              "dur-7": "४–७ दिवस",
+              "dur-14": "१ आठवड्यापेक्षा जास्त",
+              "label-sev": "तीव्रता",
+              "sev-mild": "सौम्य",
+              "sev-mod": "मध्यम",
+              "sev-sev": "तीव्र",
+              "near-facility": "तुम्ही सध्या आरोग्य केंद्राच्या जवळ आहात का?",
+              "yes": "हो, जवळ आहे",
+              "no": "नाही, लांब आहे",
+              "internet": "तुमचे इंटरनेट कनेक्शन कसे आहे?",
+              "int-good": "चांगले",
+              "int-lim": "मर्यादित",
+              "back": "मागे",
+              "analyze": "लक्षणांचे विश्लेषण करा",
+              "reviewing": "तुमच्या प्रतिसादांचे पुनरावलोकन करत आहे...",
+              "task1": "लक्षण पॅटर्न तपासत आहे",
+              "task2": "तातडीचे मूल्यांकन करत आहे",
+              "task3": "काळजी मार्ग ओळखत आहे",
+              "em-title": "तातडीच्या वैद्यकीय मदतीची आवश्यकता असू शकते",
+              "em-desc": "तुमचे प्रतिसाद तातडीच्या वैद्यकीय मदतीची आवश्यकता असलेल्या लक्षणांकडे निर्देश करतात.",
+              "call-108": "108 वर कॉल करा",
+              "find-em": "जवळपासचे आपत्कालीन केंद्र शोधा",
+              "care-urgency": "काळजीची तातडी",
+              "low": "कमी",
+              "mod": "मध्यम",
+              "high": "उच्च",
+              "emergency": "आणीबाणी",
+              "possible-exp": "संभाव्य स्पष्टीकरणे",
+              "result-disclaimer": "केवळ पात्र आरोग्य सेवा व्यावसायिकच कारण ठरवू शकतात.",
+              "care-path": "शिफारस केलेला काळजी मार्ग",
+              "tele-title": "जवळपास तज्ञ उपलब्ध नाहीत?",
+              "tele-desc": "तुम्ही लांबचा प्रवास करण्याऐवजी दूरस्थपणे आरोग्य सेवा व्यावसायिकाचा सल्ला घेऊ शकता.",
+              "start-tele": "टेलिकॉन्सल्टेशन सुरू करा",
+              "doc-avail": "डॉक्टर उपलब्ध आहेत (~१५ मिनिटे)",
+              "ref-guidance": "रेफरल मार्गदर्शन",
+              "current-fac": "सध्याचे केंद्र:",
+              "rec-fac": "शिफारस केलेले:",
+              "phc": "प्राथमिक आरोग्य केंद्र",
+              "dist-hosp": "जिल्हा रुग्णालय",
+              "ref-ready": "डिजिटल रेफरल तयार",
+              "track-ref": "रेफरल ट्रॅक करा",
+              "start-again": "पुन्हा सुरू करा",
+              "download": "सारांश डाउनलोड करा",
+              "print": "सारांश प्रिंट करा",
+              "health-journey": "तुमचा आरोग्य प्रवास",
+              "journey-today": "आज",
+              "journey-symp": "लक्षण तपासणी पूर्ण झाली",
+              "journey-prev": "मागील भेट",
+              "journey-phc": "PHC सल्लामसलत",
+              "journey-ref": "रेफरल",
+              "journey-dist": "जिल्हा रुग्णालय",
+              "view-records": "आरोग्य रेकॉर्ड पहा",
+              "need-nearby": "जवळपास आरोग्य सेवा हवी आहे का?",
+              "find-phc": "जवळपासचे PHC शोधा",
+              "find-hosp": "रुग्णालय शोधा",
+              "find-doc": "डॉक्टर शोधा",
+              "open": "आता उघडे आहे",
+              "footer-brand": "आरोग्यकनेक्ट",
+              "footer-desc": "ग्रामीण भागांसाठी डिजिटल हेल्थकेअर गेटवे.",
+              "f-services": "सेवा",
+              "f-support": "मदत",
+              "privacy": "गोपनीयता धोरण",
+              "terms": "अटी",
+              "footer-disclaimer": "केवळ माहिती आणि आरोग्य नेव्हिगेशन उद्देशांसाठी.",
+              "demo-logic": "प्रात्यक्षिक ट्रायज लॉजिक - ही क्लिनिकल निदान प्रणाली नाही.",
+              "q-chills": "तुम्हाला थंडी वाजते का?",
+              "q-breath": "तुम्हाला श्वास घेण्यास त्रास होत आहे का?",
+              "q-stomach-loc": "वेदना कोठे होत आहे?",
+              "q-chest-start": "वेदना कधी सुरू झाली?",
+              "q-faint": "तुम्ही बेशुद्ध पडलात का?"
+            }
+        };
+
+        /* 
+        ==================================================
+        14. JAVASCRIPT: SYMPTOM DATABASE & LOGIC
+        ==================================================
+        */
+        const symptomDatabase = [
+            { id: 'fever', name: 'Fever', icon: '🌡️', emergency: false },
+            { id: 'headache', name: 'Headache', icon: '🤕', emergency: false },
+            { id: 'cough', name: 'Cough', icon: '😷', emergency: false },
+            { id: 'breath', name: 'Breathing Difficulty', icon: '🫁', emergency: true },
+            { id: 'chest', name: 'Chest Pain', icon: '❤️‍🩹', emergency: true },
+            { id: 'stomach', name: 'Stomach Pain', icon: '🤢', emergency: false },
+            { id: 'vomit', name: 'Vomiting', icon: '🤮', emergency: false },
+            { id: 'diarrhea', name: 'Diarrhea', icon: '🧻', emergency: false },
+            { id: 'dizzy', name: 'Dizziness', icon: '💫', emergency: false },
+            { id: 'fatigue', name: 'Fatigue', icon: '😫', emergency: false },
+            { id: 'body', name: 'Body Pain', icon: '🦴', emergency: false },
+            { id: 'throat', name: 'Sore Throat', icon: '👄', emergency: false }
+        ];
+
+        let state = {
+            lang: 'en',
+            step: 1,
+            selectedSymptoms: [],
+            patientDetails: {
+                age: '',
+                sex: '',
+                duration: '1',
+                severity: '',
+                location: '',
+                internet: ''
+            },
+            lowBandwidth: false
+        };
+
+        /* 
+        ==================================================
+        15. JAVASCRIPT: CORE FUNCTIONS
+        ==================================================
+        */
+
+        function init() {
+            renderCommonSymptoms();
+            setupEventListeners();
+            updateLanguage(state.lang);
+        }
+
+        function updateLanguage(lang) {
+            state.lang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
+            // Re-render symptoms to update names
+            renderCommonSymptoms();
+            renderSelectedChips();
+        }
+
+        function renderCommonSymptoms() {
+            const grid = document.getElementById('commonSymptomsGrid');
+            grid.innerHTML = '';
+            symptomDatabase.forEach(s => {
+                const isSelected = state.selectedSymptoms.includes(s.id);
+                const card = document.createElement('div');
+                card.className = `symptom-card ${isSelected ? 'selected' : ''}`;
+                card.innerHTML = `<i>${s.icon}</i>${s.name}`;
+                card.onclick = () => toggleSymptom(s.id);
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleSymptom(id) {
+            if (state.selectedSymptoms.includes(id)) {
+                state.selectedSymptoms = state.selectedSymptoms.filter(s => s !== id);
+            } else {
+                state.selectedSymptoms.push(id);
+            }
+            renderCommonSymptoms();
+            renderSelectedChips();
+            updateDynamicQuestions();
+        }
+
+        function renderSelectedChips() {
+            const container = document.getElementById('selectedChipsContainer');
+            if (state.selectedSymptoms.length === 0) {
+                container.innerHTML = `<span data-i18n="no-symp">${translations[state.lang]['no-symp']}</span>`;
+                return;
+            }
+            container.innerHTML = '';
+            state.selectedSymptoms.forEach(id => {
+                const s = symptomDatabase.find(x => x.id === id);
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.innerHTML = `${s.name} <span onclick="toggleSymptom('${id}')">×</span>`;
+                container.appendChild(chip);
+            });
+        }
+
+        function updateDynamicQuestions() {
+            const container = document.getElementById('dynamicQuestions');
+            container.innerHTML = '';
+            
+            const relevantQuestions = [];
+            if (state.selectedSymptoms.includes('fever')) relevantQuestions.push({ id: 'q-chills', text: translations[state.lang]['q-chills'] });
+            if (state.selectedSymptoms.includes('cough')) relevantQuestions.push({ id: 'q-breath', text: translations[state.lang]['q-breath'] });
+            if (state.selectedSymptoms.includes('stomach')) relevantQuestions.push({ id: 'q-stomach-loc', text: translations[state.lang]['q-stomach-loc'] });
+            if (state.selectedSymptoms.includes('chest')) relevantQuestions.push({ id: 'q-chest-start', text: translations[state.lang]['q-chest-start'] });
+            if (state.selectedSymptoms.includes('dizzy')) relevantQuestions.push({ id: 'q-faint', text: translations[state.lang]['q-faint'] });
+
+            relevantQuestions.forEach(q => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.innerHTML = `
+                    <label>${q.text}</label>
+                    <div class="radio-group">
+                        <div class="radio-btn" data-i18n="yes">Yes</div>
+                        <div class="radio-btn" data-i18n="no">No</div>
+                    </div>
+                `;
+                container.appendChild(div);
+                // Add click handlers for these new buttons
+                div.querySelectorAll('.radio-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        div.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    };
+                });
+            });
+        }
+
+        function goToStep(step) {
+            state.step = step;
+            document.querySelectorAll('.wizard-step-content').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            // Update Indicators
+            document.querySelectorAll('.step').forEach((s, idx) => {
+                if (idx + 1 < step) s.className = 'step completed';
+                else if (idx + 1 === step) s.className = 'step active';
+                else s.className = 'step';
+            });
+
+            // Update Progress
+            document.getElementById('progressBar').style.width = `${step * 25}%`;
+
+            // Update Title
+            document.getElementById('wizardTitle').textContent = translations[state.lang][`step${step}-title` || 'step1-title'];
+
+            if (step === 3) {
+                runAnalysis();
+            }
+        }
+
+        function runAnalysis() {
+            setTimeout(() => {
+                document.getElementById('task-1').style.opacity = '1';
+                setTimeout(() => {
+                    document.getElementById('task-2').style.opacity = '1';
+                    setTimeout(() => {
+                        document.getElementById('task-3').style.opacity = '1';
+                        setTimeout(() => {
+                            calculateTriage();
+                            goToStep(4);
+                        }, 800);
+                    }, 600);
+                }, 600);
+            }, 400);
+        }
+
+        function calculateTriage() {
+            let urgency = 'LOW';
+            let pointerPos = '12%';
+            let isEmergency = false;
+
+            // Simple Logic
+            const hasEmergencySymptom = state.selectedSymptoms.some(id => 
+                symptomDatabase.find(s => s.id === id).emergency
+            );
+
+            if (hasEmergencySymptom || state.patientDetails.severity === 'severe') {
+                urgency = 'EMERGENCY';
+                pointerPos = '87%';
+                isEmergency = true;
+            } else if (state.patientDetails.severity === 'moderate' || state.selectedSymptoms.length > 3) {
+                urgency = 'HIGH';
+                pointerPos = '62%';
+            } else if (state.selectedSymptoms.length > 0) {
+                urgency = 'MODERATE';
+                pointerPos = '37%';
+            }
+
+            document.getElementById('urgencyText').textContent = urgency;
+            document.getElementById('urgencyText').style.color = isEmergency ? 'var(--emergency)' : 'var(--primary-indigo)';
+            document.getElementById('meterPointer').style.left = pointerPos;
+
+            if (isEmergency) {
+                document.getElementById('emergencyBanner').style.display = 'block';
+                document.getElementById('normalResults').style.opacity = '0.5';
+            } else {
+                document.getElementById('emergencyBanner').style.display = 'none';
+                document.getElementById('normalResults').style.opacity = '1';
+            }
+
+            renderExplanations();
+            renderCarePathway(urgency);
+        }
+
+        function renderExplanations() {
+            const container = document.getElementById('explanationsList');
+            container.innerHTML = '';
+            
+            let possible = [];
+            if (state.selectedSymptoms.includes('fever') && state.selectedSymptoms.includes('cough')) {
+                possible.push({ name: 'Viral Infection', desc: 'A common viral illness affecting the respiratory system.', freq: 'Common' });
+            }
+            if (state.selectedSymptoms.includes('headache')) {
+                possible.push({ name: 'Tension Headache', desc: 'Pain caused by muscle tension or stress.', freq: 'Very Common' });
+            }
+            if (state.selectedSymptoms.includes('dizzy')) {
+                possible.push({ name: 'Dehydration', desc: 'Caused by not drinking enough water or losing fluids.', freq: 'Common' });
+            }
+
+            if (possible.length === 0) {
+                possible.push({ name: 'General Illness', desc: 'Symptoms may be related to various minor conditions.', freq: 'Common' });
+            }
+
+            possible.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'explanation-card';
+                div.innerHTML = `<strong>${p.name}</strong><p style="font-size:0.8rem">${p.desc}</p><span class="freq">${p.freq}</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        function renderCarePathway(urgency) {
+            const container = document.getElementById('carePathway');
+            container.innerHTML = '';
+            let paths = [];
+
+            if (urgency === 'LOW') {
+                paths = ['Home Monitoring', 'Pharmacy Consultation'];
+            } else if (urgency === 'MODERATE') {
+                paths = ['PHC Visit', 'Teleconsultation'];
+            } else {
+                paths = ['District Hospital', 'Specialist Consultation'];
+            }
+
+            paths.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'pathway-card';
+                div.innerHTML = `<h4>${p}</h4><p style="font-size:0.8rem">Follow standard protocols for ${p.toLowerCase()}.</p>`;
+                container.appendChild(div);
+            });
+        }
+
+        function setupEventListeners() {
+            // Language Select
+            document.getElementById('languageSelect').onchange = (e) => updateLanguage(e.target.value);
+
+            // Step 1 Search
+            const searchInput = document.getElementById('symptomSearch');
+            const suggestions = document.getElementById('searchSuggestions');
+            
+            searchInput.oninput = (e) => {
+                const val = e.target.value.toLowerCase();
+                if (val.length < 2) {
+                    suggestions.style.display = 'none';
+                    return;
+                }
+                const matches = symptomDatabase.filter(s => s.name.toLowerCase().includes(val));
+                if (matches.length > 0) {
+                    suggestions.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="toggleSymptom('${m.id}'); document.getElementById('symptomSearch').value=''; document.getElementById('searchSuggestions').style.display='none'">${m.name}</div>`).join('');
+                    suggestions.style.display = 'block';
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            };
+
+            // Step 1 Next
+            document.getElementById('nextBtn-1').onclick = () => {
+                if (state.selectedSymptoms.length === 0) {
+                    alert('Please select at least one symptom.');
+                    return;
+                }
+                goToStep(2);
+            };
+
+            // Clear All
+            document.getElementById('clearAllBtn').onclick = () => {
+                state.selectedSymptoms = [];
+                renderCommonSymptoms();
+                renderSelectedChips();
+            };
+
+            // Step 2 Radio Buttons
+            document.querySelectorAll('#sexGroup .radio-btn, #severityGroup .radio-btn, #locationGroup .radio-btn, #internetGroup .radio-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const parent = btn.parentElement;
+                    parent.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update state
+                    if (parent.id === 'sexGroup') state.patientDetails.sex = btn.dataset.value;
+                    if (parent.id === 'severityGroup') state.patientDetails.severity = btn.dataset.value;
+                    if (parent.id === 'locationGroup') state.patientDetails.location = btn.dataset.value;
+                    if (parent.id === 'internetGroup') state.patientDetails.internet = btn.dataset.value;
+                };
+            });
+
+            // Step 2 Next
+            document.getElementById('nextBtn-2').onclick = () => {
+                state.patientDetails.age = document.getElementById('patientAge').value;
+                state.patientDetails.duration = document.getElementById('duration').value;
+                
+                if (!state.patientDetails.age || !state.patientDetails.severity) {
+                    alert('Please fill in all details.');
+                    return;
+                }
+                goToStep(3);
+            };
+
+            // Step 2 Back
+            document.getElementById('backBtn-2').onclick = () => goToStep(1);
+
+            // Step 4 Actions
+            document.getElementById('startAgainBtn').onclick = () => {
+                state.step = 1;
+                state.selectedSymptoms = [];
+                state.patientDetails = { age: '', sex: '', duration: '1', severity: '', location: '', internet: '' };
+                document.getElementById('patientAge').value = '';
+                document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+                renderCommonSymptoms();
+                renderSelectedChips();
+                goToStep(1);
+            };
+
+            document.getElementById('printBtn').onclick = () => window.print();
+
+            document.getElementById('downloadBtn').onclick = () => {
+                const text = `AarogyaConnect Symptom Summary\nSymptoms: ${state.selectedSymptoms.join(', ')}\nUrgency: ${document.getElementById('urgencyText').textContent}`;
+                const blob = new Blob([text], { type: 'text/plain' });
+                const anchor = document.createElement('a');
+                anchor.download = 'symptom_summary.txt';
+                anchor.href = window.URL.createObjectURL(blob);
+                anchor.click();
+            };
+
+            // Bandwidth Toggle
+            document.getElementById('bandwidthToggle').onclick = () => {
+                state.lowBandwidth = !state.lowBandwidth;
+                document.body.classList.toggle('low-bandwidth', state.lowBandwidth);
+                document.getElementById('bandwidthLabel').textContent = state.lowBandwidth ? 'Low-bandwidth mode ON' : 'Low-bandwidth mode available';
+            };
+        }
+
+        // START
+        init();
+
+    </script>
+</body>
+</html>
