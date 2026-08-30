@@ -20,7 +20,7 @@
             --slate-gray: #667085;
             --soft-border: #E6E8EE;
             --transition: cubic-bezier(0.16, 1, 0.3, 1);
-            --shadow-subtle: 0 10px 40px rgba(0,0,0,0.03);
+            --shadow-subtle: 0 10px 40px rgba(30, 42, 90, 0.04);
             --radius-lg: 28px;
             --radius-md: 16px;
         }
@@ -39,7 +39,6 @@
             overflow-x: hidden;
         }
 
-        /* --- Navigation --- */
         nav {
             position: fixed;
             top: 0;
@@ -73,6 +72,7 @@
             display: grid;
             place-items: center;
             color: white;
+            box-shadow: 0 10px 24px rgba(30, 42, 90, 0.18);
         }
 
         .nav-links { display: flex; gap: 32px; }
@@ -104,14 +104,13 @@
             outline: none;
         }
 
-        /* --- Hero Header --- */
         .hero-header {
             padding: 140px 60px 40px;
             max-width: 1400px;
             margin: 0 auto;
             position: relative;
         }
-        
+
         .hero-header::before {
             content: '';
             position: absolute;
@@ -155,7 +154,6 @@
             font-size: 1.1rem;
         }
 
-        /* --- Quick Summary Bar --- */
         .summary-bar {
             background: var(--pure-white);
             margin: 0 60px 40px;
@@ -175,7 +173,6 @@
         .summary-label { font-size: 0.7rem; color: var(--slate-gray); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
         .summary-value { font-size: 1rem; color: var(--deep-indigo); font-weight: 700; }
 
-        /* --- Container Layout --- */
         .page-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -189,7 +186,6 @@
         .section-title h2 { font-size: 1.6rem; color: var(--deep-indigo); margin-bottom: 4px; }
         .section-title p { font-size: 0.95rem; color: var(--slate-gray); }
 
-        /* --- Card Common Styles --- */
         .card {
             background: var(--pure-white);
             border-radius: var(--radius-lg);
@@ -203,7 +199,6 @@
             border-color: var(--rich-teal);
         }
 
-        /* --- Previously Consulted --- */
         .prev-doctors-grid {
             display: flex;
             gap: 20px;
