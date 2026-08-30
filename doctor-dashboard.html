@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Doctor Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f3f1;
+      --panel: #ffffff;
+      --panel-soft: #f8f7f4;
+      --line: #e7ebef;
+      --navy: #172033;
+      --indigo: #1e2a5a;
+      --teal: #0f766e;
+      --teal-soft: #dff8f4;
+      --danger: #dc2626;
+      --text: #465469;
+      --shadow: 0 18px 45px rgba(30,42,90,0.09);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--navy); }
+    a { text-decoration: none; color: inherit; }
+    body { padding: 0; }
+    .topbar { background: white; border-bottom: 1px solid var(--line); padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--indigo); color: white; font-weight: 800; }
+    .brand strong { font-size: 1.1rem; }
+    .brand small { display: block; color: var(--teal); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800; }
+    .nav { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .pill { padding: 9px 12px; border-radius: 10px; background: transparent; color: #586981; font-weight: 700; border: 1px solid transparent; }
+    .pill.active { background: var(--teal-soft); color: var(--indigo); border-color: #d8f2ee; }
+    .pill.warn { color: var(--danger); }
+    .userbox { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 42px; height: 42px; border-radius: 12px; background: var(--indigo); color: white; display: grid; place-items: center; font-weight: 800; }
+    .status { background: #f0fdf4; border: 1px solid #d6f1db; color: #1f7a52; padding: 7px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+
+    .page { padding: 28px; }
+    .wrapper { max-width: 1240px; margin: 0 auto; }
+    .hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0 28px; }
+    .hero h1 { margin: 0; font-size: clamp(2.1rem, 4vw, 4rem); line-height: 1.05; letter-spacing: -0.06em; color: var(--indigo); }
+    .hero h1 span { color: var(--teal); }
+    .hero p { margin: 12px 0 0; color: var(--text); max-width: 620px; line-height: 1.7; }
+    .orb { width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0%, #cff7f2 25%, #a8e6db 100%); display: grid; place-items: center; color: rgba(15,118,110,0.8); box-shadow: 0 20px 50px rgba(15,118,110,0.12); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(160px,1fr)); gap: 18px; margin: 20px 0 32px; }
+    .card { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; gap: 14px; align-items: center; }
+    .card-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--panel-soft); display: grid; place-items: center; color: var(--teal); }
+    .card strong { display: block; font-size: 1.8rem; letter-spacing: -0.04em; }
+    .card small { display: block; margin-top: 6px; color: #76879a; text-transform: uppercase; letter-spacing: 0.12em; font-size: 9px; font-weight: 800; }
+
+    .panel-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 18px 18px 8px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .panel-head h3 { margin: 0; font-size: 1.1rem; color: var(--indigo); }
+    .panel-head a { color: var(--teal); font-size: 0.8rem; font-weight: 800; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; font-size: 0.9rem; }
+    th { color: #73839a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; }
+    .badge { display: inline-block; padding: 6px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+    .badge.waiting { background: #fef3c7; color: #92400e; }
+    .badge.consult { background: #dcfce7; color: #166534; }
+    .badge.high { background: #fee2e2; color: #991b1b; }
+    .button { border: none; background: var(--teal); color: white; padding: 9px 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    .button.alt { background: #eef2f7; color: var(--indigo); }
+
+    .alert { background: #fff7ed; border: 1px solid #fed7aa; color: #9a4f00; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; font-weight: 700; }
+
+    @media (max-width: 900px) {
+      .hero { flex-direction: column; align-items: flex-start; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .panel-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .topbar { flex-wrap: wrap; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .page { padding: 16px; }
+      .wrapper { max-width: unset; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <strong>AarogyaConnect</strong>
+        <small>Doctor Dashboard</small>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Dashboard navigation">
+      <span class="pill active">Dashboard</span>
+      <span class="pill">Appointments</span>
+      <span class="pill">Patients</span>
+      <span class="pill">Referrals</span>
+      <span class="pill warn">Logout</span>
+    </nav>
+
+    <div class="userbox">
+      <span class="status">Available</span>
+      <div class="avatar">DM</div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="wrapper">
+      <section class="hero">
+        <div>
+          <p style="margin:0 0 8px; color:var(--teal); font-size:12px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase;">Good morning, Dr. Mehta</p>
+          <h1>Your clinical work,<br><span>organized for better care.</span></h1>
+          <p>Monitor patient risk, coordinate today’s consultations, and keep every clinical decision moving forward from one secure workspace.</p>
+        </div>
+        <div class="orb">✚</div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="card">
+          <div class="card-icon">📅</div>
+          <div><strong>24</strong><small>Appointments</small></div>
+        </div>
+        <div class="card">
+          <div class="card-icon">👥</div>
+          <div><strong>06</strong><small>Waiting</small></div>
+        </div>
+        <div class="card">
+          <div class="card-icon">📹</div>
+          <div><strong>05</strong><small>Video Calls</small></div>
+        </div>
+        <div class="card">
+          <div class="card-icon">📌</div>
+          <div><strong>04</strong><small>Referrals</small></div>
+        </div>
+      </section>
+
+      <div class="alert">High-priority case: Cardiac follow-up and teleconsultation queue needs attention before 12:00 PM.</div>
+
+      <section class="panel-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Appointment Queue</h3>
+            <a href="#">Full Queue</a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Q-No.</th>
+                <th>Patient</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Q-04</td>
+                <td>Ravi Kumar</td>
+                <td>09:30 AM</td>
+                <td><span class="badge waiting">Waiting</span></td>
+                <td><button class="button">Start</button></td>
+              </tr>
+              <tr>
+                <td>Q-05</td>
+                <td>Lakshmi Devi</td>
+                <td>10:10 AM</td>
+                <td><span class="badge consult">Ready</span></td>
+                <td><button class="button alt">Resume</button></td>
+              </tr>
+              <tr>
+                <td>Q-06</td>
+                <td>Suresh Reddy</td>
+                <td>10:45 AM</td>
+                <td><span class="badge high">Priority</span></td>
+                <td><button class="button">Review</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Clinical Overview</h3>
+            <a href="#">Live</a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Vitals Pending</td><td>03</td></tr>
+              <tr><td>Lab Results</td><td>08</td></tr>
+              <tr><td>Teleconsults</td><td>05</td></tr>
+              <tr><td>Risk Alerts</td><td>02</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
