@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect | Patient Portal</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-indigo: #1E2A5A;
+            --rich-teal: #0F766E;
+            --soft-aqua: #CFF7F2;
+            --soft-ivory: #F8F7F4;
+            --pure-white: #FFFFFF;
+            --charcoal-navy: #172033;
+            --slate-gray: #667085;
+            --soft-border: #E6E8EE;
+            --transition: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--soft-ivory);
+            color: var(--charcoal-navy);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--soft-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--deep-indigo);
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--deep-indigo);
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            color: white;
+        }
+
+        .nav-links { display: flex; gap: 32px; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--slate-gray);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--deep-indigo); }
+
+        .nav-right { display: flex; align-items: center; gap: 24px; }
+
+        /* --- Hero Section --- */
+        .hero {
+            padding: 160px 60px 60px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .hero-text h2 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--rich-teal);
+            margin-bottom: 16px;
+            animation: fadeInUp 0.8s var(--transition);
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            color: var(--deep-indigo);
+            line-height: 1.1;
+            font-weight: 600;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            animation: fadeInUp 1s var(--transition);
+        }
+
+        .hero-text h1 span { color: var(--rich-teal); }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            color: var(--slate-gray);
+            max-width: 500px;
+            animation: fadeInUp 1.2s var(--transition);
+        }
+
+        /* --- 3D Orb Visual --- */
+        .visual-container {
+            display: grid;
+            place-items: center;
+            position: relative;
+            animation: orbFade 2s var(--transition);
+        }
+
+        .orb {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle at 30% 30%, var(--pure-white), var(--soft-aqua), var(--rich-teal));
+            border-radius: 50%;
+            box-shadow: 0 40px 80px rgba(15, 118, 110, 0.15), inset -20px -20px 60px rgba(0,0,0,0.05);
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* --- Health Snapshot --- */
+        .snapshot-bar {
+            background: var(--pure-white);
+            margin: 0 60px 60px;
+            padding: 32px 60px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid var(--soft-border);
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+            animation: fadeInUp 1.4s var(--transition);
+        }
+
+        .snapshot-item { display: flex; flex-direction: column; gap: 4px; }
+        .snapshot-label { font-size: 0.7rem; color: var(--slate-gray); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .snapshot-value { font-size: 1.1rem; color: var(--deep-indigo); font-weight: 700; }
+        .snapshot-sep { width: 1px; background: var(--soft-border); }
+
+        /* --- Main Feature Grid --- */
+        .dashboard-grid {
+            padding: 0 60px 100px;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            grid-column: span 12;
+            font-size: 1.5rem;
+            color: var(--deep-indigo);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--pure-white);
+            border-radius: 28px;
+            border: 1px solid var(--soft-border);
+            padding: 32px;
+            transition: all 0.5s var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(30, 42, 90, 0.08);
+            border-color: var(--rich-teal);
+        }
+
+        /* Feature-specific sizing */
+        .feat-records { grid-column: span 4; }
+        .feat-apt { grid-column: span 5; background: var(--deep-indigo); color: white; border: none; }
+        .feat-queue { grid-column: span 3; }
+        .feat-tele { grid-column: span 4; }
+        .feat-symptom { grid-column: span 4; }
+        .feat-referral { grid-column: span 4; }
+        .feat-meds { grid-column: span 6; }
+        .feat-followup { grid-column: span 6; }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: var(--soft-aqua);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            color: var(--rich-teal);
+            margin-bottom: 24px;
+        }
+
+        .feat-apt .icon-box { background: rgba(255,255,255,0.1); color: white; }
+
+        .card h3 { font-size: 1.25rem; margin-bottom: 12px; }
+        .card p { font-size: 0.9rem; color: var(--slate-gray); margin-bottom: 24px; }
+        .feat-apt p { color: rgba(255,255,255,0.7); }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+        }
+
+        .btn-primary { background: var(--deep-indigo); color: white; }
+        .btn-white { background: white; color: var(--deep-indigo); }
+        .btn-outline { background: transparent; border: 1px solid var(--soft-border); color: var(--deep-indigo); }
+
+        /* --- Queue Indicator --- */
+        .queue-viz {
+            height: 8px;
+            background: var(--soft-ivory);
+            border-radius: 100px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .queue-progress {
+            width: 75%;
+            height: 100%;
+            background: var(--rich-teal);
+        }
+
+        /* --- Emergency SOS --- */
+        .sos-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            background: var(--deep-indigo);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 20px 40px rgba(30, 42, 90, 0.3);
+            z-index: 2000;
+            border: none;
+            animation: pulse 2s infinite;
+        }
+
+        .sos-btn span { font-size: 0.7rem; font-weight: 800; margin-top: 4px; }
+
+        /* --- Emergency Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 42, 90, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 3000;
+            display: none;
+            place-items: center;
+        }
+
+        .modal {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 32px;
+            text-align: center;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes orbFade { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(30, 42, 90, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(30, 42, 90, 0); } 100% { box-shadow: 0 0 0 0 rgba(30, 42, 90, 0); } }
+
+        /* --- Responsive --- */
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; text-align: center; padding: 120px 24px 40px; }
+            .hero-text p { margin: 0 auto 40px; }
+            .snapshot-bar { flex-wrap: wrap; gap: 20px; padding: 24px; margin: 20px; }
+            .feat-records, .feat-apt, .feat-queue, .feat-tele, .feat-symptom, .feat-referral, .feat-meds, .feat-followup { grid-column: span 12; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo">
+            <div class="logo-mark"><i data-lucide="plus"></i></div>
+            AarogyaConnect
+        </a>
+        <div class="nav-links">
+            <a href="#" class="active" data-i18n="navDash">Dashboard</a>
+            <a href="#" data-i18n="navApt">Appointments</a>
+            <a href="#" data-i18n="navRec">Health Records</a>
+            <a href="#" data-i18n="navRef">Referrals</a>
+            <a href="#" data-i18n="navMed">Medicines</a>
+        </div>
+        <div class="nav-right">
+            <select id="portalLanguageSelector" onchange="updateLanguage(this.value)" style="border: none; background: transparent; font-weight: 600; cursor: pointer;">
+                <option value="en">🌐 English</option>
+                <option value="hi">🌐 हिन्दी</option>
+                <option value="te">🌐 తెలుగు</option>
+                <option value="mr">🌐 मराठी</option>
+            </select>
+            <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--soft-border); padding-left: 20px;">
+                <div style="text-align: right;">
+                    <p style="font-size: 0.85rem; font-weight: 700;">Ram</p>
+                    <p style="font-size: 0.7rem; color: var(--slate-gray);" data-i18n="patient">Patient</p>
+                </div>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--soft-aqua); display: grid; place-items: center; color: var(--rich-teal); font-weight: 700;">R</div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h2 data-i18n="greeting">Good Morning, Ram</h2>
+            <h1 data-i18n="heroTitle">Your healthcare, <br><span>connected</span> in one place.</h1>
+            <p data-i18n="heroDesc">Access your medical records, appointments, consultations, referrals, medicines and emergency support from one secure platform.</p>
+        </div>
+        <div class="visual-container">
+            <div class="orb"></div>
+        </div>
+    </section>
+
+    <div class="snapshot-bar">
+        <div class="snapshot-item">
+            <span class="snapshot-label" data-i18n="blood">Blood Group</span>
+            <span class="snapshot-value">O+</span>
+        </div>
+        <div class="snapshot-sep"></div>
+        <div class="snapshot-item">
+            <span class="snapshot-label" data-i18n="nextApt">Next Appointment</span>
+            <span class="snapshot-value" data-i18n="aptDate">Today, 10:30 AM</span>
+        </div>
+        <div class="snapshot-sep"></div>
+        <div class="snapshot-item">
+            <span class="snapshot-label" data-i18n="activeRef">Active Referrals</span>
+            <span class="snapshot-value">1</span>
+        </div>
+        <div class="snapshot-sep"></div>
+        <div class="snapshot-item">
+            <span class="snapshot-label" data-i18n="recordsCount">Health Records</span>
+            <span class="snapshot-value">12</span>
+        </div>
+    </div>
+
+    <main class="dashboard-grid">
+        <h2 class="section-title" data-i18n="needToday">What do you need today?</h2>
+
+        <!-- Book Appointment -->
+        <div class="card feat-apt">
+            <div class="icon-box"><i data-lucide="calendar"></i></div>
+            <h3 data-i18n="bookTitle">Book an Appointment</h3>
+            <p data-i18n="bookDesc">Find the right doctor or healthcare centre and choose a convenient time.</p>
+            <button class="btn btn-white" data-i18n="bookBtn">Book Appointment</button>
+        </div>
+
+        <!-- Health Records -->
+        <div class="card feat-records">
+            <div class="icon-box"><i data-lucide="file-text"></i></div>
+            <h3 data-i18n="recTitle">Digital Health Records</h3>
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 0.8rem; border-bottom: 1px solid var(--soft-border); padding: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="font-weight: 600;">Blood Test Report</span>
+                    <span style="color: var(--slate-gray);">26 Aug</span>
+                </div>
+                <div style="font-size: 0.8rem; padding: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="font-weight: 600;">General Medicine</span>
+                    <span style="color: var(--slate-gray);">25 Aug</span>
+                </div>
+            </div>
+            <a href="digital_health_record.html" class="btn btn-outline" data-i18n="viewRec">View Records →</a>
+        </div>
+
+        <!-- Queue Status -->
+        <div class="card feat-queue">
+            <div class="icon-box"><i data-lucide="users"></i></div>
+            <h3 data-i18n="queueTitle">Queue Status</h3>
+            <p style="margin-bottom: 10px; font-weight: 700; color: var(--deep-indigo);">A-17</p>
+            <div class="queue-viz"><div class="queue-progress"></div></div>
+            <p style="font-size: 0.8rem;" data-i18n="queuePatients">4 patients ahead</p>
+        </div>
+
+        <!-- Teleconsultation -->
+        <div class="card feat-tele">
+            <div class="icon-box"><i data-lucide="video"></i></div>
+            <h3 data-i18n="teleTitle">Teleconsultation</h3>
+            <p data-i18n="teleDesc">Connect with a doctor without travelling long distances.</p>
+            <button class="btn btn-primary" data-i18n="teleBtn">Start Consultation</button>
+        </div>
+
+        <!-- Symptom Checker -->
+        <div class="card feat-symptom">
+            <div class="icon-box"><i data-lucide="activity"></i></div>
+            <h3 data-i18n="sympTitle">Symptom Checker</h3>
+            <div style="background: var(--soft-ivory); border-radius: 12px; padding: 12px; margin-bottom: 16px;">
+                <p style="font-size: 0.75rem; margin: 0;" data-i18n="sympPrompt">Describe your symptoms...</p>
+            </div>
+            <button class="btn btn-outline" data-i18n="sympBtn">Check Symptoms</button>
+        </div>
+
+        <!-- Referral Tracking -->
+        <div class="card feat-referral">
+            <div class="icon-box"><i data-lucide="git-branch"></i></div>
+            <h3 data-i18n="refTitle">Referral Progress</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--rich-teal);"></div>
+                <div style="flex: 1; height: 2px; background: var(--deep-indigo);"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--deep-indigo);"></div>
+                <div style="flex: 1; height: 2px; background: var(--soft-border);"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--soft-border);"></div>
+            </div>
+            <p style="margin-top: 12px; font-weight: 700; color: var(--deep-indigo); font-size: 0.8rem;" data-i18n="refStatus">District Hospital</p>
+        </div>
+
+        <!-- Medicine Availability -->
+        <div class="card feat-meds">
+            <div class="icon-box"><i data-lucide="pill"></i></div>
+            <h3 data-i18n="medTitle">Medicine Availability</h3>
+            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                <input type="text" placeholder="Search medicine..." style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--soft-border);">
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                <span>Paracetamol 500mg</span>
+                <span style="color: var(--rich-teal); font-weight: 700;" data-i18n="avail">AVAILABLE</span>
+            </div>
+        </div>
+
+        <!-- Follow-up -->
+        <div class="card feat-followup">
+            <div class="icon-box"><i data-lucide="bell"></i></div>
+            <h3 data-i18n="followTitle">Follow-up Reminders</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--rich-teal);"></div>
+                    <span style="font-size: 0.85rem;" data-i18n="follow1">Take prescribed medicine (Tomorrow)</span>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--slate-gray);"></div>
+                    <span style="font-size: 0.85rem;" data-i18n="follow2">Blood pressure check (02 Sep)</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <button class="sos-btn" onclick="openSOS()">
+        <i data-lucide="phone-call" size="24"></i>
+        <span>SOS</span>
+    </button>
+
+    <div class="modal-overlay" id="sosModal">
+        <div class="modal">
+            <h2 style="color: var(--deep-indigo); margin-bottom: 16px;" data-i18n="sosTitle">Emergency Assistance</h2>
+            <p style="color: var(--slate-gray); margin-bottom: 32px;" data-i18n="sosDesc">We can use your current location to help identify the nearest emergency healthcare service.</p>
+            <div id="locationStatus" style="margin-bottom: 20px; font-weight: 700; color: var(--rich-teal);"></div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="getLocation()" data-i18n="sosLoc">Share My Location</button>
+                <button class="btn btn-outline" style="width: 100%; justify-content: center;" onclick="closeSOS()" data-i18n="sosCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Translation Engine ---
+        const translations = {
+            en: {
+                navDash: "Dashboard", navApt: "Appointments", navRec: "Health Records", navRef: "Referrals", navMed: "Medicines",
+                patient: "Patient", greeting: "Good Morning, Ram", heroTitle: "Your healthcare, connected in one place.",
+                heroDesc: "Access your medical records, appointments, consultations, referrals, medicines and emergency support from one secure platform.",
+                blood: "Blood Group", nextApt: "Next Appointment", aptDate: "Today, 10:30 AM", activeRef: "Active Referrals", recordsCount: "Health Records",
+                needToday: "What do you need today?", bookTitle: "Book an Appointment", bookDesc: "Find the right doctor or centre.", bookBtn: "Book Appointment",
+                recTitle: "Digital Health Records", viewRec: "View Records →", queueTitle: "Queue Status", queuePatients: "4 patients ahead",
+                teleTitle: "Teleconsultation", teleDesc: "Connect with a doctor remotely.", teleBtn: "Start Consultation",
+                sympTitle: "Symptom Checker", sympPrompt: "Describe symptoms...", sympBtn: "Check Symptoms",
+                refTitle: "Referral Progress", refStatus: "District Hospital", medTitle: "Medicine Availability", avail: "AVAILABLE",
+                followTitle: "Follow-up Reminders", follow1: "Take prescribed medicine (Tomorrow)", follow2: "Blood pressure check (02 Sep)",
+                sosTitle: "Emergency Assistance", sosDesc: "We use location to find help.", sosLoc: "Share My Location", sosCancel: "Cancel"
+            },
+            hi: {
+                navDash: "डैशबोर्ड", navApt: "अपॉइंटमेंट", navRec: "स्वास्थ्य रिकॉर्ड", navRef: "रेफरल", navMed: "दवाएं",
+                patient: "मरीज", greeting: "सुप्रभात, राम", heroTitle: "आपका स्वास्थ्य, एक स्थान पर जुड़ा हुआ।",
+                heroDesc: "एक सुरक्षित मंच से अपने मेडिकल रिकॉर्ड, अपॉइंटमेंट, परामर्श, रेफरल और आपातकालीन सहायता प्राप्त करें।",
+                blood: "रक्त समूह", nextApt: "अगला अपॉइंटमेंट", aptDate: "आज, 10:30 बजे", activeRef: "सक्रिय रेफरल", recordsCount: "स्वास्थ्य रिकॉर्ड",
+                needToday: "आज आपको क्या चाहिए?", bookTitle: "अपॉइंटमेंट बुक करें", bookDesc: "सही डॉक्टर या केंद्र खोजें।", bookBtn: "अपॉइंटमेंट बुक करें",
+                recTitle: "डिजिटल स्वास्थ्य रिकॉर्ड", viewRec: "रिकॉर्ड देखें →", queueTitle: "कतार की स्थिति", queuePatients: "4 मरीज आगे हैं",
+                teleTitle: "टेली-परामर्श", teleDesc: "दूर से डॉक्टर से जुड़ें।", teleBtn: "परामर्श शुरू करें",
+                sympTitle: "लक्षण जांचक", sympPrompt: "लक्षणों का वर्णन करें...", sympBtn: "लक्षणों की जांच करें",
+                refTitle: "रेफरल प्रगति", refStatus: "जिला अस्पताल", medTitle: "दवा की उपलब्धता", avail: "उपलब्ध",
+                followTitle: "फॉलो-अप रिमाइंडर", follow1: "निर्धारित दवा लें (कल)", follow2: "रक्तचाप की जांच (02 सितंबर)",
+                sosTitle: "आपातकालीन सहायता", sosDesc: "मदद के लिए हम स्थान का उपयोग करते हैं।", sosLoc: "स्थान साझा करें", sosCancel: "रद्द करें"
+            },
+            te: {
+                navDash: "డ్యాష్‌బోర్డ్", navApt: "అపాయింట్‌మెంట్లు", navRec: "ఆరోగ్య రికార్డులు", navRef: "రిఫరల్స్", navMed: "మందులు",
+                patient: "రోగి", greeting: "శుభోదయం, రామ్", heroTitle: "మీ ఆరోగ్యం, ఒకే చోట అనుసంధానించబడింది.",
+                heroDesc: "ఒకే సురక్షిత ప్లాట్‌ఫారమ్ నుండి మీ వైద్య రికార్డులు, అపాయింట్‌మెంట్లు, సంప్రదింపులు మరియు అత్యవసర సహాయాన్ని పొందండి.",
+                blood: "రక్త గ్రూపు", nextApt: "తదుపరి అపాయింట్‌మెంట్", aptDate: "ఈరోజు, 10:30 AM", activeRef: "క్రియాశీల రిఫరల్స్", recordsCount: "ఆరోగ్య రికార్డులు",
+                needToday: "ఈరోజు మీకు ఏమి కావాలి?", bookTitle: "అపాయింట్‌మెంట్ బుక్ చేయండి", bookDesc: "సరైన వైద్యుడిని కనుగొనండి.", bookBtn: "బుక్ చేయండి",
+                recTitle: "డిజిటల్ ఆరోగ్య రికార్డులు", viewRec: "రికార్డులు చూడండి →", queueTitle: "క్యూ స్థితి", queuePatients: "4 రోగులు ముందున్నారు",
+                teleTitle: "టెలికన్సల్టేషన్", teleDesc: "దూరం నుండి వైద్యుడిని సంప్రదించండి.", teleBtn: "ప్రారంభించండి",
+                sympTitle: "లక్షణాల తనిఖీ", sympPrompt: "లక్షణాలను వివరించండి...", sympBtn: "తనిఖీ చేయండి",
+                refTitle: "రిఫరల్ పురోగతి", refStatus: "జిల్లా ఆసుపత్రి", medTitle: "మందుల లభ్యత", avail: "అందుబాటులో ఉంది",
+                followTitle: "రిమైండర్లు", follow1: "మందులు తీసుకోండి (రేపు)", follow2: "బీపీ తనిఖీ (02 సెప్టెంబర్)",
+                sosTitle: "అత్యవసర సహాయం", sosDesc: "సహాయం కోసం స్థానాన్ని ఉపయోగిస్తాము.", sosLoc: "స్థానాన్ని షేర్ చేయండి", sosCancel: "రద్దు చేయి"
+            },
+            mr: {
+                navDash: "डॅशबोर्ड", navApt: "अपॉइंटमेंट्स", navRec: "आरोग्य रेकॉर्ड", navRef: "रेफरल", navMed: "औषधे",
+                patient: "रुग्ण", greeting: "नमस्कार, राम", heroTitle: "तुमचे आरोग्य, एका ठिकाणी जोडलेले.",
+                heroDesc: "एका सुरक्षित प्लॅटफॉर्मवरून तुमचे वैद्यकीय रेकॉर्ड, अपॉइंटमेंट, सल्लामसलत, रेफरल आणि आपत्कालीन मदत मिळवा.",
+                blood: "रक्त गट", nextApt: "पुढील अपॉइंटमेंट", aptDate: "आज, 10:30 AM", activeRef: "सक्रिय रेफरल", recordsCount: "आरोग्य रेकॉर्ड",
+                needToday: "आज तुम्हाला काय हवे आहे?", bookTitle: "अपॉइंटमेंट बुक करा", bookDesc: "योग्य डॉक्टर किंवा केंद्र निवडा.", bookBtn: "अपॉइंटमेंट बुक करा",
+                recTitle: "डिजिटल आरोग्य रेकॉर्ड", viewRec: "रेकॉर्ड पहा →", queueTitle: "क्यूप्रणाली", queuePatients: "4 रुग्ण पुढे आहेत",
+                teleTitle: "टेलिकॉन्सल्टेशन", teleDesc: "दूरवरून डॉक्टराशी संपर्क साधा.", teleBtn: "सल्लामसलत सुरू करा",
+                sympTitle: "लक्षण तपासणी", sympPrompt: "लक्षणे लिहा...", sympBtn: "लक्षण तपासा",
+                refTitle: "रेफरल प्रगती", refStatus: "जिल्हा रुग्णालय", medTitle: "औषध उपलब्धता", avail: "उपलब्ध",
+                followTitle: "फॉलो-अप रिमाइंडर", follow1: "निर्धारित औषध घ्या (उद्या)", follow2: "रक्तदाब तपासणी (02 सप्टेंबर)",
+                sosTitle: "आपत्कालीन मदत", sosDesc: "मदतीसाठी आम्ही तुमचे स्थान वापरू.", sosLoc: "माझे स्थान शेअर करा", sosCancel: "रद्द करा"
+            }
+        };
+
+        function updateLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) el.innerText = translations[lang][key];
+            });
+
+            localStorage.setItem("selectedLanguage", lang);
+            const portalLanguageSelector = document.getElementById("portalLanguageSelector");
+            if (portalLanguageSelector) portalLanguageSelector.value = lang;
+        }
+
+        const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
+        updateLanguage(savedLanguage);
+
+        // --- SOS & Geolocation ---
+        function openSOS() { document.getElementById('sosModal').style.display = 'grid'; }
+        function closeSOS() { document.getElementById('sosModal').style.display = 'none'; }
+
+        function getLocation() {
+            const status = document.getElementById('locationStatus');
+            status.innerText = "Requesting location...";
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        status.innerText = `Location Detected: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                        setTimeout(() => {
+                            alert("Finding nearest emergency centres...");
+                            closeSOS();
+                        }, 1500);
+                    },
+                    (err) => { status.innerText = "Location access denied."; status.style.color = "#E53E3E"; }
+                );
+            } else {
+                status.innerText = "Geolocation not supported.";
+            }
+        }
+
+        // Initialize Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

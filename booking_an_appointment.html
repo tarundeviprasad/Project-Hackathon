@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | AarogyaConnect</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --deep-indigo: #1E2A5A;
+            --rich-teal: #0F766E;
+            --soft-aqua: #CFF7F2;
+            --soft-ivory: #F8F7F4;
+            --pure-white: #FFFFFF;
+            --charcoal-navy: #172033;
+            --slate-gray: #667085;
+            --soft-border: #E6E8EE;
+            --transition: cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow-subtle: 0 10px 40px rgba(0,0,0,0.03);
+            --radius-lg: 28px;
+            --radius-md: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--soft-ivory);
+            color: var(--charcoal-navy);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--soft-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--deep-indigo);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--deep-indigo);
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            color: white;
+        }
+
+        .nav-links { display: flex; gap: 32px; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--slate-gray);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .nav-links a.active { color: var(--rich-teal); position: relative; }
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--rich-teal);
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 24px; }
+        .lang-select {
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--charcoal-navy);
+            outline: none;
+        }
+
+        /* --- Hero Header --- */
+        .hero-header {
+            padding: 140px 60px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            right: 100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--soft-aqua) 0%, transparent 70%);
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .breadcrumb {
+            font-size: 0.75rem;
+            color: var(--slate-gray);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .hero-header h4 {
+            color: var(--rich-teal);
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .hero-header h1 {
+            font-size: 3rem;
+            color: var(--deep-indigo);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .hero-header p {
+            color: var(--slate-gray);
+            max-width: 600px;
+            font-size: 1.1rem;
+        }
+
+        /* --- Quick Summary Bar --- */
+        .summary-bar {
+            background: var(--pure-white);
+            margin: 0 60px 40px;
+            padding: 24px 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid var(--soft-border);
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .summary-item { display: flex; flex-direction: column; gap: 4px; flex: 1; text-align: center; }
+        .summary-item:not(:last-child) { border-right: 1px solid var(--soft-border); }
+        .summary-label { font-size: 0.7rem; color: var(--slate-gray); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .summary-value { font-size: 1rem; color: var(--deep-indigo); font-weight: 700; }
+
+        /* --- Container Layout --- */
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 60px 100px;
+        }
+
+        .section-title {
+            margin-bottom: 24px;
+        }
+
+        .section-title h2 { font-size: 1.6rem; color: var(--deep-indigo); margin-bottom: 4px; }
+        .section-title p { font-size: 0.95rem; color: var(--slate-gray); }
+
+        /* --- Card Common Styles --- */
+        .card {
+            background: var(--pure-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--soft-border);
+            padding: 24px;
+            transition: all 0.4s var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 20px 40px rgba(30, 42, 90, 0.05);
+            border-color: var(--rich-teal);
+        }
+
+        /* --- Previously Consulted --- */
+        .prev-doctors-grid {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            scrollbar-width: none;
+        }
+        .prev-doctors-grid::-webkit-scrollbar { display: none; }
+
+        .prev-doc-card {
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .doc-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--soft-aqua);
+            display: grid;
+            place-items: center;
+            color: var(--rich-teal);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            border: 4px solid var(--pure-white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .prev-doc-card h3 { font-size: 1.1rem; color: var(--deep-indigo); margin-bottom: 4px; }
+        .prev-doc-card .specialty { font-size: 0.85rem; color: var(--rich-teal); font-weight: 700; margin-bottom: 2px; }
+        .prev-doc-card .hosp { font-size: 0.8rem; color: var(--slate-gray); margin-bottom: 12px; }
+        .prev-doc-card .last-consult { font-size: 0.75rem; color: var(--slate-gray); background: var(--soft-ivory); padding: 4px 12px; border-radius: 100px; margin-bottom: 16px; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary { background: var(--rich-teal); color: white; }
+        .btn-primary:hover { background: #0b5e58; transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid var(--soft-border); color: var(--deep-indigo); }
+        .btn-outline:hover { background: var(--soft-aqua); color: var(--rich-teal); border-color: var(--soft-aqua); }
+
+        /* --- Search Panel --- */
+        .search-panel {
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: flex-end;
+            margin-top: 20px;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        .input-group label { font-size: 0.75rem; font-weight: 700; color: var(--slate-gray); text-transform: uppercase; }
+        .input-group input, .input-group select {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--soft-border);
+            background: var(--soft-ivory);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--charcoal-navy);
+            outline: none;
+        }
+
+        /* --- Results Layout --- */
+        .results-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        .filter-sidebar h3 { font-size: 0.9rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; color: var(--slate-gray); }
+        .filter-group { margin-bottom: 24px; }
+        .filter-group h4 { font-size: 0.9rem; color: var(--deep-indigo); margin-bottom: 12px; }
+        .filter-option { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; color: var(--slate-gray); cursor: pointer; }
+        .filter-option input { accent-color: var(--rich-teal); width: 16px; height: 16px; }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .results-header span { font-weight: 700; color: var(--slate-gray); font-size: 0.9rem; }
+
+        /* --- Doctor Result Cards --- */
+        .doctor-card {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+            padding: 24px;
+        }
+
+        .doc-profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: var(--radius-md);
+            background: var(--soft-aqua);
+            display: grid;
+            place-items: center;
+            color: var(--rich-teal);
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .doc-main-info { flex: 1; }
+        .doc-main-info .name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .doc-main-info .name-row h3 { color: var(--deep-indigo); font-size: 1.3rem; }
+        .verified-badge { color: #10B981; fill: #10B981; }
+        
+        .doc-main-info .spec { color: var(--rich-teal); font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+        .doc-main-info .hosp-loc { color: var(--slate-gray); font-size: 0.85rem; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+        
+        .doc-stats { display: flex; gap: 20px; border-top: 1px solid var(--soft-border); padding-top: 16px; }
+        .doc-stats-item { display: flex; flex-direction: column; }
+        .doc-stats-item .val { font-weight: 700; color: var(--deep-indigo); font-size: 0.9rem; }
+        .doc-stats-item .lbl { font-size: 0.7rem; color: var(--slate-gray); text-transform: uppercase; font-weight: 700; }
+
+        .doc-availability { width: 220px; border-left: 1px solid var(--soft-border); padding-left: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+        .avail-status { font-size: 0.75rem; color: var(--slate-gray); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .time-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        .time-chip { padding: 6px 10px; background: var(--soft-aqua); color: var(--rich-teal); border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
+        .time-chip.disabled { background: var(--soft-ivory); color: var(--slate-gray); opacity: 0.6; }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(23, 32, 51, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            place-items: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--pure-white);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            border-radius: 32px;
+            position: relative;
+            animation: modalPop 0.4s var(--transition);
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-modal { position: absolute; top: 24px; right: 24px; cursor: pointer; color: var(--slate-gray); }
+
+        .booking-step h2 { font-size: 1.5rem; color: var(--deep-indigo); margin-bottom: 8px; }
+        .booking-step p { color: var(--slate-gray); margin-bottom: 24px; }
+
+        .date-picker { display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 10px; }
+        .date-item { 
+            min-width: 80px; height: 100px; border: 1px solid var(--soft-border); border-radius: 16px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
+        }
+        .date-item.active { background: var(--rich-teal); border-color: var(--rich-teal); color: white; }
+        .date-item .day { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; opacity: 0.8; }
+        .date-item .num { font-size: 1.2rem; font-weight: 800; }
+
+        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+        .time-item { 
+            padding: 12px; border: 1px solid var(--soft-border); border-radius: 12px; 
+            text-align: center; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+        }
+        .time-item.active { background: var(--deep-indigo); border-color: var(--deep-indigo); color: white; }
+        .time-item.disabled { background: var(--soft-ivory); color: var(--slate-gray); cursor: not-allowed; opacity: 0.5; }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--charcoal-navy);
+            padding: 60px;
+            color: white;
+            text-align: center;
+        }
+        footer .logo { color: white; justify-content: center; margin-bottom: 24px; }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 1024px) {
+            .nav-links, .nav-right p { display: none; }
+            .hero-header { padding: 120px 24px 40px; text-align: center; }
+            .hero-header p { margin: 0 auto; }
+            .summary-bar { margin: 0 24px 40px; flex-wrap: wrap; gap: 20px; }
+            .summary-item { border-right: none !important; }
+            .page-container { padding: 0 24px 60px; }
+            .search-row { grid-template-columns: 1fr; }
+            .results-layout { grid-template-columns: 1fr; }
+            .filter-sidebar { display: none; }
+            .doctor-card { flex-direction: column; }
+            .doc-availability { width: 100%; border-left: none; border-top: 1px solid var(--soft-border); padding-left: 0; padding-top: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo">
+            <div class="logo-mark"><i data-lucide="plus" size="18"></i></div>
+            AarogyaConnect
+        </a>
+        <div class="nav-links">
+            <a href="#" data-i18n="navDash">Dashboard</a>
+            <a href="#" class="active" data-i18n="navApt">Appointments</a>
+            <a href="#" data-i18n="navRec">Health Records</a>
+            <a href="#" data-i18n="navRef">Referrals</a>
+            <a href="#" data-i18n="navMed">Medicines</a>
+        </div>
+        <div class="nav-right">
+            <select class="lang-select" id="langSelector" onchange="changeLanguage(this.value)">
+                <option value="en">🌐 English</option>
+                <option value="hi">🌐 हिन्दी</option>
+                <option value="te">🌐 తెలుగు</option>
+                <option value="mr">🌐 मराठी</option>
+            </select>
+            <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--soft-border); padding-left: 20px;">
+                <div style="text-align: right;">
+                    <p style="font-size: 0.85rem; font-weight: 700;">Ram</p>
+                    <p style="font-size: 0.7rem; color: var(--slate-gray);" data-i18n="patientLabel">Patient</p>
+                </div>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--soft-aqua); display: grid; place-items: center; color: var(--rich-teal); font-weight: 700;">R</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="hero-header">
+        <div class="breadcrumb" data-i18n="breadcrumb">Dashboard / Appointments / Book Appointment</div>
+        <h4 data-i18n="headerTag">Appointments</h4>
+        <h1 data-i18n="headerTitle">Book an Appointment</h1>
+        <p data-i18n="headerDesc">Find the right doctor, choose a convenient time, and manage your healthcare with ease.</p>
+    </header>
+
+    <!-- Quick Summary -->
+    <div class="summary-bar">
+        <div class="summary-item">
+            <span class="summary-label" data-i18n="sumUpcoming">Upcoming Appointment</span>
+            <span class="summary-value">Today, 10:30 AM</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label" data-i18n="sumPrev">Previously Consulted</span>
+            <span class="summary-value">6 Doctors</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label" data-i18n="sumAvail">Available Doctors</span>
+            <span class="summary-value" id="availCountText">24 Doctors</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label" data-i18n="sumLoc">Location</span>
+            <span class="summary-value">Hyderabad</span>
+        </div>
+    </div>
+
+    <div class="page-container">
+        
+        <!-- Previously Consulted Section -->
+        <section class="section-title">
+            <h2 data-i18n="prevTitle">Previously Consulted Doctors</h2>
+            <p data-i18n="prevDesc">Quickly book another appointment with a doctor you have already consulted.</p>
+        </section>
+
+        <div class="prev-doctors-grid" id="prevDoctorsList">
+            <!-- Dynamic Injection -->
+        </div>
+
+        <!-- Find Doctor Panel -->
+        <div class="card search-panel">
+            <div class="section-title">
+                <h2 data-i18n="findTitle">Find a Doctor</h2>
+                <p data-i18n="findDesc">Search from available doctors and healthcare specialists.</p>
+            </div>
+            <div class="search-row">
+                <div class="input-group">
+                    <label data-i18n="labelSearch">Search</label>
+                    <input type="text" id="searchInput" placeholder="Doctor name, specialty or hospital" data-i18n-placeholder="phSearch">
+                </div>
+                <div class="input-group">
+                    <label data-i18n="labelSpec">Specialisation</label>
+                    <select id="specFilter">
+                        <option value="All">All Specialisations</option>
+                        <option value="General Physician">General Physician</option>
+                        <option value="Cardiologist">Cardiologist</option>
+                        <option value="Dermatologist">Dermatologist</option>
+                        <option value="Neurologist">Neurologist</option>
+                        <option value="Pediatrician">Pediatrician</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label data-i18n="labelHosp">Hospital</label>
+                    <select id="hospFilter">
+                        <option value="All">All Hospitals</option>
+                        <option value="Apollo Hospitals">Apollo Hospitals</option>
+                        <option value="Yashoda Hospitals">Yashoda Hospitals</option>
+                        <option value="CARE Hospitals">CARE Hospitals</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label data-i18n="labelLoc">Location</label>
+                    <input type="text" value="Hyderabad" disabled>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()" style="height: 46px;" data-i18n="btnSearch">Search Doctors</button>
+            </div>
+        </div>
+
+        <!-- Filter + Results -->
+        <div class="results-layout">
+            <aside class="filter-sidebar">
+                <h3 data-i18n="filterTitle">Filter Doctors</h3>
+                
+                <div class="filter-group">
+                    <h4 data-i18n="fGender">Gender</h4>
+                    <label class="filter-option"><input type="checkbox"> Male</label>
+                    <label class="filter-option"><input type="checkbox"> Female</label>
+                </div>
+
+                <div class="filter-group">
+                    <h4 data-i18n="fExp">Experience</h4>
+                    <label class="filter-option"><input type="radio" name="exp"> 5+ Years</label>
+                    <label class="filter-option"><input type="radio" name="exp"> 10+ Years</label>
+                    <label class="filter-option"><input type="radio" name="exp"> 15+ Years</label>
+                </div>
+
+                <div class="filter-group">
+                    <h4 data-i18n="fConsult">Consultation Type</h4>
+                    <label class="filter-option"><input type="checkbox" checked> In-Person</label>
+                    <label class="filter-option"><input type="checkbox"> Video Call</label>
+                </div>
+
+                <button class="btn btn-outline" style="width: 100%;" onclick="resetFilters()" data-i18n="btnClear">Clear Filters</button>
+            </aside>
+
+            <main>
+                <div class="results-header">
+                    <span><span id="resCount">24</span> <span data-i18n="docFound">doctors found</span></span>
+                    <select class="lang-select" style="font-size: 0.85rem;">
+                        <option data-i18n="sortRec">Sort by: Recommended</option>
+                        <option data-i18n="sortExp">Experience</option>
+                        <option data-i18n="sortRate">Rating</option>
+                    </select>
+                </div>
+
+                <div id="doctorList" class="doctor-results-list">
+                    <!-- Dynamic Injection -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="noResults" style="display: none; text-align: center; padding: 60px;">
+                    <i data-lucide="search-x" size="48" style="color: var(--slate-gray); margin-bottom: 16px;"></i>
+                    <h3 data-i18n="noDocTitle">No doctors found</h3>
+                    <p data-i18n="noDocDesc">Try changing your search or filters.</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="modal-card">
+            <i data-lucide="x" class="close-modal" onclick="closeModal()"></i>
+            <div id="modalContent">
+                <!-- Step 1: Selection -->
+                <div class="booking-step" id="step1">
+                    <h2 data-i18n="bookTitleModal">Book Appointment</h2>
+                    <p data-i18n="bookDescModal">Choose a preferred date and time for your consultation.</p>
+                    
+                    <div id="modalDocInfo" style="display: flex; gap: 16px; margin-bottom: 24px; padding: 16px; background: var(--soft-aqua); border-radius: 16px;">
+                        <!-- Injected -->
+                    </div>
+
+                    <h4 data-i18n="selDate">Select Date</h4>
+                    <div class="date-picker">
+                        <div class="date-item active">
+                            <span class="day">Mon</span>
+                            <span class="num">31</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="day">Tue</span>
+                            <span class="num">01</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="day">Wed</span>
+                            <span class="num">02</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="day">Thu</span>
+                            <span class="num">03</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="day">Fri</span>
+                            <span class="num">04</span>
+                        </div>
+                    </div>
+
+                    <h4 data-i18n="selTime">Select Time</h4>
+                    <div class="time-grid">
+                        <div class="time-item">09:00 AM</div>
+                        <div class="time-item active">09:30 AM</div>
+                        <div class="time-item disabled">10:00 AM</div>
+                        <div class="time-item">11:30 AM</div>
+                        <div class="time-item">02:00 PM</div>
+                        <div class="time-item">04:30 PM</div>
+                    </div>
+
+                    <h4 data-i18n="labelReason">Reason for Visit</h4>
+                    <textarea placeholder="Briefly describe symptoms..." style="width: 100%; height: 80px; padding: 12px; border-radius: 12px; border: 1px solid var(--soft-border); margin-bottom: 24px; outline: none;"></textarea>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="confirmBooking()" data-i18n="btnConfirm">Confirm Appointment</button>
+                        <button class="btn btn-outline" style="flex: 1;" onclick="closeModal()" data-i18n="btnCancel">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Success -->
+                <div class="booking-step" id="step2" style="display: none; text-align: center;">
+                    <div style="width: 64px; height: 64px; background: var(--soft-aqua); color: var(--rich-teal); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
+                        <i data-lucide="check" size="32"></i>
+                    </div>
+                    <h2 data-i18n="confTitle">Appointment Confirmed</h2>
+                    <p data-i18n="confDesc">Your appointment has been successfully booked.</p>
+                    
+                    <div id="confSummary" style="background: var(--soft-ivory); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 24px; border: 1px solid var(--soft-border);">
+                        <!-- Injected -->
+                    </div>
+
+                    <button class="btn btn-primary" onclick="location.reload()" style="width: 100%; justify-content: center;" data-i18n="btnBack">Back to Doctors</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal (Brief) -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-card">
+            <i data-lucide="x" class="close-modal" onclick="closeProfile()"></i>
+            <div id="profileBody">
+                <!-- Injected -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="logo">
+            <div class="logo-mark"><i data-lucide="plus" size="18"></i></div>
+            AarogyaConnect
+        </div>
+        <p style="opacity: 0.7; max-width: 400px; margin: 0 auto 24px; font-size: 0.9rem;" data-i18n="footDesc">Connecting patients with trusted healthcare providers through a secure digital gateway.</p>
+        <div style="display: flex; gap: 24px; justify-content: center; margin-bottom: 24px; font-size: 0.85rem;">
+            <a href="#" style="color: white; text-decoration: none;" data-i18n="navDash">Dashboard</a>
+            <a href="#" style="color: white; text-decoration: none;" data-i18n="navApt">Appointments</a>
+            <a href="#" style="color: white; text-decoration: none;" data-i18n="navRec">Health Records</a>
+        </div>
+        <p style="opacity: 0.5; font-size: 0.75rem;" data-i18n="copyright">© 2026 AarogyaConnect – Healthcare Gateway. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // --- Data ---
+        const doctors = [
+            { id: 1, name: "Dr. Arjun Reddy", spec: "Cardiologist", hosp: "Apollo Hospitals", exp: 12, rating: 4.8, initial: "A", next: "Today, 4:30 PM", fee: 800, prev: false },
+            { id: 2, name: "Dr. Sneha Kapoor", spec: "Dermatologist", hosp: "CARE Hospitals", exp: 8, rating: 4.6, initial: "S", next: "Tomorrow, 10:00 AM", fee: 600, prev: true },
+            { id: 3, name: "Dr. Vivek Sharma", spec: "Neurologist", hosp: "Yashoda Hospitals", exp: 14, rating: 4.8, initial: "V", next: "Today, 2:00 PM", fee: 1000, prev: false },
+            { id: 4, name: "Dr. Meera Rao", spec: "Pediatrician", hosp: "KIMS Hospitals", exp: 9, rating: 4.7, initial: "M", next: "Wed, 11:30 AM", fee: 500, prev: true },
+            { id: 5, name: "Dr. Karthik Reddy", spec: "Orthopedic", hosp: "CARE Hospitals", exp: 11, rating: 4.8, initial: "K", next: "Today, 5:30 PM", fee: 750, prev: false },
+            { id: 6, name: "Dr. Ananya Rao", spec: "Cardiologist", hosp: "Apollo Hospitals", exp: 10, rating: 4.8, initial: "A", next: "Tomorrow, 9:30 AM", fee: 900, prev: true },
+            { id: 7, name: "Dr. Rahul Mehta", spec: "General Physician", hosp: "Yashoda Hospitals", exp: 15, rating: 4.7, initial: "R", next: "Today, 11:30 AM", fee: 400, prev: true },
+            { id: 8, name: "Dr. Priya Sharma", spec: "Dermatologist", hosp: "CARE Hospitals", exp: 12, rating: 4.9, initial: "P", next: "Wed, 10:30 AM", fee: 700, prev: true },
+            { id: 9, name: "Dr. Sanjay Gupta", spec: "General Physician", hosp: "Apollo Hospitals", exp: 20, rating: 4.9, initial: "S", next: "Today, 1:00 PM", fee: 1200, prev: false },
+            { id: 10, name: "Dr. Nisha Patel", spec: "Gynecologist", hosp: "KIMS Hospitals", exp: 7, rating: 4.5, initial: "N", next: "Tomorrow, 4:00 PM", fee: 600, prev: false },
+            { id: 11, name: "Dr. Amit Verma", spec: "Pediatrician", hosp: "Yashoda Hospitals", exp: 10, rating: 4.6, initial: "A", next: "Wed, 12:00 PM", fee: 550, prev: false },
+            { id: 12, name: "Dr. Pooja Iyer", spec: "General Physician", hosp: "CARE Hospitals", exp: 6, rating: 4.4, initial: "P", next: "Today, 3:30 PM", fee: 450, prev: false }
+        ];
+
+        // --- Translation ---
+        const translations = {
+            en: {
+                navDash: "Dashboard", navApt: "Appointments", navRec: "Health Records", navRef: "Referrals", navMed: "Medicines",
+                patientLabel: "Patient", breadcrumb: "Dashboard / Appointments / Book Appointment", headerTag: "Appointments",
+                headerTitle: "Book an Appointment", headerDesc: "Find the right doctor, choose a convenient time, and manage your healthcare with ease.",
+                sumUpcoming: "Upcoming Appointment", sumPrev: "Previously Consulted", sumAvail: "Available Doctors", sumLoc: "Location",
+                prevTitle: "Previously Consulted Doctors", prevDesc: "Quickly book another appointment with a doctor you have already consulted.",
+                findTitle: "Find a Doctor", findDesc: "Search from available doctors and healthcare specialists.",
+                labelSearch: "Search", phSearch: "Doctor name, specialty or hospital", labelSpec: "Specialisation", labelHosp: "Hospital", labelLoc: "Location", btnSearch: "Search Doctors",
+                filterTitle: "Filter Doctors", fGender: "Gender", fExp: "Experience", fConsult: "Consultation Type", btnClear: "Clear Filters",
+                docFound: "doctors found", sortRec: "Sort by: Recommended", sortExp: "Experience", sortRate: "Rating", noDocTitle: "No doctors found", noDocDesc: "Try changing your search or filters.",
+                bookTitleModal: "Book Appointment", bookDescModal: "Choose a preferred date and time for your consultation.",
+                selDate: "Select Date", selTime: "Select Time", labelReason: "Reason for Visit", btnConfirm: "Confirm Appointment", btnCancel: "Cancel",
+                confTitle: "Appointment Confirmed", confDesc: "Your appointment has been successfully booked.", btnBack: "Back to Doctors", footDesc: "Connecting patients through a secure digital gateway.", copyright: "© 2026 AarogyaConnect – Healthcare Gateway. All rights reserved."
+            },
+            hi: {
+                navDash: "डैशबोर्ड", navApt: "अपॉइंटमेंट", navRec: "स्वास्थ्य रिकॉर्ड", navRef: "रेफरल", navMed: "दवाएं",
+                patientLabel: "मरीज", breadcrumb: "डैशबोर्ड / अपॉइंटमेंट / अपॉइंटमेंट बुक करें", headerTag: "अपॉइंटमेंट",
+                headerTitle: "अपॉइंटमेंट बुक करें", headerDesc: "सही डॉक्टर ढूंढें, सुविधाजनक समय चुनें और आसानी से अपने स्वास्थ्य का प्रबंधन करें।",
+                sumUpcoming: "आगामी अपॉइंटमेंट", sumPrev: "पहले परामर्श किया गया", sumAvail: "उपलब्ध डॉक्टर", sumLoc: "स्थान",
+                prevTitle: "पहले परामर्श किए गए डॉक्टर", prevDesc: "उस डॉक्टर के साथ जल्दी से अपॉइंटमेंट बुक करें जिससे आपने पहले परामर्श किया है।",
+                findTitle: "डॉक्टर ढूंढें", findDesc: "उपलब्ध डॉक्टरों और स्वास्थ्य विशेषज्ञों में से खोजें।",
+                labelSearch: "खोजें", phSearch: "डॉक्टर का नाम, विशेषता या अस्पताल", labelSpec: "विशेषज्ञता", labelHosp: "अस्पताल", labelLoc: "स्थान", btnSearch: "डॉक्टर खोजें",
+                filterTitle: "डॉक्टर फिल्टर करें", fGender: "लिंग", fExp: "अनुभव", fConsult: "परामर्श का प्रकार", btnClear: "फिल्टर साफ़ करें",
+                docFound: "डॉक्टर मिले", sortRec: "अनुशंसित", sortExp: "अनुभव", sortRate: "रेटिंग", noDocTitle: "कोई डॉक्टर नहीं मिला", noDocDesc: "अपनी खोज या फ़िल्टर बदलने का प्रयास करें।",
+                bookTitleModal: "अपॉइंटमेंट बुक करें", bookDescModal: "अपने परामर्श के लिए पसंदीदा तिथि और समय चुनें।",
+                selDate: "तारीख चुनें", selTime: "समय चुनें", labelReason: "यात्रा का कारण", btnConfirm: "अपॉइंटमेंट पक्का करें", btnCancel: "रद्द करें",
+                confTitle: "अपॉइंटमेंट पक्का हो गया", confDesc: "आपका अपॉइंटमेंट सफलतापूर्वक बुक हो गया है।", btnBack: "डॉक्टरों पर वापस जाएं", footDesc: "एक सुरक्षित डिजिटल गेटवे के माध्यम से मरीजों को जोड़ना।", copyright: "© 2026 AarogyaConnect – हेल्थकेयर गेटवे। सर्वाधिकार सुरक्षित।"
+            },
+            te: {
+                navDash: "డ్యాష్‌బోర్డ్", navApt: "అపాయింట్‌మెంట్లు", navRec: "ఆరోగ్య రికార్డులు", navRef: "రిఫరల్స్", navMed: "మందులు",
+                patientLabel: "రోగి", breadcrumb: "డ్యాష్‌బోర్డ్ / అపాయింట్‌మెంట్లు / బుక్ చేయండి", headerTag: "అపాయింట్‌మెంట్లు",
+                headerTitle: "అపాయింట్‌మెంట్ బుక్ చేయండి", headerDesc: "సరైన వైద్యుడిని కనుగొనండి, అనుకూలమైన సమయాన్ని ఎంచుకోండి.",
+                sumUpcoming: "రాబోయే అపాయింట్‌మెంట్", sumPrev: "గతంలో సంప్రదించినవారు", sumAvail: "అందుబాటులో ఉన్న వైద్యులు", sumLoc: "ప్రాంతం",
+                prevTitle: "గతంలో సంప్రదించిన వైద్యులు", prevDesc: "మీరు ఇప్పటికే సంప్రదించిన వైద్యుడితో అపాయింట్‌మెంట్‌ని త్వరగా బుక్ చేసుకోండి.",
+                findTitle: "వైద్యుడిని వెతకండి", findDesc: "అందుబాటులో ఉన్న వైద్యులు మరియు ఆరోగ్య నిపుణుల నుండి వెతకండి.",
+                labelSearch: "వెతకండి", phSearch: "పేరు, స్పెషాలిటీ లేదా ఆసుపత్రి", labelSpec: "స్పెషలైజేషన్", labelHosp: "ఆసుపత్రి", labelLoc: "ప్రాంతం", btnSearch: "వెతకండి",
+                filterTitle: "ఫిల్టర్ చేయండి", fGender: "లింగం", fExp: "అనుభవం", fConsult: "సంప్రదింపు రకం", btnClear: "క్లియర్ చేయండి",
+                docFound: "వైద్యులు కనుగొనబడ్డారు", sortRec: "సిఫార్సు చేయబడినవి", sortExp: "అనుభవం", sortRate: "రేటింగ్", noDocTitle: "వైద్యులు దొరకలేదు", noDocDesc: "శోధన లేదా ఫిల్టర్‌లను మార్చడానికి ప్రయత్నించండి.",
+                bookTitleModal: "బుక్ చేయండి", bookDescModal: "మీ సంప్రదింపుల కోసం తేదీ మరియు సమయాన్ని ఎంచుకోండి.",
+                selDate: "తేదీని ఎంచుకోండి", selTime: "సమయాన్ని ఎంచుకోండి", labelReason: "కారణం", btnConfirm: "ధృవీకరించండి", btnCancel: "రద్దు చేయి",
+                confTitle: "ధృవీకరించబడింది", confDesc: "మీ అపాయింట్‌మెంట్ విజయవంతంగా బుక్ చేయబడింది.", btnBack: "తిరిగి వెళ్ళండి", footDesc: "సురక్షితమైన డిజిటల్ గేట్‌వే ద్వారా రోగులను అనుసంధానించడం.", copyright: "© 2026 AarogyaConnect. అన్ని హక్కులు ప్రత్యేకించబడ్డాయి."
+            },
+            mr: {
+                navDash: "डॅशबोर्ड", navApt: "अपॉइंटमेंट्स", navRec: "आरोग्य रेकॉर्ड", navRef: "रेफरल", navMed: "औषधे",
+                patientLabel: "रुग्ण", breadcrumb: "डॅशबोर्ड / अपॉइंटमेंट / बुक करा", headerTag: "अपॉइंटमेंट्स",
+                headerTitle: "अपॉइंटमेंट बुक करा", headerDesc: "योग्य डॉक्टर शोधा, सोयीस्कर वेळ निवडा आणि आपले आरोग्य सहज व्यवस्थापित करा.",
+                sumUpcoming: "आगामी अपॉइंटमेंट", sumPrev: "पूर्वी सल्लामसलत केली", sumAvail: "उपलब्ध डॉक्टर", sumLoc: "ठिकाण",
+                prevTitle: "पूर्वी सल्लामसलत केलेले डॉक्टर", prevDesc: "ज्या डॉक्टरांशी तुम्ही आधी सल्लामसलत केली आहे त्यांच्याकडे लवकर अपॉइंटमेंट बुक करा.",
+                findTitle: "डॉक्टर शोधा", findDesc: "उपलब्ध डॉक्टर आणि आरोग्य तज्ञांमधून शोधा.",
+                labelSearch: "शोधा", phSearch: "डॉक्टरांचे नाव, स्पेशालिटी किंवा रुग्णालय", labelSpec: "विशेषज्ञता", labelHosp: "रुग्णालय", labelLoc: "ठिकाण", btnSearch: "डॉक्टर शोधा",
+                filterTitle: "फिल्टर लावा", fGender: "लिंग", fExp: "अनुभव", fConsult: "परामर्श प्रकार", btnClear: "फिल्टर साफ करा",
+                docFound: "डॉक्टर सापडले", sortRec: "शिफारस केलेले", sortExp: "अनुभव", sortRate: "रेटिंग", noDocTitle: "डॉक्टर सापडले नाहीत", noDocDesc: "शोध किंवा फिल्टर बदलण्याचा प्रयत्न करा.",
+                bookTitleModal: "अपॉइंटमेंट बुक करा", bookDescModal: "सल्लामसलत करण्यासाठी तारीख आणि वेळ निवडा.",
+                selDate: "तारीख निवडा", selTime: "वेळ निवडा", labelReason: "कारण", btnConfirm: "निश्चित करा", btnCancel: "रद्द करा",
+                confTitle: "निश्चित झाले", confDesc: "तुमची अपॉइंटमेंट यशस्वीरित्या बुक झाली आहे.", btnBack: "डॉक्टरांच्या यादीवर जा", footDesc: "सुरक्षित डिजिटल गेटवेद्वारे रुग्णांना जोडणे.", copyright: "© 2026 AarogyaConnect. सर्व हक्क राखीव."
+            }
+        };
+
+        // --- State ---
+        let currentLang = localStorage.getItem("selectedLanguage") || "en";
+        let filteredDoctors = [...doctors];
+        let selectedDocId = null;
+
+        // --- Functions ---
+        function renderPrevDoctors() {
+            const list = document.getElementById('prevDoctorsList');
+            const prevDocs = doctors.filter(d => d.prev);
+            list.innerHTML = prevDocs.map(doc => `
+                <div class="card prev-doc-card">
+                    <div class="doc-avatar">${doc.initial}</div>
+                    <h3>${doc.name}</h3>
+                    <p class="specialty">${doc.spec}</p>
+                    <p class="hosp">${doc.hosp}</p>
+                    <p class="last-consult">Last consulted: 12 Aug 2026</p>
+                    <button class="btn btn-primary" onclick="openBooking(${doc.id})">Book Again</button>
+                </div>
+            `).join('');
+        }
+
+        function renderDoctors(docs) {
+            const list = document.getElementById('doctorList');
+            const noRes = document.getElementById('noResults');
+            const resCount = document.getElementById('resCount');
+            const availText = document.getElementById('availCountText');
+
+            resCount.innerText = docs.length;
+            availText.innerText = `${docs.length} Doctors`;
+
+            if (docs.length === 0) {
+                list.innerHTML = "";
+                noRes.style.display = "block";
+                return;
+            }
+
+            noRes.style.display = "none";
+            list.innerHTML = docs.map(doc => `
+                <div class="card doctor-card">
+                    <div class="doc-profile-img">${doc.initial}</div>
+                    <div class="doc-main-info">
+                        <div class="name-row">
+                            <h3>${doc.name}</h3>
+                            <i data-lucide="check-circle-2" class="verified-badge" size="18"></i>
+                        </div>
+                        <p class="spec">${doc.spec}</p>
+                        <p class="hosp-loc"><i data-lucide="map-pin" size="14"></i> ${doc.hosp}, Hyderabad</p>
+                        <div class="doc-stats">
+                            <div class="doc-stats-item">
+                                <span class="val">${doc.exp} Years</span>
+                                <span class="lbl">Exp</span>
+                            </div>
+                            <div class="doc-stats-item">
+                                <span class="val">⭐ ${doc.rating}</span>
+                                <span class="lbl">Rating</span>
+                            </div>
+                            <div class="doc-stats-item">
+                                <span class="val">₹${doc.fee}</span>
+                                <span class="lbl">Fee</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="doc-availability">
+                        <div>
+                            <p class="avail-status">Next Available</p>
+                            <div class="time-chips">
+                                <div class="time-chip">${doc.next.split(',')[1]}</div>
+                                <div class="time-chip disabled">5:00 PM</div>
+                            </div>
+                            <p style="font-size: 0.7rem; color: var(--slate-gray); font-weight: 600;">${doc.next.split(',')[0]}</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="btn btn-primary" onclick="openBooking(${doc.id})">Book Appointment</button>
+                            <button class="btn btn-outline" onclick="viewProfile(${doc.id})">View Profile</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const spec = document.getElementById('specFilter').value;
+            const hosp = document.getElementById('hospFilter').value;
+
+            filteredDoctors = doctors.filter(doc => {
+                const matchesSearch = doc.name.toLowerCase().includes(search) || 
+                                     doc.spec.toLowerCase().includes(search) || 
+                                     doc.hosp.toLowerCase().includes(search);
+                const matchesSpec = spec === "All" || doc.spec === spec;
+                const matchesHosp = hosp === "All" || doc.hosp === hosp;
+                return matchesSearch && matchesSpec && matchesHosp;
+            });
+
+            renderDoctors(filteredDoctors);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = "";
+            document.getElementById('specFilter').value = "All";
+            document.getElementById('hospFilter').value = "All";
+            filteredDoctors = [...doctors];
+            renderDoctors(filteredDoctors);
+        }
+
+        function openBooking(id) {
+            selectedDocId = id;
+            const doc = doctors.find(d => d.id === id);
+            const info = document.getElementById('modalDocInfo');
+            info.innerHTML = `
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: white; color: var(--rich-teal); display: grid; place-items: center; font-weight: 800;">${doc.initial}</div>
+                <div>
+                    <h4 style="font-weight: 700; color: var(--deep-indigo);">${doc.name}</h4>
+                    <p style="font-size: 0.8rem; color: var(--rich-teal); font-weight: 700;">${doc.spec} • ${doc.hosp}</p>
+                </div>
+            `;
+            document.getElementById('step1').style.display = "block";
+            document.getElementById('step2').style.display = "none";
+            document.getElementById('bookingModal').style.display = "grid";
+        }
+
+        function confirmBooking() {
+            const doc = doctors.find(d => d.id === selectedDocId);
+            const summary = document.getElementById('confSummary');
+            const bookingId = `AC-${new Date().getFullYear()}-${Math.floor(Math.random()*9000)+1000}`;
+            
+            summary.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Doctor</span>
+                    <span style="font-weight: 700; color: var(--deep-indigo);">${doc.name}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Hospital</span>
+                    <span style="font-weight: 700; color: var(--deep-indigo);">${doc.hosp}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Date & Time</span>
+                    <span style="font-weight: 700; color: var(--deep-indigo);">31 Aug, 9:30 AM</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px dashed var(--soft-border);">
+                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Booking ID</span>
+                    <span style="font-weight: 800; color: var(--rich-teal);">${bookingId}</span>
+                </div>
+            `;
+
+            document.getElementById('step1').style.display = "none";
+            document.getElementById('step2').style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').style.display = "none";
+        }
+
+        function viewProfile(id) {
+            const doc = doctors.find(d => d.id === id);
+            const body = document.getElementById('profileBody');
+            body.innerHTML = `
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 24px;">
+                    <div style="width: 80px; height: 80px; border-radius: var(--radius-md); background: var(--soft-aqua); color: var(--rich-teal); display: grid; place-items: center; font-size: 2rem; font-weight: 800;">${doc.initial}</div>
+                    <div>
+                        <h2 style="color: var(--deep-indigo);">${doc.name}</h2>
+                        <p style="color: var(--rich-teal); font-weight: 700;">${doc.spec}</p>
+                        <p style="color: var(--slate-gray); font-size: 0.85rem;">${doc.exp} Years Experience</p>
+                    </div>
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <h4 style="font-size: 0.9rem; color: var(--deep-indigo); margin-bottom: 8px;">About</h4>
+                    <p style="font-size: 0.85rem; color: var(--slate-gray);">Dr. ${doc.name.split(' ')[1]} is a highly experienced ${doc.spec} at ${doc.hosp}. Professional medical expertise with focus on patient care and modern diagnostics.</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                    <div style="background: var(--soft-ivory); padding: 12px; border-radius: 12px;">
+                        <span style="display: block; font-size: 0.7rem; color: var(--slate-gray); text-transform: uppercase;">Education</span>
+                        <span style="font-weight: 700; color: var(--deep-indigo); font-size: 0.8rem;">MBBS, MD ${doc.spec}</span>
+                    </div>
+                    <div style="background: var(--soft-ivory); padding: 12px; border-radius: 12px;">
+                        <span style="display: block; font-size: 0.7rem; color: var(--slate-gray); text-transform: uppercase;">Fee</span>
+                        <span style="font-weight: 700; color: var(--deep-indigo); font-size: 0.8rem;">₹${doc.fee}</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeProfile(); openBooking(${doc.id});">Book Appointment</button>
+            `;
+            document.getElementById('profileModal').style.display = "grid";
+        }
+
+        function closeProfile() {
+            document.getElementById('profileModal').style.display = "none";
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem("selectedLanguage", lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) el.innerText = translations[lang][key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
+            });
+        }
+
+        // --- Init ---
+        window.onload = () => {
+            renderPrevDoctors();
+            renderDoctors(doctors);
+            changeLanguage(currentLang);
+            document.getElementById('langSelector').value = currentLang;
+            lucide.createIcons();
+        };
+
+        // Date selection UI logic
+        document.addEventListener('click', (e) => {
+            const dateItem = e.target.closest('.date-item');
+            if (dateItem) {
+                document.querySelectorAll('.date-item').forEach(el => el.classList.remove('active'));
+                dateItem.classList.add('active');
+            }
+
+            const timeItem = e.target.closest('.time-item');
+            if (timeItem && !timeItem.classList.contains('disabled')) {
+                document.querySelectorAll('.time-item').forEach(el => el.classList.remove('active'));
+                timeItem.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
