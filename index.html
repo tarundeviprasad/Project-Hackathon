@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect | Healthcare Gateway</title>
+    
+    <!-- Typography: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons: Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-indigo: #1E2A5A;
+            --primary-teal: #0F766E;
+            --light-aqua: #CFF7F2;
+            --bg-ivory: #F8F7F4;
+            --text-dark: #172033;
+            --text-secondary: #667085;
+            --border-color: #E6E8EE;
+            --white: #FFFFFF;
+            --critical: #EF4444;
+            
+            --sidebar-width: 280px;
+            --header-height: 72px;
+            --radius-card: 16px;
+            --radius-hero: 24px;
+        }
+
+        /* Smooth Scrolling for the buttons */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-ivory);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* LAYOUT */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR (Request 4 & 5) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            z-index: 1000;
+        }
+
+        /* Request 5: Website Logo (Dark square with white plus) */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            text-decoration: none;
+        }
+
+        .logo-box {
+            width: 42px;
+            height: 42px;
+            background: var(--primary-indigo);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-indigo);
+            line-height: 1;
+        }
+
+        .logo-text span {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 24px 0 12px 12px;
+            display: block;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+        }
+
+        .nav-link.active {
+            background: var(--light-aqua);
+            color: var(--primary-teal);
+        }
+
+        .emergency-card {
+            margin-top: auto;
+            background: var(--primary-indigo);
+            border-radius: 16px;
+            padding: 24px;
+            color: var(--white);
+        }
+
+        .emergency-card p {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .emergency-card h2 {
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* HEADER */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            height: var(--header-height);
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-dark);
+            text-transform: uppercase;
+        }
+
+        .divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+        }
+
+        .location-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* CONTENT */
+        .content-area {
+            padding: 40px;
+            max-width: 1400px;
+        }
+
+        .hero-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-hero);
+            padding: 64px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 40px;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            margin-bottom: 60px;
+        }
+
+        .badge-pill {
+            display: inline-block;
+            background: var(--light-aqua);
+            color: var(--primary-teal);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            line-height: 1.1;
+            color: var(--primary-indigo);
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+
+        .hero-title span { color: var(--primary-teal); }
+
+        .hero-desc {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 520px;
+        }
+
+        .btn-group { display: flex; gap: 16px; }
+
+        .btn-teal {
+            background: var(--primary-teal);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-outline-dark {
+            border: 1.5px solid var(--primary-indigo);
+            color: var(--primary-indigo);
+            padding: 16px 28px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+
+        .network-circle {
+            width: 320px;
+            height: 320px;
+            border: 2px dashed var(--border-color);
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .center-node {
+            width: 90px;
+            height: 90px;
+            background: var(--primary-indigo);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 10;
+        }
+
+        /* ECOSYSTEM GRID */
+        .section-header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-top: 40px;
+        }
+
+        .section-header h2 {
+            font-size: 32px;
+            color: var(--primary-indigo);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .service-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-container {
+            width: 48px;
+            height: 48px;
+            background: var(--light-aqua);
+            color: var(--primary-teal);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .service-card h4 {
+            font-size: 18px;
+            color: var(--primary-indigo);
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .service-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* GATEWAY SECTION (Request 1 & 2) */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .portal-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .portal-card h3 {
+            font-size: 22px;
+            color: var(--primary-indigo);
+            margin-bottom: 16px;
+        }
+
+        .btn-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-indigo);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .portal-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <!-- Request 5: Main Website Logo -->
+            <a href="#" class="logo-container">
+                <div class="logo-box">
+                    <i data-lucide="plus" size="28" stroke-width="3"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>AarogyaConnect</h1>
+                    <span>CONNECT</span>
+                </div>
+            </a>
+
+            <nav>
+                <a href="#" class="nav-link active">
+                    <i data-lucide="home"></i> Home
+                </a>
+                <!-- Request 1: Doctor Portal Sidebar Logo -->
+                <a href="#portals" class="nav-link">
+                    <i data-lucide="stethoscope"></i> Doctor Portal
+                </a>
+                <!-- Request 1: Patient Portal Sidebar Logo -->
+                <a href="#portals" class="nav-link">
+                    <i data-lucide="user"></i> Patient Portal
+                </a>
+
+                <span class="nav-label">Support</span>
+                <!-- Request 4: Customer Service Logo -->
+                <a href="#" class="nav-link">
+                    <i data-lucide="headset"></i> Customer Service
+                </a>
+                <a href="#" class="nav-link">
+                    <i data-lucide="help-circle"></i> Help & FAQs
+                </a>
+            </nav>
+
+            <div class="emergency-card">
+                <p>Emergency Response</p>
+                <h2><i data-lucide="phone-call" size="28"></i> 108</h2>
+            </div>
+        </aside>
+
+        <div class="main-wrapper">
+            <!-- HEADER -->
+            <header class="top-header">
+                <div class="header-left">
+                    <span class="header-title">Healthcare Gateway Platform</span>
+                    <div class="divider"></div>
+                    <div class="location-tag">
+                        <i data-lucide="map-pin" size="18"></i>
+                        National Health Portal
+                    </div>
+                </div>
+                <div class="header-right">
+                    <!-- Request 2: Admin Portal Header Button Logo (Shield icon logic handled in Gateway section, but text is here) -->
+                    <a href="#portals" style="text-decoration: none;" class="btn-outline-dark" style="padding: 8px 16px;">Admin Portal</a>
+                    <div class="divider"></div>
+                    <span style="font-weight: 600; font-size: 14px; cursor: pointer;">English</span>
+                    <i data-lucide="bell" size="20" style="cursor: pointer; color: var(--text-secondary);"></i>
+                </div>
+            </header>
+
+            <main class="content-area">
+                
+                <!-- HERO SECTION -->
+                <section class="hero-card">
+                    <div class="hero-content">
+                        <span class="badge-pill">National Health Gateway</span>
+                        <h2 class="hero-title">Connecting<br>Communities to<br><span>Accessible Healthcare</span></h2>
+                        <p class="hero-desc">
+                            AarogyaConnect is a centralized digital healthcare platform designed to bridge the gap between rural patients, doctors, and specialists through technology.
+                        </p>
+                        <!-- Request 3: Button Functionality (Anchor Links) -->
+                        <div class="btn-group">
+                            <a href="#ecosystem" class="btn-teal">Explore Healthcare Services <i data-lucide="arrow-right" size="18"></i></a>
+                            <a href="#portals" class="btn-outline-dark">Choose Your Portal</a>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-visual">
+                        <div class="network-circle"></div>
+                        <div class="center-node">
+                            <i data-lucide="activity" size="40"></i>
+                        </div>
+                        <!-- Floating Nodes -->
+                        <div class="service-card" style="position: absolute; top: 0; padding: 15px; border-radius: 12px;"><i data-lucide="user" color="#0F766E"></i></div>
+                        <div class="service-card" style="position: absolute; bottom: 0; padding: 15px; border-radius: 12px;"><i data-lucide="stethoscope" color="#0F766E"></i></div>
+                        <div class="service-card" style="position: absolute; left: 0; padding: 15px; border-radius: 12px;"><i data-lucide="building-2" color="#0F766E"></i></div>
+                        <div class="service-card" style="position: absolute; right: 0; padding: 15px; border-radius: 12px;"><i data-lucide="shield-check" color="#0F766E"></i></div>
+                    </div>
+                </section>
+
+                <!-- Request 3 Target: ECOSYSTEM SECTION -->
+                <section id="ecosystem">
+                    <div class="section-header">
+                        <h2>Professional Healthcare Ecosystem</h2>
+                        <p style="color: var(--text-secondary);">Advanced digital infrastructure optimized for rural healthcare delivery.</p>
+                    </div>
+
+                    <div class="services-grid">
+                        <div class="service-card">
+                            <div class="icon-container"><i data-lucide="map"></i></div>
+                            <h4>Intelligent Facility Mapping</h4>
+                            <p>Real-time visibility into the nearest verified Primary Health Centres.</p>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-container"><i data-lucide="network"></i></div>
+                            <h4>Specialist Gateway</h4>
+                            <p>Direct encrypted access to board-certified medical specialists.</p>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-container"><i data-lucide="bar-chart-3"></i></div>
+                            <h4>Live Resource Analytics</h4>
+                            <p>Data on bed availability and equipment at regional hubs.</p>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-container"><i data-lucide="git-pull-request"></i></div>
+                            <h4>Integrated Referral Pathway</h4>
+                            <p>Automated medical data transfer and emergency prioritization.</p>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-container"><i data-lucide="calendar-check"></i></div>
+                            <h4>Smart Appointment Engine</h4>
+                            <p>Low-latency scheduling supporting regional language inputs.</p>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-container"><i data-lucide="database"></i></div>
+                            <h4>Unified Digital Records</h4>
+                            <p>Secure, longitudinal patient data repository for clinical histories.</p>
+                        </div>
+                        <div class="service-card">
+                            <div class="icon-container"><i data-lucide="video"></i></div>
+                            <h4>Virtual Clinical Outreach</h4>
+                            <p>Low-bandwidth video technology for tele-health consultations.</p>
+                        </div>
+                        <!-- Request 4: Emergency Sync Protocol Logo -->
+                        <div class="service-card">
+                            <div class="icon-container" style="background: #E0F2F1;"><i data-lucide="alert-circle" color="#00796B"></i></div>
+                            <h4>Emergency Sync Protocols</h4>
+                            <p>Synchronizing ambulance dispatch with trauma-unit readiness.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Request 3 Target: SECURE GATEWAY SECTION -->
+                <section id="portals" class="portal-section">
+                    <div class="section-header">
+                        <h2>Secure Gateway Access</h2>
+                        <p style="color: var(--text-secondary);">Authorized portal access for the healthcare network.</p>
+                    </div>
+
+                    <div class="portal-grid">
+                        <!-- Request 1: Patient Portal Logo -->
+                        <div class="portal-card">
+                            <i data-lucide="user" size="48" color="#0F766E"></i>
+                            <h3>Patient Portal</h3>
+                            <p style="color: var(--text-secondary); font-size: 14px;">Access healthcare services, book appointments, and view records.</p>
+                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                        </div>
+                        <!-- Request 1: Doctor Portal Logo -->
+                        <div class="portal-card">
+                            <i data-lucide="stethoscope" size="48" color="#0F766E"></i>
+                            <h3>Doctor Portal</h3>
+                            <p style="color: var(--text-secondary); font-size: 14px;">Manage consultations, diagnostics, and referrals efficiently.</p>
+                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                        </div>
+                        <!-- Request 2: Admin Portal Logo -->
+                        <div class="portal-card">
+                            <i data-lucide="shield-check" size="48" color="#0F766E"></i>
+                            <h3>Admin Portal</h3>
+                            <p style="color: var(--text-secondary); font-size: 14px;">Administrative oversight of regional operations and facilities.</p>
+                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
