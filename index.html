@@ -463,27 +463,6 @@
             box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
         }
 
-        .language-picker {
-            display: inline-flex;
-            align-items: center;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--white);
-            padding: 6px 10px;
-        }
-
-        .language-picker select {
-            border: none;
-            background: transparent;
-            color: var(--text-dark);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            outline: none;
-            cursor: pointer;
-            padding-right: 6px;
-        }
-
         @media (max-width: 1200px) {
             .services-grid { grid-template-columns: repeat(2, 1fr); }
             .portal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -528,26 +507,19 @@
                         </a>
                     </div>
                     <div class="divider"></div>
-                    <span class="header-title" data-i18n="headerPlatform">Healthcare Gateway Platform</span>
+                    <span class="header-title">Healthcare Gateway Platform</span>
                     <div class="divider"></div>
                     <div class="location-tag">
                         <i data-lucide="map-pin" size="18"></i>
-                        <span data-i18n="nationalHealthPortal">National Health Portal</span>
+                        National Health Portal
                     </div>
                 </div>
                 <div class="header-right">
-                    <a href="#portals" class="btn-outline-dark system-nav" style="padding: 8px 16px;" data-i18n="systemAdmin">System Admin</a>
-                    <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;" data-i18n="hospitalAdmin">Hospital Admin Portal</a>
-                    <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;" data-i18n="ashaWorker">Asha Worker Portal</a>
+                    <a href="#portals" class="btn-outline-dark system-nav" style="padding: 8px 16px;">System Admin</a>
+                    <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;">Hospital Admin Portal</a>
+                    <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;">Asha Worker Portal</a>
                     <div class="divider"></div>
-                    <label class="language-picker" aria-label="Select language">
-                        <select id="languageSelect" aria-label="Choose language">
-                            <option value="en">English</option>
-                            <option value="te">తెలుగు</option>
-                            <option value="hi">हिन्दी</option>
-                            <option value="mr">मराठी</option>
-                        </select>
-                    </label>
+                    <span style="font-weight: 600; font-size: 14px; cursor: pointer;">English</span>
                     <i data-lucide="bell" size="20" style="cursor: pointer; color: var(--text-secondary);"></i>
                 </div>
             </header>
@@ -557,19 +529,15 @@
                 <!-- HERO SECTION -->
                 <section class="hero-card">
                     <div class="hero-content">
-                        <span class="badge-pill" data-i18n="nationalHealthGateway">National Health Gateway</span>
-                        <h2 class="hero-title">
-                            <span data-i18n="heroConnect">Connecting</span><br>
-                            <span data-i18n="heroCommunities">Communities to</span><br>
-                            <span data-i18n="heroAccessible">Accessible Healthcare</span>
-                        </h2>
-                        <p class="hero-desc" data-i18n="heroDesc">
+                        <span class="badge-pill">National Health Gateway</span>
+                        <h2 class="hero-title">Connecting<br>Communities to<br><span>Accessible Healthcare</span></h2>
+                        <p class="hero-desc">
                             AarogyaConnect is a centralized digital healthcare platform designed to bridge the gap between rural patients, doctors, and specialists through technology.
                         </p>
                         <!-- Request 3: Button Functionality (Anchor Links) -->
                         <div class="btn-group">
-                            <a href="#ecosystem" class="btn-teal"><span data-i18n="exploreServices">Explore Healthcare Services</span> <i data-lucide="arrow-right" size="18"></i></a>
-                            <a href="#portals" class="btn-outline-dark" data-i18n="choosePortal">Choose Your Portal</a>
+                            <a href="#ecosystem" class="btn-teal">Explore Healthcare Services <i data-lucide="arrow-right" size="18"></i></a>
+                            <a href="#portals" class="btn-outline-dark">Choose Your Portal</a>
                         </div>
                     </div>
                     
@@ -589,51 +557,51 @@
                 <!-- Request 3 Target: ECOSYSTEM SECTION -->
                 <section id="ecosystem">
                     <div class="section-header">
-                        <h2 data-i18n="ecosystemTitle">Professional Healthcare Ecosystem</h2>
-                        <p style="color: var(--text-secondary);" data-i18n="ecosystemSubtitle">Advanced digital infrastructure optimized for rural healthcare delivery.</p>
+                        <h2>Professional Healthcare Ecosystem</h2>
+                        <p style="color: var(--text-secondary);">Advanced digital infrastructure optimized for rural healthcare delivery.</p>
                     </div>
 
                     <div class="services-grid">
                         <div class="service-card">
                             <div class="icon-container"><i data-lucide="map"></i></div>
-                            <h4 data-i18n="serviceMappingTitle">Intelligent Facility Mapping</h4>
-                            <p data-i18n="serviceMappingDesc">Real-time visibility into the nearest verified Primary Health Centres.</p>
+                            <h4>Intelligent Facility Mapping</h4>
+                            <p>Real-time visibility into the nearest verified Primary Health Centres.</p>
                         </div>
                         <div class="service-card">
                             <div class="icon-container"><i data-lucide="network"></i></div>
-                            <h4 data-i18n="serviceSpecialistTitle">Specialist Gateway</h4>
-                            <p data-i18n="serviceSpecialistDesc">Direct encrypted access to board-certified medical specialists.</p>
+                            <h4>Specialist Gateway</h4>
+                            <p>Direct encrypted access to board-certified medical specialists.</p>
                         </div>
                         <div class="service-card">
                             <div class="icon-container"><i data-lucide="bar-chart-3"></i></div>
-                            <h4 data-i18n="serviceAnalyticsTitle">Live Resource Analytics</h4>
-                            <p data-i18n="serviceAnalyticsDesc">Data on bed availability and equipment at regional hubs.</p>
+                            <h4>Live Resource Analytics</h4>
+                            <p>Data on bed availability and equipment at regional hubs.</p>
                         </div>
                         <div class="service-card">
                             <div class="icon-container"><i data-lucide="git-pull-request"></i></div>
-                            <h4 data-i18n="serviceReferralTitle">Integrated Referral Pathway</h4>
-                            <p data-i18n="serviceReferralDesc">Automated medical data transfer and emergency prioritization.</p>
+                            <h4>Integrated Referral Pathway</h4>
+                            <p>Automated medical data transfer and emergency prioritization.</p>
                         </div>
                         <div class="service-card">
                             <div class="icon-container"><i data-lucide="calendar-check"></i></div>
-                            <h4 data-i18n="serviceAppointmentsTitle">Smart Appointment Engine</h4>
-                            <p data-i18n="serviceAppointmentsDesc">Low-latency scheduling supporting regional language inputs.</p>
+                            <h4>Smart Appointment Engine</h4>
+                            <p>Low-latency scheduling supporting regional language inputs.</p>
                         </div>
                         <div class="service-card">
                             <div class="icon-container"><i data-lucide="database"></i></div>
-                            <h4 data-i18n="serviceRecordsTitle">Unified Digital Records</h4>
-                            <p data-i18n="serviceRecordsDesc">Secure, longitudinal patient data repository for clinical histories.</p>
+                            <h4>Unified Digital Records</h4>
+                            <p>Secure, longitudinal patient data repository for clinical histories.</p>
                         </div>
                         <div class="service-card">
                             <div class="icon-container"><i data-lucide="video"></i></div>
-                            <h4 data-i18n="serviceOutreachTitle">Virtual Clinical Outreach</h4>
-                            <p data-i18n="serviceOutreachDesc">Low-bandwidth video technology for tele-health consultations.</p>
+                            <h4>Virtual Clinical Outreach</h4>
+                            <p>Low-bandwidth video technology for tele-health consultations.</p>
                         </div>
                         <!-- Request 4: Emergency Sync Protocol Logo -->
                         <div class="service-card">
                             <div class="icon-container" style="background: #E0F2F1;"><i data-lucide="alert-circle" color="#00796B"></i></div>
-                            <h4 data-i18n="serviceEmergencyTitle">Emergency Sync Protocols</h4>
-                            <p data-i18n="serviceEmergencyDesc">Synchronizing ambulance dispatch with trauma-unit readiness.</p>
+                            <h4>Emergency Sync Protocols</h4>
+                            <p>Synchronizing ambulance dispatch with trauma-unit readiness.</p>
                         </div>
                     </div>
                 </section>
@@ -641,40 +609,40 @@
                 <!-- Request 3 Target: SECURE GATEWAY SECTION -->
                 <section id="portals" class="portal-section">
                     <div class="section-header">
-                        <h2 data-i18n="portalTitle">Secure Gateway Access</h2>
-                        <p style="color: var(--text-secondary);" data-i18n="portalSubtitle">Authorized portal access for the healthcare network.</p>
+                        <h2>Secure Gateway Access</h2>
+                        <p style="color: var(--text-secondary);">Authorized portal access for the healthcare network.</p>
                     </div>
 
                     <div class="portal-grid">
                         <div class="portal-card featured">
                             <div class="portal-icon"><i data-lucide="shield-check" size="32" color="#0F766E"></i></div>
-                            <h3 data-i18n="portalSystem">System Admin Portal</h3>
-                            <p data-i18n="portalSystemDesc">Monitor network health, oversee security controls, and manage policy compliance across the platform.</p>
-                            <a href="#" class="btn-login system"><span data-i18n="loginText">Login to Portal</span> <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3>System Admin Portal</h3>
+                            <p>Monitor network health, oversee security controls, and manage policy compliance across the platform.</p>
+                            <a href="#" class="btn-login system">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="user" size="32" color="#0F766E"></i></div>
-                            <h3 data-i18n="portalPatient">Patient Portal</h3>
-                            <p data-i18n="portalPatientDesc">Access healthcare services, book appointments, and view records.</p>
-                            <a href="#" class="btn-login"><span data-i18n="loginText">Login to Portal</span> <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3>Patient Portal</h3>
+                            <p>Access healthcare services, book appointments, and view records.</p>
+                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="stethoscope" size="32" color="#0F766E"></i></div>
-                            <h3 data-i18n="portalDoctor">Doctor Portal</h3>
-                            <p data-i18n="portalDoctorDesc">Manage consultations, diagnostics, and referrals efficiently.</p>
-                            <a href="#" class="btn-login"><span data-i18n="loginText">Login to Portal</span> <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3>Doctor Portal</h3>
+                            <p>Manage consultations, diagnostics, and referrals efficiently.</p>
+                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="building-2" size="32" color="#0F766E"></i></div>
-                            <h3 data-i18n="portalHospital">Hospital Admin Portal</h3>
-                            <p data-i18n="portalHospitalDesc">Administrative oversight of hospitals, staffing, and operational performance.</p>
-                            <a href="#" class="btn-login"><span data-i18n="loginText">Login to Portal</span> <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3>Hospital Admin Portal</h3>
+                            <p>Administrative oversight of hospitals, staffing, and operational performance.</p>
+                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="users" size="32" color="#0F766E"></i></div>
-                            <h3 data-i18n="portalAsha">Asha Worker Portal</h3>
-                            <p data-i18n="portalAshaDesc">Track outreach, referrals, pregnancy support, and community health reports.</p>
-                            <a href="#" class="btn-login"><span data-i18n="loginText">Login to Portal</span> <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3>Asha Worker Portal</h3>
+                            <p>Track outreach, referrals, pregnancy support, and community health reports.</p>
+                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                     </div>
                 </section>
@@ -684,208 +652,7 @@
     </div>
 
     <script>
-        const translations = {
-            en: {
-                headerPlatform: 'Healthcare Gateway Platform',
-                nationalHealthPortal: 'National Health Portal',
-                systemAdmin: 'System Admin',
-                hospitalAdmin: 'Hospital Admin Portal',
-                ashaWorker: 'Asha Worker Portal',
-                nationalHealthGateway: 'National Health Gateway',
-                heroConnect: 'Connecting',
-                heroCommunities: 'Communities to',
-                heroAccessible: 'Accessible Healthcare',
-                heroDesc: 'AarogyaConnect is a centralized digital healthcare platform designed to bridge the gap between rural patients, doctors, and specialists through technology.',
-                exploreServices: 'Explore Healthcare Services',
-                choosePortal: 'Choose Your Portal',
-                ecosystemTitle: 'Professional Healthcare Ecosystem',
-                ecosystemSubtitle: 'Advanced digital infrastructure optimized for rural healthcare delivery.',
-                serviceMappingTitle: 'Intelligent Facility Mapping',
-                serviceMappingDesc: 'Real-time visibility into the nearest verified Primary Health Centres.',
-                serviceSpecialistTitle: 'Specialist Gateway',
-                serviceSpecialistDesc: 'Direct encrypted access to board-certified medical specialists.',
-                serviceAnalyticsTitle: 'Live Resource Analytics',
-                serviceAnalyticsDesc: 'Data on bed availability and equipment at regional hubs.',
-                serviceReferralTitle: 'Integrated Referral Pathway',
-                serviceReferralDesc: 'Automated medical data transfer and emergency prioritization.',
-                serviceAppointmentsTitle: 'Smart Appointment Engine',
-                serviceAppointmentsDesc: 'Low-latency scheduling supporting regional language inputs.',
-                serviceRecordsTitle: 'Unified Digital Records',
-                serviceRecordsDesc: 'Secure, longitudinal patient data repository for clinical histories.',
-                serviceOutreachTitle: 'Virtual Clinical Outreach',
-                serviceOutreachDesc: 'Low-bandwidth video technology for tele-health consultations.',
-                serviceEmergencyTitle: 'Emergency Sync Protocols',
-                serviceEmergencyDesc: 'Synchronizing ambulance dispatch with trauma-unit readiness.',
-                portalTitle: 'Secure Gateway Access',
-                portalSubtitle: 'Authorized portal access for the healthcare network.',
-                portalSystem: 'System Admin Portal',
-                portalSystemDesc: 'Monitor network health, oversee security controls, and manage policy compliance across the platform.',
-                portalPatient: 'Patient Portal',
-                portalPatientDesc: 'Access healthcare services, book appointments, and view records.',
-                portalDoctor: 'Doctor Portal',
-                portalDoctorDesc: 'Manage consultations, diagnostics, and referrals efficiently.',
-                portalHospital: 'Hospital Admin Portal',
-                portalHospitalDesc: 'Administrative oversight of hospitals, staffing, and operational performance.',
-                portalAsha: 'Asha Worker Portal',
-                portalAshaDesc: 'Track outreach, referrals, pregnancy support, and community health reports.',
-                loginText: 'Login to Portal'
-            },
-            te: {
-                headerPlatform: 'ఆరోగ్య గేట్‌వే ప్లాట్‌ఫారమ్',
-                nationalHealthPortal: 'జాతీయ ఆరోగ్య పోర్టల్',
-                systemAdmin: 'సిస్టమ్ అడ్మిన్',
-                hospitalAdmin: 'హాస్పిటల్ అడ్మిన్ పోర్టల్',
-                ashaWorker: 'అషా వర్కర్ పోర్టల్',
-                nationalHealthGateway: 'జాతీయ ఆరోగ్య గేట్‌వే',
-                heroConnect: 'చేరుస్తున్నాం',
-                heroCommunities: 'సమాజాలకు',
-                heroAccessible: 'సులభమైన ఆరోగ్య సేవ',
-                heroDesc: 'ఆరోగ్య కనెక్ట్ అనేది గ్రామీణ రోగులు, డాక్టర్లు మరియు స్పెషలిస్టుల మధ్య అంతరాన్ని తగ్గించే కేంద్రీకరించిన డిజిటల్ ఆరోగ్య ప్లాట్‌ఫారమ్.',
-                exploreServices: 'ఆరోగ్య సేవలను అన్వేషించండి',
-                choosePortal: 'పోర్టల్‌ను ఎంచుకోండి',
-                ecosystemTitle: 'ప్రొఫెషనల్ హెల్త్‌కేర్ ఎకోసిస్టమ్',
-                ecosystemSubtitle: 'గ్రామీణ ఆరోగ్య సేవలకు అనుకూలంగా రూపొందించిన అధునాతన డిజిటల్ ఇన్ఫ్రాస్ట్రక్చర్.',
-                serviceMappingTitle: 'ఇంటెలిజెంట్ ఫెసిలిటీ మ్యాపింగ్',
-                serviceMappingDesc: 'చిన్నచిన్న మెరుగైన ప్రాథమిక ఆరోగ్య కేంద్రాల గురించి పాక్షిక సమాచారం.',
-                serviceSpecialistTitle: 'స్పెషలిస్ట్ గేట్‌వే',
-                serviceSpecialistDesc: 'బోర్డ్-సర్టిఫైడ్ మెడికల్ స్పెషలిస్టులకు సురక్షిత అనుకూల యాక్సెస్.',
-                serviceAnalyticsTitle: 'లైవ్ రిసోర్స్ అనాలిటిక్స్',
-                serviceAnalyticsDesc: 'ప్రాంతీయ కేంద్రాల్లో పడకలు మరియు పరికరాల లభ్యత గురించి డేటా.',
-                serviceReferralTitle: 'ఇంటిగ్రేటెడ్ రిఫరల్ పాత్‌వే',
-                serviceReferralDesc: 'ఆటోమేటెడ్ మెడికల్ డేటా బదిలీ మరియు అత్యవసర ప్రాధాన్యత.',
-                serviceAppointmentsTitle: 'స్మార్ట్ అపాయింట్మెంట్ ఇంజిన్',
-                serviceAppointmentsDesc: 'ప్రాంతీయ భాషలతో తక్కువ التأخير షెడ్యూలింగ్.',
-                serviceRecordsTitle: 'యునిఫైడ్ డిజిటల్ రికార్డ్స్',
-                serviceRecordsDesc: 'క్లినికల్ చరిత్రల కోసం సురక్షిత, పొడవైన రోగి డేటా నిల్వ.',
-                serviceOutreachTitle: 'వర్చువల్ క్లినికల్ ఔట్‌రెచ్',
-                serviceOutreachDesc: 'టెలీ-హెల్త్ కన్సల్టేషన్ కోసం తక్కువ-బ్యాండ్‌విడ్త్ వీడియో టెక్నాలజీ.',
-                serviceEmergencyTitle: 'ఎమర్జెన్సీ సింక్ ప్రోటోకాల్స్',
-                serviceEmergencyDesc: 'అంబులెన్స్ డిస్పాచ్‌ను ట్రామా యూనిట్ తయారీలో సమకాలీకరించడం.',
-                portalTitle: 'సురక్షిత గేట్‌వే యాక్సెస్',
-                portalSubtitle: 'ఆరోగ్య నెట్‌వర్క్ కోసం అధీకృత పోర్టల్ యాక్సెస్.',
-                portalSystem: 'సిస్టమ్ అడ్మిన్ పోర్టల్',
-                portalSystemDesc: 'నెట్‌వర్క్ హెల్త్‌ను పర్యవేక్షించడం, సెక్యూరిటీ నియంత్రణలను నిర్వహించడం మరియు పాలసీ క్రమసభ్యతను చూసుకోవడం.',
-                portalPatient: 'పేషెంట్ పోర్టల్',
-                portalPatientDesc: 'ఆరోగ్య సేవలను పొందండి, అపాయింట్‌లను బుక్ చేసుకోండి మరియు రికార్డులను చూడండి.',
-                portalDoctor: 'డాక్టర్ పోర్టల్',
-                portalDoctorDesc: 'కన్సల్టేషన్లు, డయాగ్నాస్టిక్స్ మరియు రిఫరల్స్‌ను సమర్థవంతంగా నిర్వహించండి.',
-                portalHospital: 'హాస్పిటల్ అడ్మిన్ పోర్టల్',
-                portalHospitalDesc: 'హాస్పిటల్లకు నిర్వహణ, సిబ్బంది మరియు కార్యాచరణ పనితీరు పై పరిశీలన.',
-                portalAsha: 'అషా వర్కర్ పోర్టల్',
-                portalAshaDesc: 'అవుట్రీచ్, రిఫరల్స్, గర్భధారణ సహాయం మరియు కమ్యూనిటీ హెల్త్ రిపోర్టులను ట్రాక్ చేయండి.',
-                loginText: 'పోర్టల్‌లో లాగిన్ చేయండి'
-            },
-            hi: {
-                headerPlatform: 'स्वास्थ्य गेटवे प्लेटफ़ॉर्म',
-                nationalHealthPortal: 'राष्ट्रीय स्वास्थ्य पोर्टल',
-                systemAdmin: 'सिस्टम एडमिन',
-                hospitalAdmin: 'हॉस्पिटल एडमिन पोर्टल',
-                ashaWorker: 'आशा वर्कर पोर्टल',
-                nationalHealthGateway: 'राष्ट्रीय स्वास्थ्य गेटवे',
-                heroConnect: 'कनेक्टिंग',
-                heroCommunities: 'कम्युनिटीज़ को',
-                heroAccessible: 'सुलभ स्वास्थ्य सेवा',
-                heroDesc: 'आरोग्यकनेक्ट एक केंद्रीकृत डिजिटल स्वास्थ्य प्लेटफ़ॉर्म है, जो ग्रामीण रोगियों, डॉक्टरों और विशेषज्ञों के बीच की दूरी को कम करता है।',
-                exploreServices: 'स्वास्थ्य सेवाएँ देखें',
-                choosePortal: 'अपना पोर्टल चुनें',
-                ecosystemTitle: 'पेशेवर हेल्थकेयर इकोसिस्टम',
-                ecosystemSubtitle: 'ग्रामीण स्वास्थ्य सेवा के लिए अनुकूलित उन्नत डिजिटल इन्फ्रास्ट्रक्चर।',
-                serviceMappingTitle: 'इंटेलिजेंट फॅसिलिटी मैपिंग',
-                serviceMappingDesc: 'निकटतम सत्यापित प्राथमिक स्वास्थ्य केंद्रों की वास्तविक समय जानकारी।',
-                serviceSpecialistTitle: 'स्पेशलिस्ट गेटवे',
-                serviceSpecialistDesc: 'बोर्ड-सर्टिफाइड मेडिकल विशेषज्ञों तक सुरक्षित पहुँच।',
-                serviceAnalyticsTitle: 'लाइव रिसोर्स एनालिटिक्स',
-                serviceAnalyticsDesc: 'क्षेत्रीय हबों में बेड और उपकरण उपलब्धता का डेटा।',
-                serviceReferralTitle: 'इंटीग्रेटेड रेफ़रल पथ',
-                serviceReferralDesc: 'स्वचालित मेडिकल डेटा ट्रांसफ़र और आपातकालीन प्राथमिकता।',
-                serviceAppointmentsTitle: 'स्मार्ट अपॉइंटमेंट इंजन',
-                serviceAppointmentsDesc: 'क्षेत्रीय भाषाओं का समर्थन करने वाला कम-लेटेंसी शेड्यूलिंग।',
-                serviceRecordsTitle: 'यूनिफ़ाइड डिजिटल रिकॉर्ड्स',
-                serviceRecordsDesc: 'क्लिनिकल इतिहासों के लिए सुरक्षित, दीर्घकालिक रोगी डेटा रिपॉजिटरी।',
-                serviceOutreachTitle: 'वर्चुअल क्लिनिकल आउटरीच',
-                serviceOutreachDesc: 'टेली-हेल्थ कंसल्टेशन के लिए लो-बैंडविड्थ वीडियो टेक्नोलॉजी।',
-                serviceEmergencyTitle: 'आपातकालीन सिंक प्रोटोकॉल',
-                serviceEmergencyDesc: 'एम्बुलेंस डिस्पैच को ट्रॉमा यूनिट रीडनेस के साथ सिंक्रोनाइज़ करना।',
-                portalTitle: 'सुरक्षित गेटवे एक्सेस',
-                portalSubtitle: 'स्वास्थ्य नेटवर्क के लिए अधिकृत पोर्टल एक्सेस।',
-                portalSystem: 'सिस्टम एडमिन पोर्टल',
-                portalSystemDesc: 'नेटवर्क स्वास्थ्य की निगरानी, सुरक्षा नियंत्रणों का प्रबंधन और प्लेटफॉर्म पर नीति अनुपालन।',
-                portalPatient: 'पेशेंट पोर्टल',
-                portalPatientDesc: 'स्वास्थ्य सेवाएँ एक्सेस करें, अपॉइंटमेंट बुक करें और रिकॉर्ड देखें।',
-                portalDoctor: 'डॉक्टर पोर्टल',
-                portalDoctorDesc: 'कंसल्टेशन, डायग्नोस्टिक्स और रेफ़रल को प्रभावी ढंग से प्रबंधित करें।',
-                portalHospital: 'हॉस्पिटल एडमिन पोर्टल',
-                portalHospitalDesc: 'अस्पतालों, स्टाफिंग और परिचालन प्रदर्शन पर प्रशासनिक निगरानी।',
-                portalAsha: 'आशा वर्कर पोर्टल',
-                portalAshaDesc: 'आउटरीच, रेफ़रल, प्रसव सहायता और सामुदायिक स्वास्थ्य रिपोर्ट ट्रैक करें।',
-                loginText: 'पोर्टल में लॉगिन'
-            },
-            mr: {
-                headerPlatform: 'आरोग्य गेटवे प्लॅटफॉर्म',
-                nationalHealthPortal: 'राष्ट्रीय आरोग्य पोर्टल',
-                systemAdmin: 'सिस्टम अॅडमिन',
-                hospitalAdmin: 'हॉस्पिटल अॅडमिन पोर्टल',
-                ashaWorker: 'आशा वर्कर पोर्टल',
-                nationalHealthGateway: 'राष्ट्रीय आरोग्य गेटवे',
-                heroConnect: 'कनेक्ट करत आहोत',
-                heroCommunities: 'समुदायांना',
-                heroAccessible: 'सुलभ आरोग्यसेवा',
-                heroDesc: 'आरोग्यकनेक्ट हे एक केंद्रीकृत डिजिटल आरोग्य प्लॅटफॉर्म आहे जे ग्रामीण रुग्ण, डॉक्टर आणि तज्ज्ञ यांच्यातील अंतर कमी करण्यासाठी डिझाइन केले आहे.',
-                exploreServices: 'आरोग्य सेवा एक्सप्लोर करा',
-                choosePortal: 'आपला पोर्टल निवडा',
-                ecosystemTitle: 'प्रोफेशनल हेल्थकेअर इकोसिस्टम',
-                ecosystemSubtitle: 'ग्रामीण आरोग्य सेवा साठी अनुकूलित प्रगत डिजिटल इन्फ्रास्ट्रक्चर.',
-                serviceMappingTitle: 'इंटेलिजेंट फॅसिलिटी मॅपिंग',
-                serviceMappingDesc: 'जवळच्या सत्यापित प्राथमिक आरोग्य केंद्रांची रियल-टाइम माहिती.',
-                serviceSpecialistTitle: 'स्पेशलिस्ट गेटवे',
-                serviceSpecialistDesc: 'बोर्ड-प्रमाणित वैद्यकीय तज्ज्ञांशी सुरक्षित प्रवेश.',
-                serviceAnalyticsTitle: 'लाइव्ह रिसोर्स अॅनालिटिक्स',
-                serviceAnalyticsDesc: 'प्रादेशिक केंद्रांमधील बेड आणि उपकरण उपलब्धता डेटा.',
-                serviceReferralTitle: 'इंटिग्रेटेड रेफरल पाथवे',
-                serviceReferralDesc: 'ऑटोमेटेड मेडिकल डेटा ट्रान्सफर आणि आपत्कालीन प्राधान्य.',
-                serviceAppointmentsTitle: 'स्मार्ट अपॉइंटमेंट इंजिन',
-                serviceAppointmentsDesc: 'प्रादेशिक भाषांना समर्थन देणारी कमी-लेटन्सी वेळापत्रक.',
-                serviceRecordsTitle: 'युनिफाइड डिजिटल रेकॉर्ड्स',
-                serviceRecordsDesc: 'क्लिनिकल इतिहासांसाठी सुरक्षित, दीर्घकालीन रुग्ण डेटा भंडार.',
-                serviceOutreachTitle: 'व्हर्चुअल क्लिनिकल आउटरीच',
-                serviceOutreachDesc: 'टेली-हेल्थ सल्लामसलतीसाठी लो-बँडविड्थ व्हिडिओ तंत्रज्ञान.',
-                serviceEmergencyTitle: 'इमर्जन्सी सिंक प्रोटोकॉल',
-                serviceEmergencyDesc: 'एम्बुलन्स डिस्पॅचचे ट्रॉमा युनिट तयारीशी समक्रमित करणे.',
-                portalTitle: 'सुरक्षित गेटवे अ‍ॅक्सेस',
-                portalSubtitle: 'आरोग्य नेटवर्कसाठी अधिकृत पोर्टल अ‍ॅक्सेस.',
-                portalSystem: 'सिस्टम अॅडमिन पोर्टल',
-                portalSystemDesc: 'नेटवर्क आरोग्याची निगा, सुरक्षा नियंत्रणांचे व्यवस्थापन आणि पॉलिसी अनुपालन.',
-                portalPatient: 'रुग्ण पोर्टल',
-                portalPatientDesc: 'आरोग्य सेवा वापरा, अपॉइंटमेंट बुक करा आणि रेकॉर्ड पहा.',
-                portalDoctor: 'डॉक्टर पोर्टल',
-                portalDoctorDesc: 'कन्सल्टेशन, डायग्नोस्टीक्स आणि रेफरल प्रभावीपणे व्यवस्थापित करा.',
-                portalHospital: 'हॉस्पिटल अॅडमिन पोर्टल',
-                portalHospitalDesc: 'रुग्णालये, Staffing आणि ऑपरेशनल कामगिरीवर प्रशासकीय देखरेख.',
-                portalAsha: 'आशा वर्कर पोर्टल',
-                portalAshaDesc: 'आउटरीच, रेफरल, गरोदर मदत आणि समुदाय आरोग्य अहवाल ट्रॅक करा.',
-                loginText: 'पोर्टलमध्ये लॉगिन'
-            }
-        };
-
-        const languageSelect = document.getElementById('languageSelect');
-
-        function applyLanguage(lang) {
-            const selected = translations[lang] || translations.en;
-            document.querySelectorAll('[data-i18n]').forEach((element) => {
-                const key = element.dataset.i18n;
-                if (selected[key]) {
-                    element.textContent = selected[key];
-                }
-            });
-            document.documentElement.lang = lang;
-        }
-
-        languageSelect.addEventListener('change', (event) => {
-            applyLanguage(event.target.value);
-        });
-
         lucide.createIcons();
-        applyLanguage(languageSelect.value);
     </script>
 </body>
 </html>
