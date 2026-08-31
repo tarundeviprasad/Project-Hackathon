@@ -378,20 +378,20 @@
       </section>
 
       <section class="right">
-        <form class="auth-box" id="adminLoginForm" action="index.html" method="get">
+        <form class="auth-box" action="/admin/login/" method="post">
           <h3>Admin sign in</h3>
           <p>Enter your administrative credentials to continue.</p>
 
           <div class="field">
             <label for="admin-email">Admin Email</label>
             <span class="icon-wrap">✉</span>
-            <input id="admin-email" name="admin-email" type="email" placeholder="admin@aarogya.in" required>
+            <input id="admin-email" name="username" type="text" placeholder="admin@aarogya.in" required>
           </div>
 
           <div class="field">
             <label for="admin-password">Password</label>
             <span class="icon-wrap">🔒</span>
-            <input id="admin-password" type="password" placeholder="Enter your password" required>
+            <input id="admin-password" name="password" type="password" placeholder="Enter your password" required>
           </div>
 
           <div class="inline-row">
@@ -408,10 +408,50 @@
   </div>
 
   <script>
-    document.getElementById('adminLoginForm')?.addEventListener('submit', function (event) {
-      event.preventDefault();
-      window.location.href = 'index.html';
-    });
+    async function getCsrfToken() {
+      const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrftoken='));
+
+      if (cookieValue) {
+        return decodeURIComponent(cookieValue.split('=')[1]);
+      }
+
+      await fetch('/csrf/', { credentials: 'same-origin' });
+      const freshCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrftoken='));
+
+      return freshCookie ? decodeURIComponent(freshCookie.split('=')[1]) : '';
+    }
+
+    const form = document.querySelector('form[action="/admin/login/"]');
+    if (form) {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const csrfToken = await getCsrfToken();
+        const formData = new URLSearchParams(new FormData(form));
+
+        const response = await fetch('/admin/login/', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: formData
+        });
+
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+
+        if (response.ok) {
+          window.location.href = response.url || '/index.html';
+        }
+      });
+    }
   </script>
 </body>
 </html>

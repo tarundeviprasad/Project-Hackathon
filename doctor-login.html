@@ -384,20 +384,20 @@
       </section>
 
       <section class="right">
-        <form class="auth-box" id="doctorLoginForm" action="doctor-dashboard.html" method="get">
+        <form class="auth-box" action="/doctor/login/" method="post">
           <h3>Sign in</h3>
           <p>Enter your credentials to continue to your doctor dashboard.</p>
 
           <div class="field">
             <label for="doctor-email">Medical Email</label>
             <span class="icon-wrap">✉</span>
-            <input id="doctor-email" name="doctor-email" type="email" placeholder="doctor@aarogya.in" required>
+            <input id="doctor-email" name="username" type="text" placeholder="doctor@aarogya.in" required>
           </div>
 
           <div class="field">
             <label for="doctor-password">Password</label>
             <span class="icon-wrap">🔒</span>
-            <input id="doctor-password" type="password" placeholder="Enter your password" required>
+            <input id="doctor-password" name="password" type="password" placeholder="Enter your password" required>
           </div>
 
           <div class="inline-row">
@@ -414,10 +414,50 @@
   </div>
 
   <script>
-    document.getElementById('doctorLoginForm')?.addEventListener('submit', function (event) {
-      event.preventDefault();
-      window.location.href = 'doctor-dashboard.html';
-    });
+    async function getCsrfToken() {
+      const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrftoken='));
+
+      if (cookieValue) {
+        return decodeURIComponent(cookieValue.split('=')[1]);
+      }
+
+      await fetch('/csrf/', { credentials: 'same-origin' });
+      const freshCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrftoken='));
+
+      return freshCookie ? decodeURIComponent(freshCookie.split('=')[1]) : '';
+    }
+
+    const form = document.querySelector('form[action="/doctor/login/"]');
+    if (form) {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const csrfToken = await getCsrfToken();
+        const formData = new URLSearchParams(new FormData(form));
+
+        const response = await fetch('/doctor/login/', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: formData
+        });
+
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+
+        if (response.ok) {
+          window.location.href = response.url || '/doctor-dashboard.html';
+        }
+      });
+    }
   </script>
 </body>
 </html>

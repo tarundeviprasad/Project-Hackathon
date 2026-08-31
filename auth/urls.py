@@ -7,6 +7,12 @@ from .create_doctor import create_doctor
 
 urlpatterns = [
 
+    path(
+        "csrf/",
+        login.get_csrf_token,
+        name="csrf_token"
+    ),
+
     # =========================
     # PATIENT LOGIN
     # =========================

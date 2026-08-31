@@ -1,8 +1,13 @@
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.shortcuts import render
+
+
 @login_required
 def patient_dashboard(request):
     if request.user.role != "PATIENT":
         return HttpResponseForbidden("Access denied")
-    return render(request, "patient/dashboard.html")
+        return redirect("/patient_portal.html") 
 
 
 @login_required

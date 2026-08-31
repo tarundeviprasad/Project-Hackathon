@@ -1,5 +1,5 @@
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
 
 class Patient(models.Model):
     GENDER_CHOICES = [
@@ -15,7 +15,7 @@ class Patient(models.Model):
         ('mr', 'Marathi'),
     ]
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='patient_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='patient_profile')
     patient_id = models.CharField(max_length=30, unique=True)
     full_name = models.CharField(max_length=200)
     dob = models.DateField(null=True, blank=True)

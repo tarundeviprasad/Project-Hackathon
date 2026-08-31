@@ -312,16 +312,16 @@
 <body>
 
     <nav>
-        <a href="#" class="logo">
+        <a href="index.html" class="logo">
             <div class="logo-mark"><i data-lucide="plus"></i></div>
             AarogyaConnect
         </a>
         <div class="nav-links">
-            <a href="#" class="active" data-i18n="navDash">Dashboard</a>
-            <a href="#" data-i18n="navApt">Appointments</a>
-            <a href="#" data-i18n="navRec">Health Records</a>
-            <a href="#" data-i18n="navRef">Referrals</a>
-            <a href="#" data-i18n="navMed">Medicines</a>
+            <a href="patient_portal.html" class="active" data-i18n="navDash">Dashboard</a>
+            <a href="booking_an_appointment.html" data-i18n="navApt">Appointments</a>
+            <a href="digital_health_record.html" data-i18n="navRec">Health Records</a>
+            <a href="symptom_checker.html" data-i18n="navRef">Referrals</a>
+            <a href="symptom_checker.html" data-i18n="navMed">Medicines</a>
         </div>
         <div class="nav-right">
             <select id="portalLanguageSelector" onchange="updateLanguage(this.value)" style="border: none; background: transparent; font-weight: 600; cursor: pointer;">
@@ -381,7 +381,7 @@
             <div class="icon-box"><i data-lucide="calendar"></i></div>
             <h3 data-i18n="bookTitle">Book an Appointment</h3>
             <p data-i18n="bookDesc">Find the right doctor or healthcare centre and choose a convenient time.</p>
-            <button class="btn btn-white" data-i18n="bookBtn">Book Appointment</button>
+            <button class="btn btn-white" type="button" onclick="window.location.href='booking_an_appointment.html'" data-i18n="bookBtn">Book Appointment</button>
         </div>
 
         <!-- Health Records -->
@@ -415,7 +415,7 @@
             <div class="icon-box"><i data-lucide="video"></i></div>
             <h3 data-i18n="teleTitle">Teleconsultation</h3>
             <p data-i18n="teleDesc">Connect with a doctor without travelling long distances.</p>
-            <button class="btn btn-primary" data-i18n="teleBtn">Start Consultation</button>
+            <button class="btn btn-primary" type="button" onclick="window.location.href='symptom_checker.html'" data-i18n="teleBtn">Start Consultation</button>
         </div>
 
         <!-- Symptom Checker -->
@@ -425,7 +425,7 @@
             <div style="background: var(--soft-ivory); border-radius: 12px; padding: 12px; margin-bottom: 16px;">
                 <p style="font-size: 0.75rem; margin: 0;" data-i18n="sympPrompt">Describe your symptoms...</p>
             </div>
-            <button class="btn btn-outline" data-i18n="sympBtn">Check Symptoms</button>
+            <button class="btn btn-outline" type="button" onclick="window.location.href='symptom_checker.html'" data-i18n="sympBtn">Check Symptoms</button>
         </div>
 
         <!-- Referral Tracking -->
@@ -453,16 +453,7 @@
                 <span>Paracetamol 500mg</span>
                 <span style="color: var(--rich-teal); font-weight: 700;" data-i18n="avail">AVAILABLE</span>
             </div>
-        </div>
-
-        <!-- Follow-up -->
-        <div class="card feat-followup">
-            <div class="icon-box"><i data-lucide="bell"></i></div>
-            <h3 data-i18n="followTitle">Follow-up Reminders</h3>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--rich-teal);"></div>
-                    <span style="font-size: 0.85rem;" data-i18n="follow1">Take prescribed medicine (Tomorrow)</span>
+            <button class="btn btn-outline" type="button" onclick="window.location.href='symptom_checker.html'" style="margin-top: 18px;">Check Medicines</button>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--slate-gray);"></div>
@@ -490,6 +481,12 @@
     </div>
 
     <script>
+        document.querySelectorAll('a[href="#"]').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+            });
+        });
+
         // --- Translation Engine ---
         const translations = {
             en: {

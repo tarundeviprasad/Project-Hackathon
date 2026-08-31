@@ -618,31 +618,31 @@
                             <div class="portal-icon"><i data-lucide="shield-check" size="32" color="#0F766E"></i></div>
                             <h3>System Admin Portal</h3>
                             <p>Monitor network health, oversee security controls, and manage policy compliance across the platform.</p>
-                            <a href="#" class="btn-login system">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <a href="admin-login.html" class="btn-login system">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="user" size="32" color="#0F766E"></i></div>
                             <h3>Patient Portal</h3>
                             <p>Access healthcare services, book appointments, and view records.</p>
-                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <a href="patient-login.html" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="stethoscope" size="32" color="#0F766E"></i></div>
                             <h3>Doctor Portal</h3>
                             <p>Manage consultations, diagnostics, and referrals efficiently.</p>
-                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <a href="doctor-login.html" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="building-2" size="32" color="#0F766E"></i></div>
                             <h3>Hospital Admin Portal</h3>
                             <p>Administrative oversight of hospitals, staffing, and operational performance.</p>
-                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <a href="admin-login.html" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="users" size="32" color="#0F766E"></i></div>
                             <h3>Asha Worker Portal</h3>
                             <p>Track outreach, referrals, pregnancy support, and community health reports.</p>
-                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <a href="loginpage.html" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                     </div>
                 </section>
@@ -653,6 +653,16 @@
 
     <script>
         lucide.createIcons();
+
+        document.querySelectorAll('.btn-login').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                const target = link.getAttribute('href');
+                if (target && target !== '#') {
+                    event.preventDefault();
+                    window.location.href = target;
+                }
+            });
+        });
     </script>
 </body>
 </html>
