@@ -4,7 +4,29 @@ from django.core.validators import validate_email
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.contrib.auth import authenticate, login
 from .models import User
+
+
+def home(request):
+    return redirect("patient_login")
+
+
+@csrf_protect
+def patient_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None and getattr(user, "role", None) == "PATIENT":
+            login(request, user)
+            return redirect("/patient_portal.html")
+
+        return redirect("patient_login")
+
+    return redirect("patient_login")
 
 
 @csrf_protect
