@@ -300,23 +300,58 @@
         /* GATEWAY SECTION (Request 1 & 2) */
         .portal-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 24px;
             margin-top: 40px;
+            align-items: stretch;
         }
 
         .portal-card {
             background: var(--white);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-card);
-            padding: 32px 20px;
+            padding: 30px 20px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 290px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(15, 118, 110, 0.08);
+            border-color: rgba(15, 118, 110, 0.2);
+        }
+
+        .portal-card.featured {
+            background: linear-gradient(135deg, rgba(15, 118, 110, 0.06), rgba(30, 42, 90, 0.03));
+            border-color: rgba(15, 118, 110, 0.25);
+            box-shadow: 0 18px 30px rgba(15, 118, 110, 0.08);
+        }
+
+        .portal-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            background: var(--light-aqua);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .portal-card h3 {
             font-size: 22px;
             color: var(--primary-indigo);
             margin-bottom: 16px;
+        }
+
+        .portal-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: auto;
         }
 
         .btn-login {
@@ -332,6 +367,23 @@
             text-decoration: none;
             font-weight: 700;
             margin-top: 24px;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn-login:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .btn-login.system {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-indigo));
+        }
+
+        .system-nav {
+            background: var(--primary-teal);
+            border-color: var(--primary-teal);
+            color: var(--white) !important;
+            box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
         }
 
         @media (max-width: 1200px) {
@@ -386,7 +438,7 @@
                     </div>
                 </div>
                 <div class="header-right">
-                    <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;">System Admin</a>
+                    <a href="#portals" class="btn-outline-dark system-nav" style="padding: 8px 16px;">System Admin</a>
                     <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;">Hospital Admin Portal</a>
                     <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;">Asha Worker Portal</a>
                     <div class="divider"></div>
@@ -485,34 +537,34 @@
                     </div>
 
                     <div class="portal-grid">
+                        <div class="portal-card featured">
+                            <div class="portal-icon"><i data-lucide="shield-check" size="32" color="#0F766E"></i></div>
+                            <h3>System Admin Portal</h3>
+                            <p>Monitor network health, oversee security controls, and manage policy compliance across the platform.</p>
+                            <a href="#" class="btn-login system">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                        </div>
                         <div class="portal-card">
-                            <i data-lucide="user" size="48" color="#0F766E"></i>
+                            <div class="portal-icon"><i data-lucide="user" size="32" color="#0F766E"></i></div>
                             <h3>Patient Portal</h3>
-                            <p style="color: var(--text-secondary); font-size: 14px;">Access healthcare services, book appointments, and view records.</p>
+                            <p>Access healthcare services, book appointments, and view records.</p>
                             <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
-                            <i data-lucide="stethoscope" size="48" color="#0F766E"></i>
+                            <div class="portal-icon"><i data-lucide="stethoscope" size="32" color="#0F766E"></i></div>
                             <h3>Doctor Portal</h3>
-                            <p style="color: var(--text-secondary); font-size: 14px;">Manage consultations, diagnostics, and referrals efficiently.</p>
+                            <p>Manage consultations, diagnostics, and referrals efficiently.</p>
                             <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
-                            <i data-lucide="shield-check" size="48" color="#0F766E"></i>
-                            <h3>System Admin</h3>
-                            <p style="color: var(--text-secondary); font-size: 14px;">Oversee platform governance, user management, and system-wide operations.</p>
-                            <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
-                        </div>
-                        <div class="portal-card">
-                            <i data-lucide="building-2" size="48" color="#0F766E"></i>
+                            <div class="portal-icon"><i data-lucide="building-2" size="32" color="#0F766E"></i></div>
                             <h3>Hospital Admin Portal</h3>
-                            <p style="color: var(--text-secondary); font-size: 14px;">Administrative oversight of hospitals, staffing, and operational performance.</p>
+                            <p>Administrative oversight of hospitals, staffing, and operational performance.</p>
                             <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
-                            <i data-lucide="heart-handshake" size="48" color="#0F766E"></i>
+                            <div class="portal-icon"><i data-lucide="users" size="32" color="#0F766E"></i></div>
                             <h3>Asha Worker Portal</h3>
-                            <p style="color: var(--text-secondary); font-size: 14px;">Track outreach, referrals, pregnancy support, and community health reports.</p>
+                            <p>Track outreach, referrals, pregnancy support, and community health reports.</p>
                             <a href="#" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                     </div>
