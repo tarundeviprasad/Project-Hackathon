@@ -39,13 +39,22 @@ def patient_login(request):
         identifier = request.POST.get("username")
         password = request.POST.get("password")
 
+        if not identifier or not password:
+            return JsonResponse(
+                {"error": "Please provide both email/username and password."},
+                status=400
+            )
+
         user = authenticate_by_identifier(request, identifier, password)
 
         if user is not None and getattr(user, "role", None) == "PATIENT":
             login(request, user)
-            return redirect("/patient_portal.html")
-
-        return redirect("/patient-login.html")
+            return JsonResponse({"success": True, "redirect": "/patient_portal.html"})
+        
+        return JsonResponse(
+            {"error": "Invalid email/username or password. Please try again."},
+            status=401
+        )
 
     return redirect("/patient-login.html")
 
@@ -56,13 +65,22 @@ def doctor_login(request):
         identifier = request.POST.get("username")
         password = request.POST.get("password")
 
+        if not identifier or not password:
+            return JsonResponse(
+                {"error": "Please provide both email/username and password."},
+                status=400
+            )
+
         user = authenticate_by_identifier(request, identifier, password)
 
         if user is not None and getattr(user, "role", None) == "DOCTOR":
             login(request, user)
-            return redirect("/doctor-dashboard.html")
-
-        return redirect("/doctor-login.html")
+            return JsonResponse({"success": True, "redirect": "/doctor-dashboard.html"})
+        
+        return JsonResponse(
+            {"error": "Invalid email/username or password. Please try again."},
+            status=401
+        )
 
     return redirect("/doctor-login.html")
 
@@ -73,13 +91,22 @@ def admin_login(request):
         identifier = request.POST.get("username")
         password = request.POST.get("password")
 
+        if not identifier or not password:
+            return JsonResponse(
+                {"error": "Please provide both email/username and password."},
+                status=400
+            )
+
         user = authenticate_by_identifier(request, identifier, password)
 
         if user is not None and getattr(user, "role", None) == "ADMIN":
             login(request, user)
-            return redirect("/index.html")
-
-        return redirect("/admin-login.html")
+            return JsonResponse({"success": True, "redirect": "/index.html"})
+        
+        return JsonResponse(
+            {"error": "Invalid email/username or password. Please try again."},
+            status=401
+        )
 
     return redirect("/admin-login.html")
 

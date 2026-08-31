@@ -382,6 +382,11 @@
           <h3>Admin sign in</h3>
           <p>Enter your administrative credentials to continue.</p>
 
+          <!-- Error Message Display -->
+          <div id="loginErrorContainer" style="margin-bottom: 20px; padding: 12px 14px; background: #fee2e2; border: 1px solid #fecaca; border-radius: 6px; display: none;">
+            <p id="loginErrorMessage" style="font-size: 13px; font-weight: 600; color: #dc2626; margin: 0;"></p>
+          </div>
+
           <div class="field">
             <label for="admin-email">Admin Email</label>
             <span class="icon-wrap">✉</span>
@@ -425,30 +430,56 @@
       return freshCookie ? decodeURIComponent(freshCookie.split('=')[1]) : '';
     }
 
+    // Clear error message when user starts typing
+    document.getElementById('admin-email')?.addEventListener('input', () => {
+      const errorContainer = document.getElementById('loginErrorContainer');
+      if (errorContainer) errorContainer.style.display = 'none';
+    });
+
+    document.getElementById('admin-password')?.addEventListener('input', () => {
+      const errorContainer = document.getElementById('loginErrorContainer');
+      if (errorContainer) errorContainer.style.display = 'none';
+    });
+
     const form = document.querySelector('form[action="/admin/login/"]');
+    const errorContainer = document.getElementById('loginErrorContainer');
+    const errorMessage = document.getElementById('loginErrorMessage');
+
     if (form) {
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (errorContainer) errorContainer.style.display = 'none';
+        if (errorMessage) errorMessage.textContent = '';
+
         const csrfToken = await getCsrfToken();
         const formData = new URLSearchParams(new FormData(form));
 
-        const response = await fetch('/admin/login/', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: {
-            'X-CSRFToken': csrfToken,
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: formData
-        });
+        try {
+          const response = await fetch('/admin/login/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'X-CSRFToken': csrfToken,
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+          });
 
-        if (response.redirected) {
-          window.location.href = response.url;
-          return;
-        }
+          const data = await response.json();
 
-        if (response.ok) {
-          window.location.href = response.url || '/index.html';
+          if (data.success) {
+            window.location.href = data.redirect || '/index.html';
+            return;
+          }
+
+          if (data.error) {
+            if (errorMessage) errorMessage.textContent = data.error;
+            if (errorContainer) errorContainer.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          if (errorMessage) errorMessage.textContent = 'Unable to connect to the server. Please try again.';
+          if (errorContainer) errorContainer.style.display = 'block';
         }
       });
     }

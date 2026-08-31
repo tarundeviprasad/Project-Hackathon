@@ -252,6 +252,16 @@
                         <button type="button" class="segmented-btn flex-1 py-3 text-sm font-bold text-[#667085] rounded-xl transition-all duration-300" data-mode="mobile" data-i18n="mobileOTP">Mobile OTP</button>
                     </div>
 
+                    <!-- Error Message Display -->
+                    <div id="loginErrorContainer" class="hidden mb-6 p-4 bg-red-50 border border-red-300 rounded-2xl flex items-start gap-3">
+                        <div class="mt-0.5">
+                            <i data-lucide="alert-circle" class="w-5 h-5 text-red-500"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-red-700" id="loginErrorMessage"></p>
+                        </div>
+                    </div>
+
                     <form method="POST" action="/patient/login/" class="space-y-6">
                         <div class="space-y-2">
                             <label id="loginMethodLabel" class="text-sm font-bold text-[#172033] ml-1" data-i18n="emailLabel">Email ID</label>
@@ -431,6 +441,17 @@
             return freshCookie ? decodeURIComponent(freshCookie.split('=')[1]) : '';
         }
 
+        // Clear error message when user starts typing
+        document.getElementById('loginMethodInput')?.addEventListener('input', () => {
+            const errorContainer = document.getElementById('loginErrorContainer');
+            if (errorContainer) errorContainer.classList.add('hidden');
+        });
+
+        document.querySelector('input[name="password"]')?.addEventListener('input', () => {
+            const errorContainer = document.getElementById('loginErrorContainer');
+            if (errorContainer) errorContainer.classList.add('hidden');
+        });
+
         const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
         updateLanguage(savedLanguage);
 
@@ -438,29 +459,44 @@
         lucide.createIcons();
 
         const form = document.querySelector('form[action="/patient/login/"]');
+        const errorContainer = document.getElementById('loginErrorContainer');
+        const errorMessage = document.getElementById('loginErrorMessage');
+
         if (form) {
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
+                errorContainer.classList.add('hidden');
+                errorMessage.textContent = '';
+
                 const csrfToken = await getCsrfToken();
                 const formData = new URLSearchParams(new FormData(form));
 
-                const response = await fetch('/patient/login/', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData
-                });
+                try {
+                    const response = await fetch('/patient/login/', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
 
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return;
-                }
+                    const data = await response.json();
 
-                if (response.ok) {
-                    window.location.href = response.url || '/patient_portal.html';
+                    if (data.success) {
+                        window.location.href = data.redirect || '/patient_portal.html';
+                        return;
+                    }
+
+                    if (data.error) {
+                        errorMessage.textContent = data.error;
+                        errorContainer.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    errorMessage.textContent = 'Unable to connect to the server. Please try again.';
+                    errorContainer.classList.remove('hidden');
                 }
             });
         }

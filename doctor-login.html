@@ -418,52 +418,34 @@
                 <p>Sign in using your authorized credentials.</p>
             </div>
 
-<<<<<<< HEAD
-      <section class="right">
-        <form class="auth-box" action="/doctor/login/" method="post">
-          <h3>Sign in</h3>
-          <p>Enter your credentials to continue to your doctor dashboard.</p>
+            <!-- Error Message Display -->
+            <div id="loginErrorContainer" class="hidden" style="margin-bottom: 20px; padding: 14px; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; display: none;">
+                <p id="loginErrorMessage" style="font-size: 14px; font-weight: 600; color: #dc2626; margin: 0;"></p>
+            </div>
 
-          <div class="field">
-            <label for="doctor-email">Medical Email</label>
-            <span class="icon-wrap">✉</span>
-            <input id="doctor-email" name="username" type="text" placeholder="doctor@aarogya.in" required>
-          </div>
-
-          <div class="field">
-            <label for="doctor-password">Password</label>
-            <span class="icon-wrap">🔒</span>
-            <input id="doctor-password" name="password" type="password" placeholder="Enter your password" required>
-          </div>
-=======
-            <form id="loginForm">
+            <form class="auth-box" action="/doctor/login/" method="post">
                 <div class="form-group">
-                    <label for="doctorID">Doctor ID</label>
+                    <label for="doctor-email">Doctor Email</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                         </span>
-                        <input type="text" id="doctorID" placeholder="Enter your Doctor ID" required>
+                        <input id="doctor-email" name="username" type="text" placeholder="doctor@aarogya.in" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <!-- FORGOT PASSWORD REMOVED -->
+                    <label for="doctor-password">Password</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         </span>
-                        <input type="password" id="password" placeholder="Enter your password" required>
-                        <span class="eye-icon" onclick="togglePassword()">
-                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        </span>
+                        <input id="doctor-password" name="password" type="password" placeholder="Enter your password" required>
                     </div>
                 </div>
 
                 <button type="submit" class="login-btn">Login</button>
             </form>
->>>>>>> e71ade2fcd1fc0a0734a3785a5bb131bc36d1ec5
 
             <div class="footer-badge">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -472,7 +454,6 @@
         </section>
     </main>
 
-<<<<<<< HEAD
   <script>
     async function getCsrfToken() {
       const cookieValue = document.cookie
@@ -491,53 +472,59 @@
       return freshCookie ? decodeURIComponent(freshCookie.split('=')[1]) : '';
     }
 
+    // Clear error message when user starts typing
+    document.getElementById('doctor-email')?.addEventListener('input', () => {
+      const errorContainer = document.getElementById('loginErrorContainer');
+      if (errorContainer) errorContainer.style.display = 'none';
+    });
+
+    document.getElementById('doctor-password')?.addEventListener('input', () => {
+      const errorContainer = document.getElementById('loginErrorContainer');
+      if (errorContainer) errorContainer.style.display = 'none';
+    });
+
     const form = document.querySelector('form[action="/doctor/login/"]');
+    const errorContainer = document.getElementById('loginErrorContainer');
+    const errorMessage = document.getElementById('loginErrorMessage');
+
     if (form) {
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (errorContainer) errorContainer.style.display = 'none';
+        if (errorMessage) errorMessage.textContent = '';
+
         const csrfToken = await getCsrfToken();
         const formData = new URLSearchParams(new FormData(form));
 
-        const response = await fetch('/doctor/login/', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: {
-            'X-CSRFToken': csrfToken,
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: formData
-        });
+        try {
+          const response = await fetch('/doctor/login/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'X-CSRFToken': csrfToken,
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+          });
 
-        if (response.redirected) {
-          window.location.href = response.url;
-          return;
-        }
+          const data = await response.json();
 
-        if (response.ok) {
-          window.location.href = response.url || '/doctor-dashboard.html';
+          if (data.success) {
+            window.location.href = data.redirect || '/doctor-dashboard.html';
+            return;
+          }
+
+          if (data.error) {
+            if (errorMessage) errorMessage.textContent = data.error;
+            if (errorContainer) errorContainer.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          if (errorMessage) errorMessage.textContent = 'Unable to connect to the server. Please try again.';
+          if (errorContainer) errorContainer.style.display = 'block';
         }
       });
     }
   </script>
-=======
-    <script>
-        function togglePassword() {
-            const passInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                eyeIcon.style.color = '#0f8f8a';
-            } else {
-                passInput.type = 'password';
-                eyeIcon.style.color = '#94a3b8';
-            }
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Form logic here
-        });
-    </script>
->>>>>>> e71ade2fcd1fc0a0734a3785a5bb131bc36d1ec5
 </body>
 </html>
