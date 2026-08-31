@@ -378,14 +378,14 @@
       </section>
 
       <section class="right">
-        <form class="auth-box" action="index.html" method="get">
+        <form class="auth-box" id="adminLoginForm" action="index.html" method="get">
           <h3>Admin sign in</h3>
           <p>Enter your administrative credentials to continue.</p>
 
           <div class="field">
             <label for="admin-email">Admin Email</label>
             <span class="icon-wrap">✉</span>
-            <input id="admin-email" type="email" placeholder="admin@aarogya.in" required>
+            <input id="admin-email" name="admin-email" type="email" placeholder="admin@aarogya.in" required>
           </div>
 
           <div class="field">
@@ -406,5 +406,12 @@
       </section>
     </main>
   </div>
+
+  <script>
+    document.getElementById('adminLoginForm')?.addEventListener('submit', function (event) {
+      event.preventDefault();
+      window.location.href = 'index.html';
+    });
+  </script>
 </body>
 </html>
