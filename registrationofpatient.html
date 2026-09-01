@@ -1026,7 +1026,82 @@
             return isValid;
         }
 
-        function nextStep() {
+        async function getCsrfToken() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith('csrftoken='));
+
+            if (cookieValue) {
+                return decodeURIComponent(cookieValue.split('=')[1]);
+            }
+
+            await fetch('/csrf/', { credentials: 'same-origin' });
+            const freshCookie = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith('csrftoken='));
+
+            return freshCookie ? decodeURIComponent(freshCookie.split('=')[1]) : '';
+        }
+
+        function buildSignupPayload() {
+            const fullName = document.getElementById('full_name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const baseUsername = (fullName || email.split('@')[0] || 'patient')
+                .toLowerCase()
+                .replace(/[^a-z0-9._-]+/g, '')
+                .slice(0, 20) || 'patient';
+
+            return {
+                username: `${baseUsername}_${Date.now()}`,
+                email: email,
+                password: password,
+                full_name: fullName,
+                phone: document.getElementById('phone').value.trim(),
+                village: document.getElementById('village').value.trim(),
+                district: document.getElementById('district').value.trim(),
+                gender: document.getElementById('gender').value,
+                dob: document.getElementById('dob').value
+            };
+        }
+
+        async function submitRegistration() {
+            const csrfToken = await getCsrfToken();
+            const payload = buildSignupPayload();
+            const formData = new URLSearchParams();
+
+            Object.entries(payload).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    formData.append(key, value);
+                }
+            });
+
+            try {
+                const response = await fetch('/patient/signup/', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                if (response.redirected || response.ok) {
+                    showSuccess();
+                    return;
+                }
+
+                const responseText = await response.text();
+                alert('Registration failed. Please try again.');
+                console.error(responseText);
+            } catch (error) {
+                console.error(error);
+                alert('Unable to connect to the server. Please try again.');
+            }
+        }
+
+        async function nextStep() {
             if (!validateStep(currentStep)) return;
 
             if (currentStep < 3) {
@@ -1038,7 +1113,7 @@
                 document.getElementById('nextBtn').innerText = currentStep === 3 ? translations[lang].registerPatientBtn : translations[lang].continueBtn;
                 updateBtnVisibility();
             } else {
-                showSuccess();
+                await submitRegistration();
             }
         }
 

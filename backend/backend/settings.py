@@ -15,12 +15,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third-party apps
     'rest_framework',
     'corsheaders',
-    # Local API app
     'api',
+    'auth.apps.PortalAuthConfig',
 ]
+
+AUTH_USER_MODEL = 'portal_auth.User'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # Must stay first

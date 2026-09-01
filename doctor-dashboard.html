@@ -183,35 +183,6 @@
     </style>
 </head>
 <body>
-
-    <!-- TOP NAVBAR -->
-    <nav>
-        <div class="nav-left">
-            <div class="logo-group">
-                <div class="logo">Aarogya Connect</div>
-                <div class="logo-sub">DOCTOR PORTAL</div>
-            </div>
-            <div class="nav-features">
-                Queue Status: <span style="color: var(--rich-teal);">Active</span> • System Check: <span style="color: var(--rich-teal);">Secure</span>
-            </div>
-        </div>
-        
-        <div class="nav-right">
-            <select class="lang-dropdown">
-                <option value="en">English</option>
-                <option value="te">తెలుగు (Telugu)</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="mr">मराठी (Marathi)</option>
-            </select>
-            
-            <div class="profile-card">
-                <div class="profile-info">
-                    <span class="profile-name">Dr. Anjali Sharma</span>
-                    <span class="profile-dept">Senior Cardiologist</span>
-                </div>
-                <div class="profile-avatar"><i data-lucide="user"></i></div>
-            </div>
-        </div>
     </nav>
 
     <!-- HERO SECTION -->
@@ -266,6 +237,99 @@
                 <p style="font-size: 0.75rem; color: var(--slate-gray); font-weight: 700;">PATIENTS WAITING</p>
             </div>
             <button style="background: var(--rich-teal); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;">Start Consultation</button>
+  <main class="page">
+    <div class="wrapper">
+      <section class="hero">
+        <div>
+          <p style="margin:0 0 8px; color:var(--teal); font-size:12px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase;">Good morning, Dr. Mehta</p>
+          <h1>Your clinical work,<br><span>organized for better care.</span></h1>
+          <p>Monitor patient risk, coordinate today’s consultations, and keep every clinical decision moving forward from one secure workspace.</p>
+        </div>
+        <div class="orb">✚</div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="card">
+          <div class="card-icon">📅</div>
+          <div><strong>24</strong><small>Appointments</small></div>
+        </div>
+        <div class="card">
+          <div class="card-icon">👥</div>
+          <div><strong>06</strong><small>Waiting</small></div>
+        </div>
+        <div class="card">
+          <div class="card-icon">📹</div>
+          <div><strong>05</strong><small>Video Calls</small></div>
+        </div>
+        <div class="card">
+          <div class="card-icon">📌</div>
+          <div><strong>04</strong><small>Referrals</small></div>
+        </div>
+      </section>
+
+      <div class="alert">High-priority case: Cardiac follow-up and teleconsultation queue needs attention before 12:00 PM.</div>
+
+      <section class="panel-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Appointment Queue</h3>
+            <a href="booking_an_appointment.html">Full Queue</a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Q-No.</th>
+                <th>Patient</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Q-04</td>
+                <td>Ravi Kumar</td>
+                <td>09:30 AM</td>
+                <td><span class="badge waiting">Waiting</span></td>
+                <td><button class="button">Start</button></td>
+              </tr>
+              <tr>
+                <td>Q-05</td>
+                <td>Lakshmi Devi</td>
+                <td>10:10 AM</td>
+                <td><span class="badge consult">Ready</span></td>
+                <td><button class="button alt">Resume</button></td>
+              </tr>
+              <tr>
+                <td>Q-06</td>
+                <td>Suresh Reddy</td>
+                <td>10:45 AM</td>
+                <td><span class="badge high">Priority</span></td>
+                <td><button class="button">Review</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Clinical Overview</h3>
+            <a href="symptom_checker.html">Live</a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Vitals Pending</td><td>03</td></tr>
+              <tr><td>Lab Results</td><td>08</td></tr>
+              <tr><td>Teleconsults</td><td>05</td></tr>
+              <tr><td>Risk Alerts</td><td>02</td></tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- Card 3: Referral Management -->

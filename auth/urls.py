@@ -1,11 +1,18 @@
 from django.urls import path
 from . import login
 from . import dashboard
+from . import signup
 from .logout import user_logout
 from .create_doctor import create_doctor
 
 
 urlpatterns = [
+
+    path(
+        "csrf/",
+        login.get_csrf_token,
+        name="csrf_token"
+    ),
 
     # =========================
     # PATIENT LOGIN
@@ -34,6 +41,16 @@ urlpatterns = [
         "admin/login/",
         login.admin_login,
         name="admin_login"
+    ),
+
+
+    # =========================
+    # PATIENT SIGNUP
+    # =========================
+    path(
+        "patient/signup/",
+        signup.patient_signup,
+        name="patient_signup"
     ),
 
 
