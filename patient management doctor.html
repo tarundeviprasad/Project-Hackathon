@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management | AarogyaConnect</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-indigo: #1E2A5A;
+            --rich-teal: #0F766E;
+            --soft-aqua: #CFF7F2;
+            --soft-ivory: #F8F7F4;
+            --pure-white: #FFFFFF;
+            --charcoal-navy: #172033;
+            --slate-gray: #667085;
+            --soft-gray: #E6E8EE;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--soft-ivory);
+            color: var(--charcoal-navy);
+            min-height: 100vh;
+        }
+
+        /* --- REFINED TOP NAVIGATION --- */
+        nav {
+            background-color: var(--pure-white);
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--soft-gray);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(30, 42, 90, 0.04);
+        }
+
+        /* Branding with New Reference Logo */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            background-color: var(--deep-indigo);
+            border-radius: 10px; /* Matching rounded corner reference */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Styled Plus Sign from Image 2 */
+        .brand-logo::before, .brand-logo::after {
+            content: "";
+            position: absolute;
+            background-color: white;
+            border-radius: 2px;
+        }
+        .brand-logo::before { width: 18px; height: 4px; } /* Horizontal bar */
+        .brand-logo::after { width: 4px; height: 18px; }  /* Vertical bar */
+
+        .brand-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--deep-indigo);
+            letter-spacing: -0.5px;
+        }
+
+        /* Balanced Navigation Menu (6 Items) */
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 8px; /* Balanced spacing */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-item {
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--slate-gray);
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            color: var(--rich-teal);
+            background-color: var(--soft-ivory);
+        }
+
+        .nav-item.active {
+            color: var(--deep-indigo);
+            background-color: var(--soft-aqua);
+            font-weight: 600;
+        }
+
+        /* Right Profile Section */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .notification-btn {
+            color: var(--slate-gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .dr-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 20px;
+            border-left: 1px solid var(--soft-gray);
+        }
+
+        .dr-info { text-align: right; }
+        .dr-name { display: block; font-size: 0.85rem; font-weight: 600; color: var(--charcoal-navy); }
+        .dr-spec { display: block; font-size: 0.75rem; color: var(--rich-teal); font-weight: 600; }
+
+        .dr-avatar {
+            width: 38px;
+            height: 38px;
+            background-color: var(--soft-aqua);
+            color: var(--rich-teal);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        /* --- EXISTING PAGE CONTENT (MAINTAINED) --- */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 40px 60px;
+        }
+
+        .page-header { margin-bottom: 32px; }
+        .page-header h1 { font-size: 1.85rem; color: var(--deep-indigo); font-weight: 700; }
+        .page-header p { color: var(--slate-gray); font-size: 1rem; }
+
+        .search-area { display: flex; gap: 16px; margin-bottom: 32px; }
+        .search-wrapper { flex: 1; background-color: var(--pure-white); border: 1px solid var(--soft-gray); border-radius: 12px; display: flex; align-items: center; padding: 0 20px; }
+        .search-wrapper input { flex: 1; border: none; outline: none; padding: 16px 12px; font-size: 1rem; }
+
+        .btn-add { background-color: var(--rich-teal); color: var(--pure-white); border: none; padding: 0 28px; border-radius: 12px; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
+        .stat-card { background-color: var(--pure-white); padding: 24px; border-radius: 14px; border: 1px solid var(--soft-gray); display: flex; align-items: center; gap: 18px; }
+        .stat-icon { width: 48px; height: 48px; background-color: var(--soft-ivory); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--deep-indigo); }
+        .stat-info h3 { font-size: 1.5rem; color: var(--deep-indigo); font-weight: 700; }
+        .stat-info p { font-size: 0.8rem; color: var(--slate-gray); font-weight: 600; text-transform: uppercase; }
+
+        .workflow-grid { display: grid; grid-template-columns: 1fr 400px; gap: 32px; }
+        .list-panel { background-color: var(--pure-white); border-radius: 16px; border: 1px solid var(--soft-gray); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: #fafbfc; text-align: left; padding: 18px 24px; font-size: 0.75rem; font-weight: 700; color: var(--slate-gray); text-transform: uppercase; border-bottom: 1px solid var(--soft-gray); }
+        td { padding: 18px 24px; font-size: 0.95rem; border-bottom: 1px solid var(--soft-gray); }
+        tr.selected { background-color: var(--soft-aqua); }
+        .status-badge { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .status-active { background-color: #eaf6f4; color: var(--rich-teal); }
+
+        .info-panel { background-color: var(--pure-white); border-radius: 16px; border: 1px solid var(--soft-gray); padding: 32px; position: sticky; top: 112px; }
+        .summary-list { margin-bottom: 32px; }
+        .summary-item { display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--soft-gray); }
+        .btn-full-record { background-color: var(--deep-indigo); color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; }
+        .dhr-section { background-color: var(--soft-aqua); padding: 20px; border-radius: 12px; display: flex; gap: 16px; }
+
+        @media (max-width: 1300px) {
+            .nav-menu { position: static; transform: none; left: auto; margin: 0 auto; gap: 2px; }
+            nav { padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HORIZONTAL NAVIGATION -->
+    <nav>
+        <div class="nav-left">
+            <a href="#" class="brand">
+                <div class="brand-logo"></div> <!-- New Plus-Logo Reference -->
+                <span class="brand-name">AarogyaConnect</span>
+            </a>
+        </div>
+
+        <!-- Distributed Menu (Removed Analytics & Messages) -->
+        <ul class="nav-menu">
+            <li><a href="#" class="nav-item">Dashboard</a></li>
+            <li><a href="#" class="nav-item active">Patient Management</a></li>
+            <li><a href="#" class="nav-item">Appointments</a></li>
+            <li><a href="#" class="nav-item">Consultations</a></li>
+            <li><a href="#" class="nav-item">Prescriptions</a></li>
+            <li><a href="#" class="nav-item">Lab Reports</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <div class="notification-btn">
+                <i data-lucide="bell" size="20"></i>
+            </div>
+            <div class="dr-profile">
+                <div class="dr-info">
+                    <span class="dr-name">Dr. Arvind Kumar</span>
+                    <span class="dr-spec">Senior General Physician</span>
+                </div>
+                <div class="dr-avatar">AK</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- PAGE HEADER -->
+        <header class="page-header">
+            <h1>Patient Management</h1>
+            <p>Search, view and securely manage patient records</p>
+        </header>
+
+        <!-- PATIENT SEARCH + ADD PATIENT -->
+        <section class="search-area">
+            <div class="search-wrapper">
+                <i data-lucide="search" size="20"></i>
+                <input type="text" placeholder="Search by Patient ID, ABHA ID, Name or Phone Number">
+            </div>
+            <button class="btn-add">
+                <i data-lucide="user-plus" size="20"></i>
+                Add New Patient
+            </button>
+        </section>
+
+        <!-- PATIENT SUMMARY / STATISTICS -->
+        <section class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="users"></i></div>
+                <div class="stat-info"><p>Total Patients</p><h3>1,248</h3></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="user-check"></i></div>
+                <div class="stat-info"><p>Active Cases</p><h3>142</h3></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="stethoscope"></i></div>
+                <div class="stat-info"><p>Recent Consults</p><h3>28</h3></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="clipboard-list"></i></div>
+                <div class="stat-info"><p>Reports Pending</p><h3>12</h3></div>
+            </div>
+        </section>
+
+        <!-- WORKFLOW SECTION -->
+        <div class="workflow-grid">
+            <div class="list-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Patient ID</th>
+                            <th>ABHA ID</th>
+                            <th>Age/Gender</th>
+                            <th>Last Consult</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="selected">
+                            <td><strong style="color: var(--deep-indigo)">Rahul Santhosh</strong></td>
+                            <td>PT-88219</td>
+                            <td>91-8821-0021-9921</td>
+                            <td>42 / Male</td>
+                            <td>12 Oct 2023</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--deep-indigo)">Meena Kumari</strong></td>
+                            <td>PT-90112</td>
+                            <td>91-4421-1121-8872</td>
+                            <td>31 / Female</td>
+                            <td>08 Oct 2023</td>
+                            <td><span class="status-badge" style="background:#fff9f0; color:#b25e09;">Review</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: var(--deep-indigo)">Balaji Rao</strong></td>
+                            <td>PT-77210</td>
+                            <td>91-3321-0011-5521</td>
+                            <td>55 / Male</td>
+                            <td>22 Sep 2023</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-panel">
+                <div style="text-align: center; margin-bottom: 28px;">
+                    <h2 style="color: var(--deep-indigo); margin-bottom: 4px;">Rahul Santhosh</h2>
+                    <span class="status-badge status-active">Stable Condition</span>
+                </div>
+                <div class="summary-list">
+                    <div class="summary-item"><span style="color: var(--slate-gray)">Patient ID</span><strong>PT-88219</strong></div>
+                    <div class="summary-item"><span style="color: var(--slate-gray)">ABHA ID</span><strong>91-8821...9921</strong></div>
+                    <div class="summary-item"><span style="color: var(--slate-gray)">Age / Gender</span><strong>42 / Male</strong></div>
+                    <div class="summary-item"><span style="color: var(--slate-gray)">Phone</span><strong>+91 98821 00219</strong></div>
+                </div>
+                <button class="btn-full-record">View Full Patient Record</button>
+                <div class="dhr-section">
+                    <i data-lucide="database" style="color: var(--rich-teal)"></i>
+                    <div>
+                        <h4 style="color: var(--deep-indigo); margin-bottom: 4px;">Digital Health Record</h4>
+                        <p style="font-size: 0.85rem; color: var(--charcoal-navy)">Securely access the patient's full medical history and reports in one place.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

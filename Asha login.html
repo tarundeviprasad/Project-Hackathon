@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASHA Portal Login | AarogyaConnect</title>
+    <!-- Typography: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons: Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-indigo: #1E2A5A;
+            --healthcare-teal: #0F766E;
+            --soft-aqua: #CFF7F2;
+            --soft-ivory: #F8F7F4;
+            --pure-white: #FFFFFF;
+            --charcoal-navy: #172033;
+            --slate-gray: #667085;
+            --soft-gray: #E6E8EE;
+            --transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--soft-ivory);
+            color: var(--charcoal-navy);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Desktop Viewport Fit */
+        }
+
+        /* --- HEADER --- */
+        header {
+            width: min(1400px, calc(100vw - 120px));
+            margin: 30px auto 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .brand-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-box {
+            background-color: var(--primary-indigo);
+            width: 38px; height: 38px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+        }
+        .logo-text {
+            font-weight: 800; font-size: 19px;
+            letter-spacing: -0.02em; display: flex; gap: 4px;
+        }
+
+        .header-controls { display: flex; gap: 12px; }
+        .btn-header {
+            background: var(--pure-white);
+            border: 1px solid var(--soft-gray);
+            border-radius: 12px;
+            padding: 10px 18px;
+            color: var(--primary-indigo);
+            font-weight: 600; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; transition: var(--transition);
+            text-decoration: none;
+        }
+        .btn-header:hover { border-color: var(--healthcare-teal); transform: translateY(-1px); }
+
+        /* --- GRID --- */
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .master-grid {
+            width: min(1400px, calc(100vw - 120px));
+            height: calc(100vh - 140px);
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 500px;
+            gap: 90px;
+            align-items: center;
+        }
+
+        /* --- LEFT COLUMN --- */
+        .content-left {
+            display: flex;
+            flex-direction: column;
+            max-width: 650px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .badge {
+            background-color: var(--soft-aqua);
+            color: var(--healthcare-teal);
+            font-weight: 700; font-size: 14px;
+            letter-spacing: 0.07em; padding: 10px 20px;
+            border-radius: 999px; width: fit-content;
+            margin-bottom: 24px; text-transform: uppercase;
+        }
+
+        .asha-title {
+            font-size: 72px; font-weight: 700;
+            line-height: 0.88; letter-spacing: -0.045em;
+            margin-bottom: 30px;
+        }
+        .title-top { color: var(--primary-indigo); display: block; }
+        .title-bottom { color: var(--healthcare-teal); display: block; }
+
+        .headline {
+            font-size: 24px; font-weight: 600; line-height: 1.35;
+            color: var(--primary-indigo); margin-bottom: 16px;
+        }
+
+        .description {
+            font-size: 17px; line-height: 1.6; color: var(--slate-gray);
+            margin-bottom: 28px; max-width: 590px;
+        }
+
+        /* --- ILLUSTRATION --- */
+        .illustration-box {
+            position: relative;
+            width: 480px; height: 190px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .illus-svg {
+            position: absolute; width: 400px; height: 160px;
+            z-index: 0; opacity: 0.18; pointer-events: none;
+        }
+
+        .card-node {
+            position: absolute; display: flex; align-items: center; justify-content: center;
+            color: var(--healthcare-teal); transition: var(--transition); z-index: 2;
+        }
+
+        .node-center {
+            width: 92px; height: 92px; background: var(--pure-white);
+            border: 1px solid var(--soft-gray); border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(30,42,90,.07);
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
+        }
+
+        .node-surround {
+            width: 58px; height: 58px; background: var(--soft-aqua);
+            border-radius: 15px; animation: float 6s ease-in-out infinite;
+        }
+
+        .n-top    { left: 50%; top: 0; transform: translateX(-50%); animation-delay: 0s; }
+        .n-left   { left: 45px; top: 50%; transform: translateY(-50%); animation-delay: 1.5s; }
+        .n-right  { right: 45px; top: 50%; transform: translateY(-50%); animation-delay: 3s; }
+        .n-bottom { left: 50%; bottom: 0; transform: translateX(-50%); animation-delay: 4.5s; }
+
+        /* --- RIGHT COLUMN: LOGIN CARD --- */
+        .login-card {
+            background: var(--pure-white);
+            padding: 38px 42px;
+            border-radius: 28px;
+            border: 1px solid var(--soft-gray);
+            box-shadow: 0 20px 60px rgba(30,42,90,.08);
+            animation: slideUp 0.8s ease-out;
+            align-self: center;
+        }
+
+        .card-header { text-align: center; margin-bottom: 34px; }
+        .eyebrow {
+            color: var(--healthcare-teal); font-weight: 700;
+            font-size: 13px; letter-spacing: 0.15em;
+            text-transform: uppercase; margin-bottom: 18px; display: block;
+        }
+        .card-header h2 { font-size: 40px; font-weight: 700; color: var(--primary-indigo); margin-bottom: 8px; }
+        .card-header p { color: var(--slate-gray); font-size: 16px; }
+
+        /* --- FIXED: INPUT ICONS INSIDE --- */
+        .field { margin-bottom: 24px; width: 100%; }
+        .field label {
+            display: block; font-weight: 600; font-size: 16px;
+            color: var(--charcoal-navy); margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--soft-gray);
+            border-radius: 15px;
+            background: var(--pure-white);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        /* Focus state on the wrapper itself */
+        .input-wrapper:focus-within {
+            border-color: var(--healthcare-teal);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.08);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            color: var(--slate-gray);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding-left: 58px; /* Offset for internal left icon */
+            padding-right: 50px; /* Offset for internal eye icon */
+            font-size: 16px;
+            font-family: inherit;
+            color: var(--charcoal-navy);
+        }
+
+        .input-wrapper input::placeholder { color: var(--slate-gray); opacity: 0.7; }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border: none;
+            background: transparent;
+            color: var(--slate-gray);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .forgot-pw {
+            display: block; text-align: right; margin-top: 10px;
+            color: var(--healthcare-teal); font-size: 14px;
+            font-weight: 600; text-decoration: none;
+        }
+
+        .btn-login {
+            width: 100%; height: 60px; background: var(--healthcare-teal);
+            color: white; border: none; border-radius: 15px;
+            font-size: 17px; font-weight: 700; cursor: pointer;
+            margin-top: 28px; display: flex; align-items: center;
+            justify-content: center; gap: 10px; transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(15, 118, 110, 0.15);
+        }
+        .btn-login:hover { background: #0c665f; transform: translateY(-1px); }
+
+        .security-footer {
+            margin-top: 22px; padding-top: 18px;
+            border-top: 1px solid var(--soft-gray);
+            text-align: center; color: var(--slate-gray);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .security-footer span { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        @media (max-width: 1024px) {
+            body { overflow: auto; }
+            .master-grid { grid-template-columns: 1fr; height: auto; padding: 40px 0; text-align: center; gap: 60px; }
+            .content-left { align-items: center; max-width: 100%; }
+            .illustration-box { display: none; }
+            .asha-title { font-size: 56px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="brand-logo">
+            <div class="logo-box"><i data-lucide="plus" stroke-width="3" size="20"></i></div>
+            <div class="logo-text">
+                <span style="color: var(--primary-indigo);">AAROGYA</span>
+                <span style="color: var(--healthcare-teal);">CONNECT</span>
+            </div>
+        </a>
+        <div class="header-controls">
+            <button class="btn-header"><i data-lucide="globe" size="16"></i> English</button>
+            <a href="#" class="btn-header"><i data-lucide="arrow-left" size="16"></i> Back to Home</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="master-grid">
+            <!-- LEFT -->
+            <section class="content-left">
+                <div class="badge">Authorized Personnel Only</div>
+                <h1 class="asha-title">
+                    <span class="title-top">ASHA</span>
+                    <span class="title-bottom">Portal</span>
+                </h1>
+                <p class="headline">Empowering community healthcare, one connection at a time.</p>
+                <p class="description">
+                    AarogyaConnect helps ASHA workers connect communities with essential healthcare services, patient follow-ups, and coordinated care through one secure digital platform.
+                </p>
+
+                <div class="illustration-box">
+                    <svg class="illus-svg" viewBox="0 0 400 160">
+                        <ellipse cx="200" cy="80" rx="150" ry="65" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5 7" />
+                    </svg>
+                    <div class="card-node node-center"><i data-lucide="heart-pulse" size="32"></i></div>
+                    <div class="card-node node-surround n-top"><i data-lucide="users" size="24"></i></div>
+                    <div class="card-node node-surround n-left"><i data-lucide="heart" size="24"></i></div>
+                    <div class="card-node node-surround n-right"><i data-lucide="shield-check" size="24"></i></div>
+                    <div class="card-node node-surround n-bottom"><i data-lucide="clipboard-check" size="24"></i></div>
+                </div>
+            </section>
+
+            <!-- RIGHT: LOGIN CARD WITH FIXED INPUTS -->
+            <section class="content-right">
+                <div class="login-card">
+                    <div class="card-header">
+                        <span class="eyebrow">Authorized Access</span>
+                        <h2>ASHA Login</h2>
+                        <p>Sign in with your authorized credentials.</p>
+                    </div>
+
+                    <form id="ashaLoginForm">
+                        <div class="field">
+                            <label>ASHA Login ID</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="user" class="input-icon"></i>
+                                <input type="text" id="ashaId" placeholder="Enter your ASHA Login ID" required>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Password</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="lock" class="input-icon"></i>
+                                <input type="password" id="password" placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle" id="togglePass">
+                                    <i data-lucide="eye" size="18"></i>
+                                </button>
+                            </div>
+                            <a href="#" class="forgot-pw" onclick="handleHelp()">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="btn-login" id="loginBtn">
+                            Login <i data-lucide="arrow-right" size="18"></i>
+                        </button>
+                    </form>
+
+                    <div class="security-footer">
+                        <i data-lucide="shield-check" size="20"></i>
+                        <span>Authorized ASHA Personnel Access</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Password Toggle Logic
+        const tBtn = document.getElementById('togglePass');
+        const pInp = document.getElementById('password');
+        tBtn.addEventListener('click', () => {
+            const isPass = pInp.type === 'password';
+            pInp.type = isPass ? 'text' : 'password';
+            tBtn.innerHTML = isPass ? '<i data-lucide="eye-off" size="18"></i>' : '<i data-lucide="eye" size="18"></i>';
+            lucide.createIcons();
+        });
+
+        // Demo Login Logic
+        document.getElementById('ashaLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = 'Signing in...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            setTimeout(() => {
+                alert("Successful demonstration of ASHA Portal Login.");
+                btn.innerHTML = 'Login <i data-lucide="arrow-right" size="18"></i>';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                lucide.createIcons();
+            }, 1000);
+        });
+
+        function handleHelp() {
+            alert("Please contact your Block Health Supervisor to reset your credentials.");
+        }
+    </script>
+</body>
+</html>

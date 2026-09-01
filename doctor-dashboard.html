@@ -1,204 +1,298 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Doctor Dashboard</title>
-  <style>
-    :root {
-      --bg: #f4f3f1;
-      --panel: #ffffff;
-      --panel-soft: #f8f7f4;
-      --line: #e7ebef;
-      --navy: #172033;
-      --indigo: #1e2a5a;
-      --teal: #0f766e;
-      --teal-soft: #dff8f4;
-      --danger: #dc2626;
-      --text: #465469;
-      --shadow: 0 18px 45px rgba(30,42,90,0.09);
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--navy); }
-    a { text-decoration: none; color: inherit; }
-    body { padding: 0; }
-    .topbar { background: white; border-bottom: 1px solid var(--line); padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .logo { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--indigo); color: white; font-weight: 800; }
-    .brand strong { font-size: 1.1rem; }
-    .brand small { display: block; color: var(--teal); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800; }
-    .nav { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .pill { padding: 9px 12px; border-radius: 10px; background: transparent; color: #586981; font-weight: 700; border: 1px solid transparent; }
-    .pill.active { background: var(--teal-soft); color: var(--indigo); border-color: #d8f2ee; }
-    .pill.warn { color: var(--danger); }
-    .userbox { display: flex; align-items: center; gap: 12px; }
-    .avatar { width: 42px; height: 42px; border-radius: 12px; background: var(--indigo); color: white; display: grid; place-items: center; font-weight: 800; }
-    .status { background: #f0fdf4; border: 1px solid #d6f1db; color: #1f7a52; padding: 7px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect | Doctor Portal</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-indigo: #1E2A5A;
+            --rich-teal: #0F766E;
+            --soft-aqua: #CFF7F2;
+            --soft-ivory: #F8F7F4;
+            --pure-white: #FFFFFF;
+            --slate-gray: #667085;
+            --soft-border: #E6E8EE;
+            --transition: cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-    .page { padding: 28px; }
-    .wrapper { max-width: 1240px; margin: 0 auto; }
-    .hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0 28px; }
-    .hero h1 { margin: 0; font-size: clamp(2.1rem, 4vw, 4rem); line-height: 1.05; letter-spacing: -0.06em; color: var(--indigo); }
-    .hero h1 span { color: var(--teal); }
-    .hero p { margin: 12px 0 0; color: var(--text); max-width: 620px; line-height: 1.7; }
-    .orb { width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0%, #cff7f2 25%, #a8e6db 100%); display: grid; place-items: center; color: rgba(15,118,110,0.8); box-shadow: 0 20px 50px rgba(15,118,110,0.12); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(160px,1fr)); gap: 18px; margin: 20px 0 32px; }
-    .card { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; gap: 14px; align-items: center; }
-    .card-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--panel-soft); display: grid; place-items: center; color: var(--teal); }
-    .card strong { display: block; font-size: 1.8rem; letter-spacing: -0.04em; }
-    .card small { display: block; margin-top: 6px; color: #76879a; text-transform: uppercase; letter-spacing: 0.12em; font-size: 9px; font-weight: 800; }
+        body {
+            background-color: var(--soft-ivory);
+            color: var(--deep-indigo);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-    .panel-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
-    .panel { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 18px 18px 8px; }
-    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .panel-head h3 { margin: 0; font-size: 1.1rem; color: var(--indigo); }
-    .panel-head a { color: var(--teal); font-size: 0.8rem; font-weight: 800; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; font-size: 0.9rem; }
-    th { color: #73839a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; }
-    .badge { display: inline-block; padding: 6px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; }
-    .badge.waiting { background: #fef3c7; color: #92400e; }
-    .badge.consult { background: #dcfce7; color: #166534; }
-    .badge.high { background: #fee2e2; color: #991b1b; }
-    .button { border: none; background: var(--teal); color: white; padding: 9px 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-    .button.alt { background: #eef2f7; color: var(--indigo); }
+        /* --- 1. TOP NAVBAR --- */
+        nav {
+            position: sticky;
+            top: 20px;
+            width: calc(100% - 40px);
+            margin: 20px auto;
+            height: 80px;
+            background: var(--pure-white);
+            border-radius: 16px;
+            border: 2px solid var(--deep-indigo);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1000;
+        }
 
-    .alert { background: #fff7ed; border: 1px solid #fed7aa; color: #9a4f00; border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; font-weight: 700; }
+        .nav-left { display: flex; align-items: center; gap: 30px; }
+        .logo-group { display: flex; flex-direction: column; }
+        .logo { font-weight: 800; font-size: 1.2rem; text-transform: uppercase; color: var(--deep-indigo); line-height: 1; }
+        .logo-sub { font-size: 0.65rem; color: var(--rich-teal); font-weight: 700; letter-spacing: 2px; }
+        
+        .nav-features { font-size: 0.8rem; color: var(--slate-gray); font-weight: 600; max-width: 300px; line-height: 1.2; }
 
-    @media (max-width: 900px) {
-      .hero { flex-direction: column; align-items: flex-start; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .panel-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 560px) {
-      .topbar { flex-wrap: wrap; }
-      .stats-grid { grid-template-columns: 1fr; }
-      .page { padding: 16px; }
-      .wrapper { max-width: unset; }
-    }
-  </style>
+        .nav-right { display: flex; align-items: center; gap: 24px; }
+        
+        /* Language Dropdown */
+        .lang-dropdown {
+            border: 1px solid var(--soft-border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--deep-indigo);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 20px;
+            border-left: 1px solid var(--soft-border);
+        }
+        .profile-info { text-align: right; }
+        .profile-name { font-size: 0.9rem; font-weight: 700; display: block; }
+        .profile-dept { font-size: 0.7rem; color: var(--slate-gray); font-weight: 600; }
+        .profile-avatar { width: 40px; height: 40px; background: var(--deep-indigo); color: white; border-radius: 12px; display: grid; place-items: center; }
+
+        /* --- 2. HERO SECTION --- */
+        .hero {
+            padding: 40px 60px;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .hero-text h1 { font-size: 2.2rem; margin-bottom: 8px; }
+        .hero-text p { font-size: 1rem; color: var(--slate-gray); font-weight: 500; font-style: italic; max-width: 500px; }
+
+        .theme-design-box {
+            width: 100%;
+            height: 280px;
+            background: var(--pure-white);
+            border: 2px solid var(--deep-indigo);
+            border-radius: 32px;
+            display: grid;
+            place-items: center;
+            position: relative;
+            box-shadow: 12px 12px 0px var(--soft-aqua);
+        }
+
+        /* Themed Graphic */
+        .design-element {
+            width: 120px; height: 120px;
+            background: var(--rich-teal);
+            border-radius: 24px;
+            display: grid; place-items: center;
+            color: white;
+            transform: rotate(-10deg);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* --- 3. STATS STRIP --- */
+        .stats-strip {
+            background: var(--pure-white);
+            margin: 20px 60px;
+            padding: 24px 60px;
+            border-radius: 20px;
+            border: 2px solid var(--deep-indigo);
+            display: flex;
+            justify-content: space-between;
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-item { display: flex; flex-direction: column; gap: 4px; }
+        .stat-label { font-size: 0.75rem; color: var(--slate-gray); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1.4rem; color: var(--rich-teal); font-weight: 800; }
+
+        /* --- 4. MAIN FEATURE GRID --- */
+        .dashboard-grid {
+            padding: 40px 60px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--pure-white);
+            border-radius: 40px;
+            border: 2px solid var(--deep-indigo);
+            padding: 30px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s var(--transition);
+        }
+
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(30, 42, 90, 0.05); }
+
+        .card h3 { font-size: 0.9rem; text-transform: uppercase; margin-bottom: 20px; font-weight: 700; color: var(--deep-indigo); letter-spacing: 1px; border-bottom: 1px solid var(--soft-border); padding-bottom: 10px; }
+
+        /* Asymmetric card sizing */
+        .card-1 { grid-column: span 1; } /* Appointments */
+        .card-2 { grid-column: span 1; } /* Consultations */
+        .card-3 { grid-column: span 1; } /* Referral Management */
+        .card-4 { grid-column: span 1; } /* Patient Management / Lab Reports */
+
+        .feature-list { list-style: none; }
+        .feature-list li { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.9rem; font-weight: 600; color: #444; }
+        .feature-list li i { color: var(--rich-teal); }
+
+        .urgent-tag { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-left: auto; }
+
+        /* --- Animations --- */
+        @keyframes float { 0%, 100% { transform: rotate(-10deg) translateY(0); } 50% { transform: rotate(-10deg) translateY(-20px); } }
+
+        @media (max-width: 1024px) {
+            .hero, .dashboard-grid { grid-template-columns: 1fr; }
+            .card { grid-column: span 3; }
+        }
+    </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">A</div>
-      <div>
-        <strong>AarogyaConnect</strong>
-        <small>Doctor Dashboard</small>
-      </div>
-    </div>
 
-    <nav class="nav" aria-label="Dashboard navigation">
-      <span class="pill active">Dashboard</span>
-      <span class="pill">Appointments</span>
-      <span class="pill">Patients</span>
-      <span class="pill">Referrals</span>
-      <span class="pill warn">Logout</span>
+    <!-- TOP NAVBAR -->
+    <nav>
+        <div class="nav-left">
+            <div class="logo-group">
+                <div class="logo">Aarogya Connect</div>
+                <div class="logo-sub">DOCTOR PORTAL</div>
+            </div>
+            <div class="nav-features">
+                Queue Status: <span style="color: var(--rich-teal);">Active</span> • System Check: <span style="color: var(--rich-teal);">Secure</span>
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <select class="lang-dropdown">
+                <option value="en">English</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="hi">हिन्दी (Hindi)</option>
+                <option value="mr">मराठी (Marathi)</option>
+            </select>
+            
+            <div class="profile-card">
+                <div class="profile-info">
+                    <span class="profile-name">Dr. Anjali Sharma</span>
+                    <span class="profile-dept">Senior Cardiologist</span>
+                </div>
+                <div class="profile-avatar"><i data-lucide="user"></i></div>
+            </div>
+        </div>
     </nav>
 
-    <div class="userbox">
-      <span class="status">Available</span>
-      <div class="avatar">DM</div>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Hey, Dr. Sharma</h1>
+            <p>"The art of medicine consists of amusing the patient while nature cures the disease."</p>
+            <div style="margin-top: 20px; font-size: 0.8rem; font-weight: 700; color: var(--rich-teal);">Patient Management System v2.0 Live</div>
+        </div>
+        <div class="theme-design-box">
+            <div class="design-element">
+                <i data-lucide="heart-pulse" size="60"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+        <div class="stat-item">
+            <span class="stat-label">Appointments Today</span>
+            <span class="stat-value">18</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Active Consultations</span>
+            <span class="stat-value">05</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Pending Referrals</span>
+            <span class="stat-value">03</span>
+        </div>
     </div>
-  </header>
 
-  <main class="page">
-    <div class="wrapper">
-      <section class="hero">
-        <div>
-          <p style="margin:0 0 8px; color:var(--teal); font-size:12px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase;">Good morning, Dr. Mehta</p>
-          <h1>Your clinical work,<br><span>organized for better care.</span></h1>
-          <p>Monitor patient risk, coordinate today’s consultations, and keep every clinical decision moving forward from one secure workspace.</p>
-        </div>
-        <div class="orb">✚</div>
-      </section>
-
-      <section class="stats-grid">
-        <div class="card">
-          <div class="card-icon">📅</div>
-          <div><strong>24</strong><small>Appointments</small></div>
-        </div>
-        <div class="card">
-          <div class="card-icon">👥</div>
-          <div><strong>06</strong><small>Waiting</small></div>
-        </div>
-        <div class="card">
-          <div class="card-icon">📹</div>
-          <div><strong>05</strong><small>Video Calls</small></div>
-        </div>
-        <div class="card">
-          <div class="card-icon">📌</div>
-          <div><strong>04</strong><small>Referrals</small></div>
-        </div>
-      </section>
-
-      <div class="alert">High-priority case: Cardiac follow-up and teleconsultation queue needs attention before 12:00 PM.</div>
-
-      <section class="panel-grid">
-        <div class="panel">
-          <div class="panel-head">
-            <h3>Appointment Queue</h3>
-            <a href="#">Full Queue</a>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Q-No.</th>
-                <th>Patient</th>
-                <th>Time</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Q-04</td>
-                <td>Ravi Kumar</td>
-                <td>09:30 AM</td>
-                <td><span class="badge waiting">Waiting</span></td>
-                <td><button class="button">Start</button></td>
-              </tr>
-              <tr>
-                <td>Q-05</td>
-                <td>Lakshmi Devi</td>
-                <td>10:10 AM</td>
-                <td><span class="badge consult">Ready</span></td>
-                <td><button class="button alt">Resume</button></td>
-              </tr>
-              <tr>
-                <td>Q-06</td>
-                <td>Suresh Reddy</td>
-                <td>10:45 AM</td>
-                <td><span class="badge high">Priority</span></td>
-                <td><button class="button">Review</button></td>
-              </tr>
-            </tbody>
-          </table>
+    <!-- MAIN GRID CONTENT -->
+    <main class="dashboard-grid">
+        
+        <!-- Card 1: Appointments List -->
+        <div class="card card-1">
+            <h3>Appointments & Lists</h3>
+            <ul class="feature-list">
+                <li><i data-lucide="clock" size="16"></i> 09:30 - Rahul Kumar</li>
+                <li><i data-lucide="clock" size="16"></i> 10:15 - Sneha Patil</li>
+                <li><i data-lucide="clock" size="16"></i> 11:00 - Amit Varma</li>
+                <li><i data-lucide="plus-circle" size="16"></i> <span style="color: var(--rich-teal);">View All Appointments</span></li>
+            </ul>
         </div>
 
-        <div class="panel">
-          <div class="panel-head">
-            <h3>Clinical Overview</h3>
-            <a href="#">Live</a>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Vitals Pending</td><td>03</td></tr>
-              <tr><td>Lab Results</td><td>08</td></tr>
-              <tr><td>Teleconsults</td><td>05</td></tr>
-              <tr><td>Risk Alerts</td><td>02</td></tr>
-            </tbody>
-          </table>
+        <!-- Card 2: Consultations & Queue -->
+        <div class="card card-2">
+            <h3>Teleconsultation Queue</h3>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="font-size: 3rem; font-weight: 800; color: var(--deep-indigo);">04</span>
+                <p style="font-size: 0.75rem; color: var(--slate-gray); font-weight: 700;">PATIENTS WAITING</p>
+            </div>
+            <button style="background: var(--rich-teal); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;">Start Consultation</button>
         </div>
-      </section>
-    </div>
-  </main>
+
+        <!-- Card 3: Referral Management -->
+        <div class="card card-3">
+            <h3>Referral Management</h3>
+            <ul class="feature-list">
+                <li><i data-lucide="arrow-up-right" size="16"></i> Outbound: 02</li>
+                <li><i data-lucide="arrow-down-left" size="16"></i> Inbound: 01</li>
+                <li style="margin-top: 10px; opacity: 0.6; font-size: 0.75rem;">Last update: 10 mins ago</li>
+            </ul>
+        </div>
+
+        <!-- Card 4: Extra Features (Meds & Lab Reports) -->
+        <div class="card card-4">
+            <h3>Lab Reports & e-Prescriptions</h3>
+            <ul class="feature-list">
+                <li><i data-lucide="file-text" size="16"></i> Lab Reports <span class="urgent-tag">02 NEW</span></li>
+                <li><i data-lucide="pill" size="16"></i> e-Prescription History</li>
+                <li><i data-lucide="users" size="16"></i> Patient Management</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>
