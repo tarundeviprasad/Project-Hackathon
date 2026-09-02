@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect | Appointments & Queue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-indigo: #1E2A5A;
+            --primary-teal: #0F766E;
+            --light-aqua: #CFF7F2;
+            --bg-ivory: #F8F7F4;
+            --white: #FFFFFF;
+            --text-dark: #172033;
+            --text-secondary: #667085;
+            --border-color: #E6E8EE;
+            --status-waiting: #F59E0B;
+            --status-progress: #3B82F6;
+            --status-done: #10B981;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
+
+        body { 
+            background-color: var(--bg-ivory); 
+            color: var(--text-dark); 
+            display: flex; 
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden; /* Fix: Removes the horizontal scrollbar */
+        }
+
+        /* Sidebar - Focused strictly on Appointments */
+        aside { 
+            width: 260px; 
+            background-color: var(--primary-indigo); 
+            color: var(--white); 
+            position: fixed; 
+            height: 100vh; 
+            z-index: 100; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        .sidebar-logo { 
+            padding: 2.5rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            font-weight: 700; 
+            font-size: 1.25rem; 
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon { 
+            width: 32px; 
+            height: 32px; 
+            background: var(--primary-teal); 
+            border-radius: 8px; 
+            display: grid; 
+            place-items: center; 
+        }
+
+        .nav-links { 
+            flex: 1; 
+            padding: 0 0.75rem; 
+        }
+
+        .nav-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 14px 16px; 
+            text-decoration: none; 
+            color: rgba(255, 255, 255, 0.7); 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            transition: 0.2s; 
+        }
+
+        .nav-item.active { 
+            background: var(--primary-teal); 
+            color: var(--white); 
+        }
+
+        /* Main Content - Calculated Width to prevent overflow */
+        main { 
+            flex: 1; 
+            margin-left: 260px; 
+            padding: 2.5rem 3rem; 
+            width: calc(100% - 260px); 
+        }
+
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2.5rem; 
+        }
+
+        .header-title h1 { font-size: 1.75rem; color: var(--primary-indigo); margin-bottom: 4px; }
+        .header-title p { color: var(--text-secondary); font-size: 0.95rem; }
+
+        .btn-primary { 
+            background: var(--primary-teal); 
+            color: var(--white); 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 30px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.2); 
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.1); }
+
+        /* Metrics Display */
+        .metrics-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 24px; 
+            margin-bottom: 2.5rem; 
+        }
+
+        .metric-card { 
+            background: var(--white); 
+            padding: 1.5rem; 
+            border-radius: var(--radius-lg); 
+            border: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            box-shadow: var(--shadow-sm); 
+        }
+
+        .metric-val { font-size: 2rem; font-weight: 800; display: block; margin-top: 8px; }
+        .metric-label { color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Unified Queue Section */
+        .queue-container { 
+            background: var(--white); 
+            border-radius: var(--radius-lg); 
+            border: 1px solid var(--border-color); 
+            box-shadow: var(--shadow-sm); 
+            overflow: hidden; 
+        }
+
+        .queue-header { 
+            padding: 1.5rem 2rem; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #FAFAFB;
+        }
+
+        .tabs { display: flex; gap: 8px; background: #EEEFF2; padding: 4px; border-radius: 12px; }
+        .tab { padding: 10px 20px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: none; background: transparent; color: var(--text-secondary); transition: 0.2s; }
+        .tab.active { background: var(--white); color: var(--primary-teal); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+
+        .search-box {
+            position: relative;
+            width: 280px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-size: 0.9rem;
+        }
+        .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+
+        /* Responsive Table */
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 16px 24px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); font-weight: 700; border-bottom: 1px solid var(--border-color); }
+        td { padding: 18px 24px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr.row-in-progress { background-color: #F0F7FF; }
+        
+        .patient-cell { display: flex; align-items: center; gap: 14px; }
+        .q-num { font-weight: 800; color: var(--text-secondary); width: 40px; font-size: 0.9rem; }
+        .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--light-aqua); color: var(--primary-teal); display: grid; place-items: center; font-weight: 700; font-size: 0.9rem; }
+
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-online { background: #E0F2F1; color: var(--primary-teal); }
+        .badge-walkin { background: #F2F4F7; color: var(--text-secondary); }
+        
+        .status-pill { font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+        .status-waiting { color: var(--status-waiting); }
+        .status-progress { color: var(--status-progress); }
+        .status-done { color: var(--status-done); }
+
+        /* Dropdown Actions */
+        .dropdown { position: relative; }
+        .dropdown-menu { position: absolute; right: 0; top: 100%; background: var(--white); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.12); width: 200px; display: none; z-index: 200; overflow: hidden; padding: 6px; }
+        .dropdown-menu.show { display: block; }
+        .dropdown-item { padding: 12px 14px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+        .dropdown-item:hover { background: var(--bg-ivory); color: var(--primary-teal); }
+        .text-danger { color: #D92D20; }
+        .text-danger:hover { background: #FEF3F2; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: var(--white); width: 480px; border-radius: var(--radius-lg); padding: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: var(--primary-indigo); }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; outline: none; font-size: 0.95rem; }
+        .form-group input:focus { border-color: var(--primary-teal); }
+        
+        .view-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F2F4F7; }
+        .view-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        .view-val { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i data-lucide="calendar-check-2" color="white" size="18"></i></div> 
+            AarogyaConnect
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="nav-item active"><i data-lucide="layout-list" size="20"></i> Appointments & Queue</a>
+        </nav>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title">
+                <h1 id="greeting">Today's Appointments</h1>
+                <p>Manage patients in the unified consultation queue.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="openModal('newApptModal')">
+                    <i data-lucide="plus-circle" size="20"></i> Create Appointment
+                </button>
+            </div>
+        </header>
+
+        <!-- Metric Overview -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div><span class="metric-label">Scheduled</span><span class="metric-val" id="m-total">0</span></div>
+                <i data-lucide="calendar" color="#1E2A5A"></i>
+            </div>
+            <div class="metric-card">
+                <div><span class="metric-label">Waiting</span><span class="metric-val" id="m-waiting" style="color: var(--status-waiting)">0</span></div>
+                <i data-lucide="clock" color="#F59E0B"></i>
+            </div>
+            <div class="metric-card">
+                <div><span class="metric-label">Active</span><span class="metric-val" id="m-progress" style="color: var(--status-progress)">0</span></div>
+                <i data-lucide="activity" color="#3B82F6"></i>
+            </div>
+            <div class="metric-card">
+                <div><span class="metric-label">Completed</span><span class="metric-val" id="m-done" style="color: var(--status-done)">0</span></div>
+                <i data-lucide="check-circle-2" color="#10B981"></i>
+            </div>
+        </section>
+
+        <!-- Main Table Card -->
+        <section class="queue-container">
+            <div class="queue-header">
+                <div class="tabs">
+                    <button class="tab active" onclick="setFilter('All', this)">All Patients</button>
+                    <button class="tab" onclick="setFilter('Online Teleconsultation', this)">Online</button>
+                    <button class="tab" onclick="setFilter('Walk-in', this)">Walk-in</button>
+                </div>
+                <div class="search-box">
+                    <i data-lucide="search" size="18"></i>
+                    <input type="text" placeholder="Search by name..." onkeyup="searchPatient(this.value)">
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Queue</th>
+                        <th>Patient Name & Details</th>
+                        <th>Slot Time</th>
+                        <th>Visit Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="queueBody"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- NEW APPOINTMENT MODAL -->
+    <div class="modal-overlay" id="newApptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>New Appointment</h3>
+                <i data-lucide="x" style="cursor:pointer" onclick="closeModal('newApptModal')"></i>
+            </div>
+            <form onsubmit="saveAppointment(event)">
+                <div class="form-group"><label>Full Name</label><input type="text" id="pName" required placeholder="e.g. Rahul Verma"></div>
+                <div style="display:flex; gap:12px">
+                    <div class="form-group" style="flex:1"><label>Age</label><input type="number" id="pAge" required></div>
+                    <div class="form-group" style="flex:1"><label>Gender</label><select id="pGender"><option>Male</option><option>Female</option></select></div>
+                </div>
+                <div class="form-group"><label>Preferred Time</label><input type="time" id="pTime" required></div>
+                <div class="form-group"><label>Consultation Type</label><select id="pType"><option>Walk-in</option><option>Online Teleconsultation</option></select></div>
+                <div class="form-group"><label>Reason for Visit</label><input type="text" id="pReason" placeholder="e.g. Fever, Follow-up" required></div>
+                <button type="submit" class="btn-primary" style="width:100%; justify-content:center; border-radius: 12px; margin-top: 10px;">Confirm Appointment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- VIEW DETAILS MODAL -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal">
+            <div class="modal-header"><h3>Appointment Summary</h3><i data-lucide="x" style="cursor:pointer" onclick="closeModal('viewModal')"></i></div>
+            <div id="viewDetailsContent"></div>
+        </div>
+    </div>
+
+    <!-- RESCHEDULE MODAL -->
+    <div class="modal-overlay" id="rescheduleModal">
+        <div class="modal">
+            <div class="modal-header"><h3>Reschedule Patient</h3><i data-lucide="x" style="cursor:pointer" onclick="closeModal('rescheduleModal')"></i></div>
+            <div class="form-group">
+                <label>Select New Time Slot</label>
+                <input type="time" id="newTimeInput">
+            </div>
+            <button class="btn-primary" style="width:100%; justify-content:center; border-radius: 12px;" onclick="confirmReschedule()">Update Appointment</button>
+        </div>
+    </div>
+
+    <script>
+        // Initial Mock Data
+        let appointments = [
+            { id: 1, name: "Ramesh Kumar", age: 45, gender: "Male", time: "09:00", type: "Walk-in", status: "Completed", reason: "Viral Fever Follow-up" },
+            { id: 2, name: "Lakshmi Devi", age: 52, gender: "Female", time: "09:20", type: "Online Teleconsultation", status: "Completed", reason: "Diabetes Follow-up" },
+            { id: 3, name: "Suresh Rao", age: 38, gender: "Male", time: "09:40", type: "Walk-in", status: "Completed", reason: "Blood Pressure Review" },
+            { id: 4, name: "Anitha Kumari", age: 29, gender: "Female", time: "10:00", type: "Online Teleconsultation", status: "In-Progress", reason: "General Consultation" },
+            { id: 5, name: "Mohan Babu", age: 61, gender: "Male", time: "10:20", type: "Walk-in", status: "Waiting", reason: "Joint Pain" },
+            { id: 6, name: "Priya Sharma", age: 34, gender: "Female", time: "10:40", type: "Online Teleconsultation", status: "Waiting", reason: "Respiratory Follow-up" },
+            { id: 7, name: "Vikram Singh", age: 42, gender: "Male", time: "11:00", type: "Walk-in", status: "Waiting", reason: "Chronic Migraine" },
+            { id: 8, name: "Kavita Reddy", age: 31, gender: "Female", time: "11:15", type: "Online Teleconsultation", status: "Waiting", reason: "Stomach Pain" }
+        ];
+
+        let currentFilter = 'All';
+        let activeRescheduleId = null;
+
+        function renderQueue(data = appointments) {
+            const body = document.getElementById('queueBody');
+            body.innerHTML = '';
+            
+            // Re-sort by time chronologically
+            let sorted = [...data].sort((a, b) => a.time.localeCompare(b.time));
+            
+            sorted.forEach((appt, index) => {
+                const row = document.createElement('tr');
+                if(appt.status === 'In-Progress') row.className = 'row-in-progress';
+                
+                const initials = appt.name.split(' ').map(n => n[0]).join('');
+
+                row.innerHTML = `
+                    <td><span class="q-num">#${(index + 1).toString().padStart(2, '0')}</span></td>
+                    <td>
+                        <div class="patient-cell">
+                            <div class="avatar">${initials}</div>
+                            <div>
+                                <div style="font-weight:700; color:var(--primary-indigo)">${appt.name}</div>
+                                <div style="font-size:0.75rem; color:var(--text-secondary); font-weight:500;">${appt.age} / ${appt.gender}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-weight:700; font-size:0.9rem">${formatTime(appt.time)}</td>
+                    <td><span class="badge ${appt.type.includes('Online') ? 'badge-online' : 'badge-walkin'}">
+                        <i data-lucide="${appt.type.includes('Online') ? 'video' : 'user'}" size="12"></i>
+                        ${appt.type.includes('Online') ? 'Online' : 'Walk-in'}
+                    </span></td>
+                    <td><span class="status-pill status-${appt.status.toLowerCase().replace(' ', '')}"><i data-lucide="circle" size="8" fill="currentColor"></i> ${appt.status}</span></td>
+                    <td class="dropdown">
+                        <button onclick="toggleDrop(event, ${appt.id})" style="background:none; border:none; cursor:pointer; color:var(--text-secondary);"><i data-lucide="more-horizontal" size="20"></i></button>
+                        <div class="dropdown-menu" id="drop-${appt.id}">
+                            <div class="dropdown-item" onclick="viewAppt(${appt.id})"><i data-lucide="eye" size="14"></i> View Appointment</div>
+                            <div class="dropdown-item" onclick="openReschedule(${appt.id}, '${appt.time}')"><i data-lucide="calendar" size="14"></i> Reschedule</div>
+                            <div class="dropdown-item text-danger" onclick="cancelAppt(${appt.id})"><i data-lucide="trash-2" size="14"></i> Cancel Appointment</div>
+                        </div>
+                    </td>
+                `;
+                body.appendChild(row);
+            });
+            updateMetrics();
+            lucide.createIcons();
+        }
+
+        function viewAppt(id) {
+            const appt = appointments.find(a => a.id === id);
+            const content = document.getElementById('viewDetailsContent');
+            content.innerHTML = `
+                <div class="view-row"><span class="view-label">Patient Name</span><span class="view-val">${appt.name}</span></div>
+                <div class="view-row"><span class="view-label">Age / Gender</span><span class="view-val">${appt.age} / ${appt.gender}</span></div>
+                <div class="view-row"><span class="view-label">Appointment Time</span><span class="view-val">${formatTime(appt.time)}</span></div>
+                <div class="view-row"><span class="view-label">Visit Type</span><span class="view-val">${appt.type}</span></div>
+                <div class="view-row"><span class="view-label">Reason</span><span class="view-val">${appt.reason}</span></div>
+                <div class="view-row" style="border:none"><span class="view-label">Queue Status</span><span class="view-val" style="color:var(--primary-teal)">${appt.status}</span></div>
+            `;
+            openModal('viewModal');
+        }
+
+        function openReschedule(id, time) {
+            activeRescheduleId = id;
+            document.getElementById('newTimeInput').value = time;
+            openModal('rescheduleModal');
+        }
+
+        function confirmReschedule() {
+            const newTime = document.getElementById('newTimeInput').value;
+            const appt = appointments.find(a => a.id === activeRescheduleId);
+            if(appt) {
+                appt.time = newTime;
+                applyFilters();
+                closeModal('rescheduleModal');
+            }
+        }
+
+        function cancelAppt(id) {
+            if(confirm("Confirm: Remove this patient from the queue?")) {
+                appointments = appointments.filter(a => a.id !== id);
+                applyFilters();
+            }
+        }
+
+        function saveAppointment(e) {
+            e.preventDefault();
+            const newObj = {
+                id: Date.now(),
+                name: document.getElementById('pName').value,
+                age: document.getElementById('pAge').value,
+                gender: document.getElementById('pGender').value,
+                time: document.getElementById('pTime').value,
+                type: document.getElementById('pType').value,
+                reason: document.getElementById('pReason').value,
+                status: "Waiting"
+            };
+            appointments.push(newObj);
+            closeModal('newApptModal');
+            applyFilters();
+            e.target.reset();
+        }
+
+        function formatTime(t) {
+            let [h, m] = t.split(':');
+            let ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            return `${h}:${m} ${ampm}`;
+        }
+
+        function updateMetrics() {
+            document.getElementById('m-total').innerText = appointments.length.toString().padStart(2, '0');
+            document.getElementById('m-waiting').innerText = appointments.filter(a => a.status === 'Waiting').length.toString().padStart(2, '0');
+            document.getElementById('m-progress').innerText = appointments.filter(a => a.status === 'In-Progress').length.toString().padStart(2, '0');
+            document.getElementById('m-done').innerText = appointments.filter(a => a.status === 'Completed').length.toString().padStart(2, '0');
+        }
+
+        function setFilter(type, el) {
+            currentFilter = type;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            applyFilters();
+        }
+
+        function searchPatient(val) {
+            applyFilters(val.toLowerCase());
+        }
+
+        function applyFilters(searchQuery = '') {
+            let filtered = appointments.filter(a => {
+                const matchesType = currentFilter === 'All' || a.type === currentFilter;
+                const matchesSearch = a.name.toLowerCase().includes(searchQuery);
+                return matchesType && matchesSearch;
+            });
+            renderQueue(filtered);
+        }
+
+        function toggleDrop(e, id) {
+            e.stopPropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            document.getElementById(`drop-${id}`).classList.toggle('show');
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        window.onclick = () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        
+        renderQueue();
+    </script>
+</body>
+</html>
