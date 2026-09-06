@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referrals | AarogyaConnect Doctor Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-indigo: #1E2A5A;
+            --primary-hover: #162044;
+            --healthcare-teal: #0F766E;
+            --teal-hover: #0B5E57;
+            --light-aqua: #F0FDFB;
+            --page-bg: #F4F5F7;
+            --panel-white: #FFFFFF;
+            --text-main: #111827;
+            --text-secondary: #4B5563;
+            --border-color: #E5E7EB;
+            --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--page-bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 32px 48px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* --- HEADER --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .header-content h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary-indigo);
+            letter-spacing: -0.02em;
+            margin-bottom: 2px;
+        }
+
+        .header-content p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-indigo);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* --- TABS --- */
+        .tabs-container {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            margin-bottom: -1px;
+        }
+
+        .tab .count {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 7px;
+            background: #E5E7EB;
+            border-radius: 9999px;
+            color: var(--text-secondary);
+        }
+
+        .tab:hover {
+            color: var(--primary-indigo);
+        }
+
+        .tab.active {
+            background-color: var(--panel-white);
+            color: var(--primary-indigo);
+            border-color: var(--border-color);
+            border-bottom-color: var(--panel-white);
+        }
+
+        .tab.active .count {
+            background-color: var(--light-aqua);
+            color: var(--healthcare-teal);
+            border: 1px solid rgba(15, 118, 110, 0.2);
+        }
+
+        /* --- CONTENT SECTION --- */
+        .section-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .section-title-row h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .filter-dropdown {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--panel-white);
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .filter-dropdown:focus {
+            border-color: var(--healthcare-teal);
+            box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.1);
+        }
+
+        /* --- REFERRAL CARDS --- */
+        .referral-card {
+            background: var(--panel-white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px 24px;
+            display: grid;
+            grid-template-columns: 1.3fr 1.1fr 1.5fr 1fr auto;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 12px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .referral-card:hover {
+            border-color: #CBD5E1;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .patient-info .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-indigo);
+            display: block;
+        }
+
+        .patient-info .meta,
+        .doc-info .meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .doc-info .name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .reason-info .reason {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .reason-info .desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+
+        .date-info {
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .date-info .time {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        /* --- BUTTONS --- */
+        .action-group {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-accept, .btn-decline {
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-accept {
+            background-color: var(--healthcare-teal);
+            color: white;
+            border: 1px solid var(--healthcare-teal);
+        }
+
+        .btn-accept:hover {
+            background-color: var(--teal-hover);
+        }
+
+        .btn-decline {
+            background-color: var(--panel-white);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-decline:hover {
+            background-color: #F9FAFB;
+            color: var(--text-main);
+            border-color: #D1D5DB;
+        }
+
+        /* --- STATUS STATES --- */
+        .referral-card.status-accepted {
+            background-color: var(--light-aqua);
+            border-color: rgba(15, 118, 110, 0.3);
+        }
+
+        .accepted-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: var(--healthcare-teal);
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid rgba(15, 118, 110, 0.2);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .pending-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #FFFBEB;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: #B45309;
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid #FDE68A;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .detail-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(17, 24, 39, 0.45);
+        }
+
+        .detail-modal-overlay.open {
+            display: flex;
+        }
+
+        .detail-modal {
+            position: relative;
+            width: min(560px, 100%);
+            background: var(--panel-white);
+            border-radius: 10px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(17, 24, 39, 0.18);
+        }
+
+        .detail-modal h2 {
+            color: var(--primary-indigo);
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .detail-modal-subtitle {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .detail-item .label {
+            margin-bottom: 4px;
+        }
+
+        .detail-item p {
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .close-detail {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .referral-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .referral-form label {
+            display: grid;
+            gap: 6px;
+            color: var(--primary-indigo);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .referral-form input,
+        .referral-form textarea {
+            width: 100%;
+            padding: 11px 12px;
+            color: var(--text-main);
+            font: inherit;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            outline: none;
+        }
+
+        .referral-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .referral-form input:focus,
+        .referral-form textarea:focus {
+            border-color: var(--healthcare-teal);
+            box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 720px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-item.full-width {
+                grid-column: auto;
+            }
+        }
+
+        /* Reference layout */
+        body {
+            max-width: none;
+            padding: 0 0 48px;
+            background: #FAFBFE;
+        }
+
+        .topbar {
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 max(24px, calc((100% - 1016px) / 2));
+            background: #FFFFFF;
+            border-bottom: 1px solid #EEF1F7;
+        }
+
+        .search-box {
+            width: 630px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            color: #243B78;
+            border: 1px solid #E8ECF5;
+            border-radius: 9px;
+            box-shadow: 0 3px 10px rgba(30, 42, 90, 0.04);
+        }
+
+        .search-box span {
+            color: #7A89AD;
+            font-size: 13px;
+        }
+
+        .search-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .shortcut {
+            margin-left: auto;
+            padding: 2px 6px;
+            color: #40517F;
+            font-weight: 600;
+            border: 1px solid #E5EAF4;
+            border-radius: 5px;
+            background: #FBFCFF;
+        }
+
+        .doctor-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary-indigo);
+        }
+
+       
+        .doctor-avatar {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #D9E9F5, #5B7199);
+            border: 2px solid #F2F5FA;
+        }
+
+        .doctor-profile strong,
+        .doctor-profile small {
+            display: block;
+        }
+
+        .doctor-profile strong {
+            font-size: 14px;
+        }
+
+        .doctor-profile small {
+            color: #68799F;
+            font-size: 11px;
+        }
+
+        .profile-chevron {
+            margin-left: 36px;
+            font-size: 18px;
+        }
+
+        .page-header,
+        .tabs-container,
+        main {
+            width: min(1128px, calc(100% - 48px));
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header {
+            margin-top: 22px;
+            margin-bottom: 24px;
+        }
+
+        .header-content h1 {
+            font-size: 32px;
+            letter-spacing: -0.03em;
+        }
+
+        .header-content p {
+            color: #63749A;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            min-height: 44px;
+            padding: 0 24px;
+            border-radius: 9px;
+            background: #253B86;
+            box-shadow: 0 6px 12px rgba(37, 59, 134, 0.16);
+        }
+
+        .tabs-container {
+            width: fit-content;
+            min-width: 470px;
+            gap: 0;
+            margin-left: max(24px, calc((100% - 1128px) / 2));
+            margin-bottom: 0;
+            padding: 5px;
+            border: 1px solid #E9EDF5;
+            border-bottom: 1px solid #E9EDF5;
+            border-radius: 10px 10px 0 0;
+            background: #F5F7FB;
+        }
+
+        .tab {
+            padding: 9px 14px;
+            color: #56698F;
+            border: 0;
+            border-radius: 7px;
+            margin-bottom: 0;
+        }
+
+        .tab.active {
+            color: #1E3175;
+            background: #FFFFFF;
+            border: 1px solid #DDEAF1;
+            box-shadow: 0 2px 8px rgba(15, 118, 110, 0.10);
+        }
+
+        .tab .count {
+            color: #647399;
+            background: #E3E9F3;
+        }
+
+        .tab.active .count {
+            color: #1E3175;
+            background: #DDEBFA;
+            border: 0;
+        }
+
+        .tab-panel.active {
+            padding: 20px 16px 16px;
+            border: 1px solid #EEF1F6;
+            border-radius: 0 10px 10px 10px;
+            background: #FFFFFF;
+            box-shadow: 0 5px 14px rgba(30, 42, 90, 0.04);
+        }
+
+        .section-title-row {
+            margin-bottom: 18px;
+        }
+
+        .section-title-row h2 {
+            color: #1E3175;
+            font-size: 18px;
+        }
+
+        .section-title-row p {
+            color: #6B7CA1 !important;
+        }
+
+        .filter-dropdown {
+            min-width: 220px;
+            height: 40px;
+            padding: 0 14px;
+            color: #32497F;
+            border-color: #E8ECF4;
+            border-radius: 9px;
+            background: #FBFCFF;
+        }
+
+        .referral-card {
+            min-height: 78px;
+            grid-template-columns: 1.3fr 1fr 1.45fr 0.85fr auto;
+            gap: 18px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border-color: #E9EDF4;
+            border-radius: 10px;
+            box-shadow: 0 3px 9px rgba(30, 42, 90, 0.035);
+        }
+
+        .referral-card.status-accepted {
+            background: #F1FBFA;
+            border-color: #D8EFEC;
+        }
+
+        .patient-info {
+            position: relative;
+            padding-left: 52px;
+        }
+
+        .patient-info::before {
+            content: "PS";
+            position: absolute;
+            left: 0;
+            top: 3px;
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            color: #168C90;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 50%;
+            background: #DDF5F4;
+        }
+
+        #incoming-panel .referral-card:nth-child(3) .patient-info::before {
+            content: "AM";
+        }
+
+        #incoming-panel .referral-card:nth-child(4) .patient-info::before {
+            content: "SI";
+        }
+
+        .label {
+            color: #7081A5;
+            font-size: 10px;
+            letter-spacing: 0.03em;
+        }
+
+        .patient-info .name {
+            color: #152A68;
+            font-size: 14px;
+        }
+
+        .patient-info .meta,
+        .doc-info .meta,
+        .reason-info .desc {
+            color: #7182A7;
+            font-size: 12px;
+        }
+
+        .doc-info .name,
+        .reason-info .reason,
+        .date-info {
+            color: #172A61;
+            font-size: 13px;
+        }
+
+        .reason-info .desc {
+            max-width: 260px;
+        }
+
+        .date-info .time {
+            color: #7182A7;
+        }
+
+        .action-group {
+            gap: 10px;
+        }
+
+        .btn-accept,
+        .btn-decline {
+            min-width: 100px;
+            min-height: 42px;
+            padding: 0 18px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .btn-accept {
+            background: #087F83;
+            border-color: #087F83;
+        }
+
+        .btn-decline {
+            color: #24366F;
+            border-color: #AEBBD5;
+        }
+
+        @media (max-width: 900px) {
+            .topbar {
+                padding: 0 24px;
+            }
+
+            .search-box {
+                width: 48%;
+            }
+
+            .referral-card {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .action-group {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .topbar {
+                height: auto;
+                gap: 12px;
+                padding: 12px 16px;
+                flex-wrap: wrap;
+            }
+
+            .search-box {
+                width: 100%;
+                order: 2;
+            }
+
+            .doctor-profile {
+                margin-left: auto;
+            }
+
+            .page-header,
+            main {
+                width: calc(100% - 24px);
+            }
+
+            .page-header {
+                align-items: flex-start;
+                gap: 16px;
+                flex-direction: column;
+            }
+
+            .tabs-container {
+                width: calc(100% - 24px);
+                min-width: 0;
+                margin-left: 12px;
+                overflow-x: auto;
+            }
+
+            .tab {
+                white-space: nowrap;
+            }
+
+            .section-title-row {
+                align-items: flex-start;
+                gap: 12px;
+                flex-direction: column;
+            }
+
+            .filter-dropdown {
+                width: 100%;
+            }
+
+            .referral-card {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="search-box">
+            <span class="search-icon">&#8981;</span>
+            <span>Search patient by name, ID or phone...</span>
+            <span class="shortcut">Ctrl K</span>
+        </div>
+        <div class="doctor-profile">
+            <span class="search-icon">&#128276;</span>
+            <span class="doctor-avatar">RK</span>
+            <span>
+                <strong>Dr. Rajesh Kumar</strong>
+                <small>Reg ID: MC-99234</small>
+            </span>
+            <span class="profile-chevron">&#8964;</span>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Referrals</h1>
+            <p>Manage incoming clinical evaluations, track referrals, and coordinate follow-ups.</p>
+        </div>
+        <button class="btn-primary" id="sendReferralButton" type="button">
+            <span>+</span> Send Referral
+        </button>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-container">
+        <button class="tab active" data-tab="incoming-panel">
+            Incoming Referrals <span class="count">3</span>
+        </button>
+        <button class="tab" data-tab="sent-panel">
+            Sent Referrals <span class="count">5</span>
+        </button>
+        <button class="tab" data-tab="followups-panel">
+            Follow-ups <span class="count">4</span>
+        </button>
+    </nav>
+
+    <!-- Content Area -->
+    <main>
+        <section class="tab-panel active" id="incoming-panel">
+        <div class="section-title-row">
+            <div>
+                <h2>Incoming Referral Requests</h2>
+                <p style="color: var(--text-secondary); font-size: 13px; margin-top: 2px;">Review and action patient transfer details submitted by referring practitioners.</p>
+            </div>
+            <select class="filter-dropdown" aria-label="Filter by specialty">
+                <option>All Specialties</option>
+                <option>Cardiology</option>
+                <option>Neurology</option>
+            </select>
+        </div>
+
+        <!-- Referral Card 1 (Pending) -->
+        <div class="referral-card">
+            <div class="patient-info">
+                <span class="label">Patient Information</span>
+                <span class="name">Priya Sharma</span>
+                <span class="meta">P-10244 &bull; 28 yrs &bull; Female</span>
+            </div>
+            <div class="doc-info">
+                <span class="label">Referred By</span>
+                <span class="name">Dr. Neha Verma</span>
+                <span class="meta">General Physician</span>
+            </div>
+            <div class="reason-info">
+                <span class="label">Reason for Referral</span>
+                <p class="reason">Cardiology evaluation</p>
+                <p class="desc">Recurrent chest pain. Please evaluate immediately.</p>
+            </div>
+            <div class="date-info">
+                <span class="label">Received On</span>
+                <div>Sep 5, 2026</div>
+                <div class="time">10:15 AM</div>
+            </div>
+            <div class="action-group">
+                <button class="btn-accept">Accept</button>
+                <button class="btn-decline">Decline</button>
+            </div>
+        </div>
+
+        <!-- Referral Card 2 (Accepted State) -->
+        <div class="referral-card status-accepted">
+            <div class="patient-info">
+                <span class="label">Patient Information</span>
+                <span class="name">Arjun Mehta</span>
+                <span class="meta">P-10982 &bull; 45 yrs &bull; Male</span>
+            </div>
+            <div class="doc-info">
+                <span class="label">Referred By</span>
+                <span class="name">Dr. Vikram Seth</span>
+                <span class="meta">Internal Medicine</span>
+            </div>
+            <div class="reason-info">
+                <span class="label">Reason for Referral</span>
+                <p class="reason">Hypertension Management</p>
+                <p class="desc">Uncontrolled BP despite maximal medication.</p>
+            </div>
+            <div class="date-info">
+                <span class="label">Received On</span>
+                <div>Sep 4, 2026</div>
+                <div class="time">02:30 PM</div>
+            </div>
+            <div class="action-group">
+                <div class="accepted-badge">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.6666 5L7.49992 14.1667L3.33325 10" stroke="#0F766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Accepted
+                </div>
+            </div>
+        </div>
+
+        <!-- Referral Card 3 (Pending) -->
+        <div class="referral-card">
+            <div class="patient-info">
+                <span class="label">Patient Information</span>
+                <span class="name">Sonia Ittehad</span>
+                <span class="meta">P-11005 &bull; 34 yrs &bull; Female</span>
+            </div>
+            <div class="doc-info">
+                <span class="label">Referred By</span>
+                <span class="name">Dr. Amit Singh</span>
+                <span class="meta">General Physician</span>
+            </div>
+            <div class="reason-info">
+                <span class="label">Reason for Referral</span>
+                <p class="reason">Post-COVID Tachycardia</p>
+                <p class="desc">Evaluating for potential dysautonomia symptoms.</p>
+            </div>
+            <div class="date-info">
+                <span class="label">Received On</span>
+                <div>Sep 4, 2026</div>
+                <div class="time">09:00 AM</div>
+            </div>
+            <div class="action-group">
+                <button class="btn-accept">Accept</button>
+                <button class="btn-decline">Decline</button>
+            </div>
+        </div>
+        </section>
+
+        <section class="tab-panel" id="sent-panel">
+            <div class="section-title-row">
+                <div>
+                    <h2>Sent Referrals</h2>
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-top: 2px;">Track referrals you sent and see whether each one has been accepted.</p>
+                </div>
+                <select class="filter-dropdown" aria-label="Filter sent referrals">
+                    <option>All Statuses</option>
+                    <option>Accepted</option>
+                    <option>Pending</option>
+                </select>
+            </div>
+
+            <div class="referral-card status-accepted">
+                <div class="patient-info">
+                    <span class="label">Patient Information</span>
+                    <span class="name">Meera Reddy</span>
+                    <span class="meta">P-10318 &bull; 39 yrs &bull; Female</span>
+                </div>
+                <div class="doc-info">
+                    <span class="label">Sent To</span>
+                    <span class="name">Dr. Rohan Kapoor</span>
+                    <span class="meta">Cardiologist</span>
+                </div>
+                <div class="reason-info">
+                    <span class="label">Reason for Referral</span>
+                    <p class="reason">Cardiology consultation</p>
+                    <p class="desc">Evaluation for recurring palpitations.</p>
+                </div>
+                <div class="date-info">
+                    <span class="label">Sent On</span>
+                    <div>Sep 5, 2026</div>
+                    <div class="time">11:40 AM</div>
+                </div>
+                <div class="action-group">
+                    <div class="accepted-badge">&#10003; Accepted</div>
+                </div>
+            </div>
+
+            <div class="referral-card">
+                <div class="patient-info">
+                    <span class="label">Patient Information</span>
+                    <span class="name">Rahul Kumar</span>
+                    <span class="meta">P-10426 &bull; 52 yrs &bull; Male</span>
+                </div>
+                <div class="doc-info">
+                    <span class="label">Sent To</span>
+                    <span class="name">Dr. Ananya Rao</span>
+                    <span class="meta">Neurologist</span>
+                </div>
+                <div class="reason-info">
+                    <span class="label">Reason for Referral</span>
+                    <p class="reason">Neurology evaluation</p>
+                    <p class="desc">Assessment for persistent dizziness.</p>
+                </div>
+                <div class="date-info">
+                    <span class="label">Sent On</span>
+                    <div>Sep 6, 2026</div>
+                    <div class="time">09:20 AM</div>
+                </div>
+                <div class="action-group">
+                    <div class="pending-badge">&#8226; Pending</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tab-panel" id="followups-panel">
+            <div class="section-title-row">
+                <div>
+                    <h2>Follow-ups</h2>
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-top: 2px;">Keep track of patients who need a referral update or next clinical action.</p>
+                </div>
+                <button class="filter-dropdown" type="button">All Follow-ups</button>
+            </div>
+
+            <div class="referral-card">
+                <div class="patient-info">
+                    <span class="label">Patient Information</span>
+                    <span class="name">Meera Reddy</span>
+                    <span class="meta">P-10318 &bull; 39 yrs &bull; Female</span>
+                </div>
+                <div class="doc-info">
+                    <span class="label">Referral Contact</span>
+                    <span class="name">Dr. Rohan Kapoor</span>
+                    <span class="meta">Cardiology</span>
+                </div>
+                <div class="reason-info">
+                    <span class="label">Next Action</span>
+                    <p class="reason">Review consultation report</p>
+                    <p class="desc">Confirm the recommended treatment plan.</p>
+                </div>
+                <div class="date-info">
+                    <span class="label">Due On</span>
+                    <div>Sep 8, 2026</div>
+                    <div class="time">In 2 days</div>
+                </div>
+                <div class="action-group">
+                    <button class="btn-primary view-details" type="button">View Details</button>
+                </div>
+            </div>
+
+            <div class="referral-card">
+                <div class="patient-info">
+                    <span class="label">Patient Information</span>
+                    <span class="name">Arjun Mehta</span>
+                    <span class="meta">P-10982 &bull; 45 yrs &bull; Male</span>
+                </div>
+                <div class="doc-info">
+                    <span class="label">Referral Contact</span>
+                    <span class="name">Dr. Vikram Seth</span>
+                    <span class="meta">Internal Medicine</span>
+                </div>
+                <div class="reason-info">
+                    <span class="label">Next Action</span>
+                    <p class="reason">Schedule follow-up consultation</p>
+                    <p class="desc">Check blood pressure response after treatment.</p>
+                </div>
+                <div class="date-info">
+                    <span class="label">Due On</span>
+                    <div>Sep 10, 2026</div>
+                    <div class="time">In 4 days</div>
+                </div>
+                <div class="action-group">
+                    <button class="btn-primary view-details" type="button">View Details</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="detail-modal-overlay" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+        <div class="detail-modal">
+            <button class="close-detail" type="button" aria-label="Close patient details">&times;</button>
+            <h2 id="detailModalTitle"></h2>
+            <p class="detail-modal-subtitle">Patient referral and follow-up details</p>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="label">Patient ID and Demographics</span>
+                    <p id="detailPatientMeta"></p>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Referral Contact</span>
+                    <p id="detailContact"></p>
+                </div>
+                <div class="detail-item full-width">
+                    <span class="label">Reason for Referral</span>
+                    <p id="detailReason"></p>
+                </div>
+                <div class="detail-item full-width">
+                    <span class="label">Next Action</span>
+                    <p id="detailAction"></p>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Due Date</span>
+                    <p id="detailDueDate"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-modal-overlay" id="sendReferralModal" role="dialog" aria-modal="true" aria-labelledby="sendReferralTitle">
+        <div class="detail-modal">
+            <button class="close-detail" id="closeSendReferral" type="button" aria-label="Close send referral form">&times;</button>
+            <h2 id="sendReferralTitle">Send Referral</h2>
+            <p class="detail-modal-subtitle">Enter the patient details to request a referral.</p>
+            <form class="referral-form" id="sendReferralForm">
+                <label for="patientName">Patient Name
+                    <input id="patientName" name="patientName" type="text" placeholder="Enter patient name" required>
+                </label>
+                <label for="patientId">Patient ID
+                    <input id="patientId" name="patientId" type="text" placeholder="Enter patient ID" required>
+                </label>
+                <label for="referralIssue">Issue
+                    <textarea id="referralIssue" name="referralIssue" placeholder="Type the patient's issue" required></textarea>
+                </label>
+                <div class="form-actions">
+                    <button class="btn-decline" id="cancelSendReferral" type="button">Cancel</button>
+                    <button class="btn-accept" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const detailModal = document.getElementById('detailModal');
+        const sendReferralModal = document.getElementById('sendReferralModal');
+        const sendReferralForm = document.getElementById('sendReferralForm');
+
+        document.getElementById('sendReferralButton').addEventListener('click', function () {
+            sendReferralModal.classList.add('open');
+            document.getElementById('patientName').focus();
+        });
+
+        function closeSendReferralModal() {
+            sendReferralModal.classList.remove('open');
+        }
+
+        document.getElementById('closeSendReferral').addEventListener('click', closeSendReferralModal);
+        document.getElementById('cancelSendReferral').addEventListener('click', closeSendReferralModal);
+
+        sendReferralModal.addEventListener('click', function (event) {
+            if (event.target === sendReferralModal) {
+                closeSendReferralModal();
+            }
+        });
+
+        sendReferralForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            closeSendReferralModal();
+            sendReferralForm.reset();
+            window.alert('Okay, permission requested.');
+        });
+
+        document.querySelectorAll('.view-details').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const card = button.closest('.referral-card');
+                document.getElementById('detailModalTitle').textContent = card.querySelector('.patient-info .name').textContent;
+                document.getElementById('detailPatientMeta').textContent = card.querySelector('.patient-info .meta').textContent;
+                document.getElementById('detailContact').textContent = card.querySelector('.doc-info .name').textContent + ' - ' + card.querySelector('.doc-info .meta').textContent;
+                document.getElementById('detailReason').textContent = card.querySelector('.reason').textContent + '. ' + card.querySelector('.desc').textContent;
+                document.getElementById('detailAction').textContent = card.querySelector('.reason').textContent;
+                document.getElementById('detailDueDate').textContent = card.querySelector('.date-info').textContent.trim();
+                detailModal.classList.add('open');
+            });
+        });
+
+        document.querySelector('.close-detail').addEventListener('click', function () {
+            detailModal.classList.remove('open');
+        });
+
+        detailModal.addEventListener('click', function (event) {
+            if (event.target === detailModal) {
+                detailModal.classList.remove('open');
+            }
+        });
+
+        document.querySelectorAll('.tab').forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                document.querySelectorAll('.tab').forEach(function (item) {
+                    item.classList.toggle('active', item === tab);
+                });
+
+                document.querySelectorAll('.tab-panel').forEach(function (panel) {
+                    panel.classList.toggle('active', panel.id === tab.dataset.tab);
+                });
+            });
+        });
+
+        document.querySelectorAll('.btn-decline').forEach(function (button) {
+            button.addEventListener('click', function () {
+                button.closest('.referral-card').remove();
+            });
+        });
+
+        document.querySelectorAll('.btn-accept').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const card = button.closest('.referral-card');
+                const actionGroup = card.querySelector('.action-group');
+
+                card.classList.add('status-accepted');
+                actionGroup.innerHTML = `
+                    <div class="accepted-badge">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16.6666 5L7.49992 14.1667L3.33325 10" stroke="#0F766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Accepted
+                    </div>`;
+            });
+        });
+    </script>
+
+</body>
+</html>
