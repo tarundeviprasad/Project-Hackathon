@@ -360,6 +360,7 @@
             box-shadow: 0 0 0 4px var(--highlight);
         }
 
+        /* SURGICAL UI CHANGE: PASSWORD & CONFIRM PASSWORD ICON INPUTS */
         .password-input-container {
             position: relative;
             display: flex;
@@ -368,19 +369,34 @@
 
         .password-input-container input {
             width: 100%;
+            padding-left: 44px; /* Space for lock icon */
+            padding-right: 44px; /* Space for eye icon */
         }
 
-        .gen-pass-btn {
+        .field-icon-left {
             position: absolute;
-            right: 12px;
-            background: var(--highlight);
+            left: 16px;
+            color: var(--text-sec);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-pass-btn {
+            position: absolute;
+            right: 16px;
+            background: none;
             border: none;
-            color: var(--accent);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
+            color: var(--text-sec);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            transition: var(--transition);
+        }
+
+        .toggle-pass-btn:hover {
+            color: var(--primary);
         }
 
         .strength-meter {
@@ -746,18 +762,36 @@
                             <label>Email Address</label>
                             <input type="email" placeholder="admin@hospital.com" required id="adminEmail">
                         </div>
+                        
+                        <!-- SURGICAL CHANGE: PASSWORD FIELD -->
                         <div class="form-group">
                             <label>Password</label>
                             <div class="password-input-container">
-                                <input type="password" placeholder="Create secure password" required id="adminPass" onkeyup="checkPassStrength(this.value)">
-                                <button type="button" class="gen-pass-btn" onclick="generatePassword()">Generate</button>
+                                <span class="field-icon-left">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </span>
+                                <input type="password" placeholder="Enter your password" required id="adminPass" onkeyup="checkPassStrength(this.value)">
+                                <button type="button" class="toggle-pass-btn" onclick="toggleVisibility('adminPass')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
                             </div>
                             <div class="strength-meter"><div class="strength-bar" id="passStrength"></div></div>
                         </div>
+
+                        <!-- SURGICAL CHANGE: CONFIRM PASSWORD FIELD -->
                         <div class="form-group">
                             <label>Confirm Password</label>
-                            <input type="password" placeholder="Confirm password" required id="adminConfirm">
+                            <div class="password-input-container">
+                                <span class="field-icon-left">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </span>
+                                <input type="password" placeholder="Confirm password" required id="adminConfirm">
+                                <button type="button" class="toggle-pass-btn" onclick="toggleVisibility('adminConfirm')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
                         </div>
+                        <!-- END SURGICAL CHANGE -->
                     </div>
 
                     <div style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
@@ -1037,21 +1071,21 @@
             showToast(`Navigating to ${viewId.charAt(0).toUpperCase() + viewId.slice(1)}...`);
         }
 
-        // --- Password Generation ---
-        function generatePassword() {
-            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
-            let pass = "";
-            for(let i = 0; i < 12; i++) {
-                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        // SURGICAL CHANGE: TOGGLE VISIBILITY ONLY (GENERATION REMOVED AS PER INSTRUCTIONS)
+        function toggleVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
             }
-            document.getElementById('adminPass').value = pass;
-            document.getElementById('adminConfirm').value = pass;
-            checkPassStrength(pass);
         }
 
         function checkPassStrength(val) {
             const bar = document.getElementById('passStrength');
-            if(val.length < 5) {
+            if(val.length === 0) {
+                bar.style.width = '0%';
+            } else if(val.length < 5) {
                 bar.style.width = '20%';
                 bar.style.background = '#FF4D4D';
             } else if(val.length < 10) {
