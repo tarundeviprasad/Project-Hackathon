@@ -392,24 +392,24 @@
             <div class="patient-bio">
                 <div class="avatar-circle" id="patientInitials">R</div>
                 <div class="bio-info">
-                    <h2 id="patientName">Ram</h2>
-                    <p id="patientDetails">24 Years • Female</p>
-                    <p id="patientLocation">Kandukur Village, Prakasam District</p>
+                    <h2 id="patientName">Patient</h2>
+                    <p id="patientDetails">Patient details unavailable</p>
+                    <p id="patientLocation">Location unavailable</p>
                     <p><span>Preferred Language:</span> <strong id="patientLanguage">Telugu</strong></p>
                 </div>
             </div>
             <div class="health-tags">
                 <div class="tag-group">
                     <span class="tag-label">Blood Group</span>
-                    <span class="tag-value" style="color: var(--slate-gray)">Not Added</span>
+                    <span id="bloodGroupTag" class="tag-value" style="color: var(--slate-gray)">Not Added</span>
                 </div>
                 <div class="tag-group">
                     <span class="tag-label">Allergies</span>
-                    <span class="tag-value">No allergies recorded</span>
+                    <span id="allergiesTag" class="tag-value">No allergies recorded</span>
                 </div>
                 <div class="tag-group">
                     <span class="tag-label">Active Conditions</span>
-                    <span class="tag-value">No active conditions</span>
+                    <span id="conditionsTag" class="tag-value">No active conditions</span>
                 </div>
                 <button class="btn-edit-profile">Edit Health Profile</button>
             </div>
@@ -419,19 +419,19 @@
         <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon"><i data-lucide="stethoscope"></i></div>
-                <div class="stat-info"><h3>12</h3><p>Total Consultations</p></div>
+                <div class="stat-info"><h3 id="consultationsCount">0</h3><p>Total Consultations</p></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i data-lucide="pill"></i></div>
-                <div class="stat-info"><h3>3</h3><p>Active Prescriptions</p></div>
+                <div class="stat-info"><h3 id="prescriptionsCount">0</h3><p>Active Prescriptions</p></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i data-lucide="file-text"></i></div>
-                <div class="stat-info"><h3>5</h3><p>Lab Reports</p></div>
+                <div class="stat-info"><h3 id="labReportsCount">0</h3><p>Lab Reports</p></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i data-lucide="git-pull-request"></i></div>
-                <div class="stat-info"><h3>1</h3><p>Active Referral</p></div>
+                <div class="stat-info"><h3 id="referralsCount">0</h3><p>Active Referral</p></div>
             </div>
         </section>
 
@@ -654,20 +654,46 @@
         const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
         updateLanguage(savedLanguage);
 
-        const patientProfile = JSON.parse(localStorage.getItem('patientProfile') || 'null');
-        if (patientProfile) {
-            const nameParts = patientProfile.name.trim().split(/\s+/).filter(Boolean);
-            const initials = nameParts[0]?.[0] || 'P';
-            const patientIdLabel = translations[savedLanguage]?.['Patient ID: AC-2026-9127'] || 'Patient ID: AC-2026-9127';
-            const patientLanguage = { en: 'English', hi: 'Hindi', te: 'Telugu', mr: 'Marathi' }[patientProfile.language] || 'English';
-            const age = patientProfile.dob ? Math.max(0, new Date().getFullYear() - new Date(patientProfile.dob).getFullYear()) : '';
-            document.getElementById('patientInitials').textContent = initials.toUpperCase();
-            document.getElementById('patientName').textContent = patientProfile.name;
-            document.getElementById('patientDetails').textContent = age ? `${age} Years • ${patientProfile.gender || 'Patient'}` : (patientProfile.gender || 'Patient');
-            document.getElementById('patientLocation').textContent = [patientProfile.village, patientProfile.district].filter(Boolean).join(', ') || 'Location not added';
-            document.getElementById('patientLanguage').textContent = patientLanguage;
-            document.getElementById('patientIdBadge').textContent = patientIdLabel.replace('AC-2026-9127', patientProfile.id);
+        async function loadHealthRecords() {
+            const response = await fetch('/api/v1/patient/me/records', { credentials: 'same-origin' });
+            if (!response.ok) return;
+            const data = await response.json();
+            const patient = data.patient;
+            const stats = data.stats;
+            document.getElementById('patientIdBadge').textContent = `Patient ID: ${patient.patient_id}`;
+            document.getElementById('patientName').textContent = patient.full_name;
+            document.getElementById('patientDetails').textContent = [patient.gender, patient.dob].filter(Boolean).join(' • ');
+            document.getElementById('patientLocation').textContent = [patient.village, patient.district].filter(Boolean).join(', ');
+            document.getElementById('bloodGroupTag').textContent = patient.blood_group;
+            document.getElementById('allergiesTag').textContent = patient.allergies;
+            document.getElementById('conditionsTag').textContent = patient.active_conditions;
+            document.getElementById('consultationsCount').textContent = stats.total_consultations;
+            document.getElementById('prescriptionsCount').textContent = stats.active_prescriptions;
+            document.getElementById('labReportsCount').textContent = stats.lab_reports;
+            document.getElementById('referralsCount').textContent = stats.active_referrals;
+            document.getElementById('patientInitials').textContent = patient.full_name.charAt(0).toUpperCase();
+
+            const timeline = document.querySelector('.timeline-container');
+            timeline.innerHTML = data.timeline.length ? data.timeline.map(record => `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="event-header">
+                            <div class="event-type">${record.title}</div>
+                            <div class="status-badge status-completed">${record.status}</div>
+                        </div>
+                        <p class="event-date">${record.event_date} • ${record.facility_name}</p>
+                        <div class="event-body">
+                            <div class="detail-item"><label>Doctor</label><p>${record.doctor_name || 'Not assigned'}</p></div>
+                            <div class="detail-item"><label>Health Issue</label><p>${record.health_issue || 'Not recorded'}</p></div>
+                            <div class="detail-item"><label>Diagnosis</label><p>${record.diagnosis || 'Not recorded'}</p></div>
+                        </div>
+                    </div>
+                </div>`).join('') : '<p>No health records have been recorded yet.</p>';
         }
+
+        loadHealthRecords().catch(() => {});
+
         lucide.createIcons();
     </script>
 </body>

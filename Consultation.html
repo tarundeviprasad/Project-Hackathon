@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect | Clinical Consultation</title>
+    <!-- Font: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-indigo: #1E2A5A;
+            --primary-teal: #0F766E;
+            --light-aqua: #CFF7F2;
+            --bg-ivory: #F8F7F4;
+            --white: #FFFFFF;
+            --text-dark: #172033;
+            --text-secondary: #667085;
+            --border-color: #E6E8EE;
+            --status-waiting: #F59E0B;
+            --status-progress: #3B82F6;
+            --status-done: #10B981;
+            
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-ivory);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding-bottom: 100px; /* Space for sticky bottom bar */
+        }
+
+        /* --- TOP NAVIGATION --- */
+        header.top-nav {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* SURGICAL LOGO REPLACEMENT */
+        .brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .brand img {
+            height: 36px; /* Optimized height for the 72px header */
+            width: auto;
+            display: block;
+        }
+
+        nav.nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--primary-indigo);
+            background-color: #f3f4f6;
+        }
+
+        .nav-item.active {
+            background-color: var(--light-aqua);
+            color: var(--primary-teal);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-trigger {
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .dr-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 16px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light-aqua);
+            color: var(--primary-teal);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .dr-name-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dr-name { font-weight: 700; font-size: 0.9rem; color: var(--primary-indigo); }
+        .dr-specialty { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
+
+        /* --- PAGE CONTENT --- */
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 40px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .heading-group h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary-indigo);
+            margin-bottom: 4px;
+        }
+
+        .heading-meta {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background-color: #EBF5FF;
+            color: var(--status-progress);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.2s;
+        }
+
+        .btn-icon:hover {
+            background-color: #f9fafb;
+            color: var(--primary-indigo);
+        }
+
+        /* --- PATIENT SUMMARY --- */
+        .patient-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-teal);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .p-identity h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-indigo);
+            margin-bottom: 4px;
+        }
+
+        .p-sub { color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
+
+        .p-stats {
+            display: flex;
+            gap: 40px;
+        }
+
+        .stat-box .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .stat-box .value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .allergy-pill {
+            background-color: #FEE2E2;
+            color: #B91C1C;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .btn-teal-outline {
+            border: 1px solid var(--primary-teal);
+            color: var(--primary-teal);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-teal-outline:hover { background-color: var(--light-aqua); }
+
+        /* --- WORKSPACE GRID --- */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-indigo);
+        }
+
+        .card-header i { color: var(--primary-teal); }
+
+        textarea {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus { border-color: var(--primary-teal); }
+
+        /* Symptoms Chips */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .chip {
+            padding: 8px 16px;
+            background-color: var(--bg-ivory);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chip.active {
+            background-color: var(--light-aqua);
+            border-color: var(--primary-teal);
+            color: var(--primary-teal);
+        }
+
+        .btn-add-inline {
+            background: none;
+            border: none;
+            color: var(--primary-teal);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Vitals Grid */
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .vital-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .vital-input label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .vital-input input {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .vital-input input:focus { border-color: var(--primary-teal); }
+
+        /* --- VIDEO PANEL --- */
+        .video-panel {
+            background-color: var(--primary-indigo);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+        }
+
+        .video-header {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #10B981;
+            font-weight: 700;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10B981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .main-video {
+            width: 100%;
+            aspect-ratio: 16/11;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .patient-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .self-view {
+            position: absolute;
+            width: 100px;
+            height: 70px;
+            bottom: 16px;
+            right: 16px;
+            background-color: #222;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .video-controls {
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background-color: rgba(0,0,0,0.3);
+        }
+
+        .v-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .v-btn:hover { background-color: rgba(255,255,255,0.2); }
+        .v-btn.off { background-color: #EF4444; color: white; }
+        .v-btn.end-call { background-color: #EF4444; width: 60px; border-radius: 30px; }
+
+        /* Prescription Table */
+        .presc-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .presc-table th {
+            text-align: left;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .presc-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .presc-table input {
+            width: 100%;
+            border: none;
+            font-size: 0.9rem;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .remove-row {
+            color: #EF4444;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .remove-row:hover { opacity: 1; }
+
+        /* Assessment Chips */
+        .diag-chip {
+            background-color: var(--light-aqua);
+            color: var(--primary-teal);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- STICKY BOTTOM BAR --- */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 40px;
+            gap: 16px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            z-index: 900;
+        }
+
+        .btn-ghost {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-teal);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.2);
+        }
+
+        .btn-primary:hover { filter: brightness(1.1); }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(23, 32, 51, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background-color: var(--white);
+            width: 480px;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-icon-wrap {
+            width: 64px;
+            height: 64px;
+            background-color: #ECFDF5;
+            color: var(--status-done);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .modal h2 { color: var(--primary-indigo); font-weight: 800; margin-bottom: 12px; }
+        .modal p { color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; }
+
+        .modal-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* --- TOAST --- */
+        #toast {
+            position: fixed;
+            top: 90px;
+            right: 40px;
+            background-color: var(--primary-indigo);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-md);
+            z-index: 3000;
+            font-weight: 600;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .workspace { grid-template-columns: 1fr; }
+            .video-panel { max-width: 500px; margin: 0 auto 24px; }
+        }
+
+        @media (max-width: 850px) {
+            header.top-nav { padding: 0 20px; }
+            nav.nav-links { display: none; } /* Simplified for mobile */
+            .page-container { padding: 24px 20px; }
+            .p-stats { display: none; }
+            .vitals-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <header class="top-nav">
+        <a href="#" class="brand">
+            <!-- BRAND LOGO UPDATED FROM UPLOADED REFERENCE -->
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg0IiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMTg0IDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0PSIzMiIgaGVpZ2h0PSIzMiIgeD0iOCIgeT0iOCIgcng9IjgiIGZpbGw9IiMwRjc2NkUiLz4KPHBhdGggZD0iTTIxIDhWMjRNMTMgMTZIMjkiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjx0ZXh0IHg9IjUyIiB5PSIzMSIgZmlsbD0iIzFFMkE1QSIgc3R5bGU9ImZvbnQ6IDgwMCAyNHB4ICdQbHVzIEpha2FydGEgU2FucycsIHNhbnMtc2VyaWYiPkFhcm9neWE8dHNwYW4gZmlsbD0iIzBGNzY2RSI+Q29ubmVjdDwvdHNwYW4+PC90ZXh0Pgo8L3N2Zz4=" alt="AarogyaConnect Logo">
+        </a>
+
+        <nav class="nav-links">
+            <a href="#" class="nav-item"><i data-lucide="layout-dashboard" size="18"></i>Dashboard</a>
+            <a href="#" class="nav-item"><i data-lucide="calendar" size="18"></i>Appointments</a>
+            <a href="#" class="nav-item"><i data-lucide="list" size="18"></i>Queue</a>
+            <a href="#" class="nav-item"><i data-lucide="users" size="18"></i>Patients</a>
+            <a href="#" class="nav-item active"><i data-lucide="stethoscope" size="18"></i>Consultation</a>
+            <a href="#" class="nav-item"><i data-lucide="settings" size="18"></i>Settings</a>
+        </nav>
+
+        <div class="user-profile">
+            <div class="icon-trigger">
+                <i data-lucide="bell" size="22"></i>
+            </div>
+            <div class="dr-info">
+                <div class="avatar">DM</div>
+                <div class="dr-name-group">
+                    <span class="dr-name">Dr. Amit Mehta</span>
+                    <span class="dr-specialty">General Physician</span>
+                </div>
+                <i data-lucide="chevron-down" size="16" color="#667085"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="heading-group">
+                <h1>Consultation</h1>
+                <div class="heading-meta">
+                    <span>Appointment #04</span>
+                    <span>•</span>
+                    <span>02 September 2026</span>
+                    <span>•</span>
+                    <span>10:00 AM</span>
+                    <div class="status-badge" id="mainStatus">
+                        <div class="live-dot" style="background: var(--status-progress); border:none;"></div>
+                        In Progress
+                    </div>
+                </div>
+            </div>
+            <div class="header-btns">
+                <button class="btn-icon" onclick="saveDraft()"><i data-lucide="save" size="20"></i></button>
+                <button class="btn-icon"><i data-lucide="history" size="20"></i></button>
+            </div>
+        </div>
+
+        <!-- PATIENT SUMMARY -->
+        <div class="patient-card">
+            <div class="p-identity">
+                <h2>Anitha Kumari</h2>
+                <p class="p-sub">29 years • Female • ID: AC-9832</p>
+            </div>
+            <div class="p-stats">
+                <div class="stat-box">
+                    <div class="label">Appointment Type</div>
+                    <div class="value">Online Teleconsultation</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Reason</div>
+                    <div class="value">General Consultation</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Last Visit</div>
+                    <div class="value">15 Aug 2026</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Allergies</div>
+                    <div class="value"><span class="allergy-pill">Penicillin</span></div>
+                </div>
+            </div>
+            <button class="btn-teal-outline">
+                <i data-lucide="phone" size="18"></i> Contact
+            </button>
+        </div>
+
+        <!-- WORKSPACE -->
+        <div class="workspace">
+            <!-- LEFT COLUMN -->
+            <div class="workspace-main">
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="message-square" size="18"></i>
+                        <h3>Chief Complaint</h3>
+                    </div>
+                    <textarea>Patient reports mild fever and fatigue for the past two days. Occasional body ache noted.</textarea>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="thermometer" size="18"></i>
+                        <h3>Symptoms</h3>
+                    </div>
+                    <div class="chips-container" id="symptomContainer">
+                        <div class="chip active" onclick="this.classList.toggle('active')">Fever</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">Cough</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">Headache</div>
+                        <div class="chip active" onclick="this.classList.toggle('active')">Fatigue</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">Body pain</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">Chills</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">Nausea</div>
+                    </div>
+                    <button class="btn-add-inline" onclick="addSymptom()">
+                        <i data-lucide="plus" size="14"></i> Add Other Symptom
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="activity" size="18"></i>
+                        <h3>Vitals</h3>
+                    </div>
+                    <div class="vitals-grid">
+                        <div class="vital-input">
+                            <label>Temperature (°F)</label>
+                            <input type="text" value="100.4">
+                        </div>
+                        <div class="vital-input">
+                            <label>Blood Pressure (mmHg)</label>
+                            <input type="text" value="128/82">
+                        </div>
+                        <div class="vital-input">
+                            <label>Pulse (bpm)</label>
+                            <input type="text" value="82">
+                        </div>
+                        <div class="vital-input">
+                            <label>SpO₂ (%)</label>
+                            <input type="text" value="98">
+                        </div>
+                        <div class="vital-input">
+                            <label>Weight (kg)</label>
+                            <input type="text" value="64">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="clipboard" size="18"></i>
+                        <h3>Medical History</h3>
+                    </div>
+                    <textarea>No significant chronic illness reported. Patient has occasional seasonal allergies. History of appendectomy (2018).</textarea>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="scroll" size="18"></i>
+                        <h3>Clinical Notes</h3>
+                    </div>
+                    <textarea placeholder="Enter clinical observations, examination findings and consultation notes..."></textarea>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="workspace-side">
+                <!-- VIDEO PANEL -->
+                <div class="video-panel">
+                    <div class="video-header">
+                        <div class="connection-status">
+                            <div class="live-dot"></div>
+                            Connected • Good connection
+                        </div>
+                        <span style="color: rgba(255,255,255,0.6); font-size: 0.7rem; font-weight: 700;">Online Teleconsultation</span>
+                    </div>
+                    <div class="main-video">
+                        <div class="patient-placeholder">
+                            <i data-lucide="user" size="64"></i>
+                            <span style="font-size: 0.8rem; font-weight: 600;">Patient: Anitha Kumari</span>
+                        </div>
+                        <div class="self-view">
+                            <div style="width:100%; height:100%; background:#333; display:flex; align-items:center; justify-content:center;">
+                                <i data-lucide="video" size="16" color="white"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button class="v-btn" id="micBtn" onclick="toggleBtn('micBtn')"><i data-lucide="mic" size="18"></i></button>
+                        <button class="v-btn" id="camBtn" onclick="toggleBtn('camBtn')"><i data-lucide="video" size="18"></i></button>
+                        <button class="v-btn"><i data-lucide="monitor" size="18"></i></button>
+                        <button class="v-btn end-call"><i data-lucide="phone-off" size="18"></i></button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="clipboard-list" size="18"></i>
+                        <h3>Assessment & Diagnosis</h3>
+                    </div>
+                    <div class="chips-container">
+                        <div class="diag-chip">Viral Fever <i data-lucide="x" size="14" style="cursor:pointer"></i></div>
+                    </div>
+                    <button class="btn-add-inline" style="margin-top: 10px;">
+                        <i data-lucide="plus" size="14"></i> Add Diagnosis
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="pill" size="18"></i>
+                        <h3>Prescription</h3>
+                    </div>
+                    <table class="presc-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Freq</th>
+                                <th>Dur</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="medTable">
+                            <tr>
+                                <td><input type="text" value="Paracetamol 500mg"></td>
+                                <td><input type="text" value="1-0-1"></td>
+                                <td><input type="text" value="3 days"></td>
+                                <td class="remove-row"><i data-lucide="trash-2" size="14"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn-add-inline" style="margin-top: 16px;" onclick="addMedRow()">
+                        <i data-lucide="plus" size="14"></i> Add Medicine
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="flask-conical" size="18"></i>
+                        <h3>Investigations</h3>
+                    </div>
+                    <div class="chips-container">
+                        <div class="chip" onclick="this.classList.toggle('active')">CBC</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">Urine Test</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">X-Ray</div>
+                        <div class="chip" onclick="this.classList.toggle('active')">Blood Sugar</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="corner-up-right" size="18"></i>
+                        <h3>Referral</h3>
+                    </div>
+                    <div class="vital-input" style="margin-bottom: 12px;">
+                        <label>Specialist / Facility</label>
+                        <input type="text" placeholder="Search specialist...">
+                    </div>
+                    <button class="btn-add-inline">
+                        <i data-lucide="plus" size="14"></i> Add Referral
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i data-lucide="calendar-check" size="18"></i>
+                        <h3>Follow-up</h3>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <div class="vital-input" style="flex:1">
+                            <label>Next Visit</label>
+                            <input type="date">
+                        </div>
+                        <button class="btn-icon" style="margin-top: 20px;"><i data-lucide="plus" size="18"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM ACTION BAR -->
+    <div class="bottom-actions">
+        <button class="btn-ghost" onclick="saveDraft()">Save Draft</button>
+        <button class="btn-ghost">+ Add Follow-up</button>
+        <button class="btn-primary" onclick="openModal()">Complete Consultation</button>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-icon-wrap">
+                <i data-lucide="check-circle" size="32"></i>
+            </div>
+            <h2>Complete this consultation?</h2>
+            <p>The consultation will be marked as completed and the clinical record will be saved to the patient's history.</p>
+            <div class="modal-btns">
+                <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="finalizeConsult()">Complete Consultation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast">
+        <i data-lucide="save" size="18"></i>
+        <span>Consultation draft saved.</span>
+    </div>
+
+    <script>
+        // Init Lucide
+        lucide.createIcons();
+
+        // Save Draft Interaction
+        function saveDraft() {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Add Symptom Logic
+        function addSymptom() {
+            const symptom = prompt("Enter other symptom:");
+            if (symptom) {
+                const container = document.getElementById('symptomContainer');
+                const chip = document.createElement('div');
+                chip.className = 'chip active';
+                chip.innerText = symptom;
+                chip.onclick = function() { this.classList.toggle('active'); };
+                container.appendChild(chip);
+            }
+        }
+
+        // Add Medicine Logic
+        function addMedRow() {
+            const table = document.getElementById('medTable');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" placeholder="Enter medicine"></td>
+                <td><input type="text" placeholder="Freq"></td>
+                <td><input type="text" placeholder="Dur"></td>
+                <td class="remove-row" onclick="this.parentElement.remove()"><i data-lucide="trash-2" size="14"></i></td>
+            `;
+            table.appendChild(row);
+            lucide.createIcons();
+        }
+
+        // Video Control Logic
+        function toggleBtn(id) {
+            const btn = document.getElementById(id);
+            btn.classList.toggle('off');
+        }
+
+        // Modal Logic
+        function openModal() {
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        async function finalizeConsult() {
+            const patientId = new URLSearchParams(window.location.search).get('patient_id');
+            if (!patientId) {
+                closeModal();
+                window.alert('Open this consultation from an assigned patient record to save it.');
+                return;
+            }
+            const textareas = Array.from(document.querySelectorAll('textarea'));
+            const response = await fetch('/api/v1/consultations', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_id: patientId,
+                    symptoms: textareas[0]?.value || '',
+                    notes: textareas[textareas.length - 1]?.value || '',
+                    prescription: Array.from(document.querySelectorAll('#medTable input')).map(input => input.value).join(' | '),
+                    status: 'Completed'
+                })
+            });
+            if (!response.ok) {
+                window.alert('Unable to save consultation. Please verify the patient assignment.');
+                return;
+            }
+            closeModal();
+            // Show Success Notification
+            const toast = document.getElementById('toast');
+            toast.innerHTML = '<i data-lucide="check-circle" size="18"></i> <span>Consultation completed successfully.</span>';
+            toast.style.backgroundColor = '#10B981';
+            toast.style.display = 'flex';
+            
+            // UI State Change
+            const badge = document.getElementById('mainStatus');
+            badge.style.backgroundColor = '#ECFDF5';
+            badge.style.color = '#10B981';
+            badge.innerHTML = '<i data-lucide="check-circle" size="14"></i> Completed';
+            
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect | System Administration Portal</title>
+    <!-- Google Font: Onest -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1E2A5A;         /* Deep Indigo */
+            --accent: #0F766E;          /* Rich Teal */
+            --highlight: #CFF7F2;       /* Soft Aqua */
+            --bg-main: #F8F7F4;         /* Soft Ivory */
+            --white: #FFFFFF;           /* Pure White */
+            --text-main: #172033;       /* Charcoal Navy */
+            --text-sec: #667085;        /* Slate Gray */
+            --border: #E6E8EE;          /* Soft Gray */
+            --shadow: 0 4px 20px rgba(23, 32, 80, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Onest', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* --- TOP NAVIGATION --- */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            color: var(--primary);
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-sec);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-main);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--highlight);
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--highlight);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .avatar-circle {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* --- MAIN DASHBOARD CONTENT --- */
+        .main-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 40px 48px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.8px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-main);
+        }
+
+        /* --- STATS GRID --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(23, 32, 80, 0.08);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-main);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-sec);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-trend {
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trend-up { color: var(--accent); }
+
+        /* --- TWO COLUMN LAYOUT --- */
+        .layout-row {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--text-sec);
+        }
+
+        /* --- FORM STYLING --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: var(--transition);
+            background: var(--bg-main);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 4px var(--highlight);
+        }
+
+        /* SURGICAL UI CHANGE: PASSWORD & CONFIRM PASSWORD ICON INPUTS */
+        .password-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-input-container input {
+            width: 100%;
+            padding-left: 44px; /* Space for lock icon */
+            padding-right: 44px; /* Space for eye icon */
+        }
+
+        .field-icon-left {
+            position: absolute;
+            left: 16px;
+            color: var(--text-sec);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-pass-btn {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-sec);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            transition: var(--transition);
+        }
+
+        .toggle-pass-btn:hover {
+            color: var(--primary);
+        }
+
+        .strength-meter {
+            height: 4px;
+            width: 100%;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            background: #FF4D4D;
+            transition: width 0.3s ease;
+        }
+
+        /* --- SUCCESS ALERT --- */
+        .credential-success {
+            display: none;
+            background: #F0FFF4;
+            border: 1px solid #C6F6D5;
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 24px;
+        }
+
+        .secure-creds-box {
+            background: var(--white);
+            border: 1px dashed var(--accent);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        /* --- DISTRIBUTION BARS --- */
+        .distribution-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dist-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dist-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .dist-track {
+            height: 8px;
+            background: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .dist-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 100px;
+        }
+
+        .dist-bar.secondary {
+            background: var(--accent);
+        }
+
+        /* --- TABLE STYLING --- */
+        .table-section {
+            margin-bottom: 40px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background: var(--white);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 20px 24px;
+            background: var(--bg-main);
+            color: var(--text-sec);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            color: var(--text-main);
+        }
+
+        .hospital-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-success {
+            background: var(--highlight);
+            color: var(--accent);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* --- ACTIVITY & STATUS --- */
+        .activity-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 16px;
+            position: relative;
+        }
+
+        .activity-icon {
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-top: 6px;
+            z-index: 2;
+        }
+
+        .activity-content p {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .activity-content span {
+            font-size: 12px;
+            color: var(--text-sec);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-row:last-child {
+            border-bottom: none;
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(23, 32, 51, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-sec);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            .nav-center { display: none; }
+            .mobile-menu-btn { display: block; }
+            .layout-row, .activity-grid { grid-template-columns: 1fr; }
+            .top-nav { padding: 0 24px; }
+            .main-container { padding: 32px 24px; }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: auto; }
+            .dashboard-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .stat-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- --- TOP NAVIGATION --- -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <svg class="logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M24 2C26.2 15.8 31.9 21.6 46 24C31.9 26.4 26.2 32.2 24 46C21.8 32.2 16.1 26.4 2 24C16.1 21.6 21.8 15.8 24 2Z" fill="currentColor"/>
+                <circle cx="24" cy="24" r="4" fill="#0F766E"/>
+            </svg>
+            <span class="brand-name">AarogyaConnect</span>
+        </div>
+
+        <div class="nav-center">
+            <a onclick="switchView('dashboard')" class="nav-link active">Dashboard</a>
+            <a onclick="switchView('hospitals')" class="nav-link">Hospitals</a>
+            <a onclick="switchView('doctors')" class="nav-link">Doctors</a>
+            <a onclick="switchView('admins')" class="nav-link">Hospital Admins</a>
+            <a onclick="switchView('credentials')" class="nav-link">Credentials</a>
+            <a onclick="switchView('reports')" class="nav-link">Reports</a>
+        </div>
+
+        <div class="nav-right">
+            <div class="status-pill">
+                <div class="status-dot"></div>
+                System Online
+            </div>
+            <div class="avatar-circle">SA</div>
+            <button class="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+
+    <!-- --- MAIN CONTENT --- -->
+    <main class="main-container" id="mainDashboard">
+        
+        <header class="dashboard-header">
+            <div>
+                <span class="eyebrow">System Administration</span>
+                <h1 class="page-title">AarogyaConnect System Overview</h1>
+                <p style="color: var(--text-sec); margin-top: 4px;">Monitor hospitals, doctors, and network administrators.</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="openModal('hospitalModal')">
+                    <span>+</span> Add Hospital
+                </button>
+                <button class="btn btn-primary" onclick="scrollToElement('adminAccess')">
+                    Create Hospital Admin
+                </button>
+            </div>
+        </header>
+
+        <!-- --- STATS GRID --- -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🏥</div>
+                    <div class="stat-trend trend-up">↑ 8.4%</div>
+                </div>
+                <div class="stat-label">Total Hospitals</div>
+                <div class="stat-value">24</div>
+                <div class="stat-label">Registered in network</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🩺</div>
+                    <div class="stat-trend trend-up">↑ 12.1%</div>
+                </div>
+                <div class="stat-label">Total Doctors</div>
+                <div class="stat-value">486</div>
+                <div class="stat-label">Across all facilities</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🛡️</div>
+                    <div style="font-size: 12px; color: var(--accent);">Active</div>
+                </div>
+                <div class="stat-label">Hospital Admins</div>
+                <div class="stat-value">24</div>
+                <div class="stat-label">Verified accounts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📊</div>
+                    <div style="font-size: 12px; color: var(--text-sec);">Live</div>
+                </div>
+                <div class="stat-label">Active Hospitals</div>
+                <div class="stat-value">22</div>
+                <div class="stat-label">2 Attention Required</div>
+            </div>
+        </section>
+
+        <!-- --- TWO COLUMN: ADMIN CREATION & DIST --- -->
+        <div class="layout-row">
+            
+            <!-- --- CREDENTIAL CREATION --- -->
+            <section class="card" id="adminAccess">
+                <div class="card-header">
+                    <h2 class="card-title">Hospital Admin Access</h2>
+                    <p class="card-subtitle">Create secure login credentials for hospital administrators.</p>
+                </div>
+                
+                <form id="adminForm" onsubmit="handleAdminCreation(event)">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Select Hospital</label>
+                            <select required id="hospSelect">
+                                <option value="">Choose a hospital</option>
+                                <option value="Apollo Care Hospital">Apollo Care Hospital</option>
+                                <option value="MediLife Hospital">MediLife Hospital</option>
+                                <option value="Zenith Healthcare">Zenith Healthcare</option>
+                                <option value="Sunrise Medical Center">Sunrise Medical Center</option>
+                                <option value="Green Valley Hospital">Green Valley Hospital</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Admin Name</label>
+                            <input type="text" placeholder="Enter administrator name" required id="adminName">
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" placeholder="Create username" required id="adminUser">
+                        </div>
+                        <div class="form-group full">
+                            <label>Email Address</label>
+                            <input type="email" placeholder="admin@hospital.com" required id="adminEmail">
+                        </div>
+                        
+                        <!-- SURGICAL CHANGE: PASSWORD FIELD -->
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="password-input-container">
+                                <span class="field-icon-left">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </span>
+                                <input type="password" placeholder="Enter your password" required id="adminPass" onkeyup="checkPassStrength(this.value)">
+                                <button type="button" class="toggle-pass-btn" onclick="toggleVisibility('adminPass')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                            <div class="strength-meter"><div class="strength-bar" id="passStrength"></div></div>
+                        </div>
+
+                        <!-- SURGICAL CHANGE: CONFIRM PASSWORD FIELD -->
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <div class="password-input-container">
+                                <span class="field-icon-left">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </span>
+                                <input type="password" placeholder="Confirm password" required id="adminConfirm">
+                                <button type="button" class="toggle-pass-btn" onclick="toggleVisibility('adminConfirm')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- END SURGICAL CHANGE -->
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="requireChange">
+                        <label for="requireChange" style="text-transform: none; font-weight: 500;">Require password change on first login</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="margin-top: 32px; width: 100%; justify-content: center;">
+                        Create Hospital Admin Account
+                    </button>
+                </form>
+
+                <div class="credential-success" id="adminSuccess">
+                    <p style="font-weight: 700; color: var(--accent);">✓ Hospital administrator account created successfully.</p>
+                    <div class="secure-creds-box">
+                        <div style="margin-bottom: 8px;"><strong>Hospital:</strong> <span id="resHosp">...</span></div>
+                        <div style="margin-bottom: 8px;"><strong>Username:</strong> <span id="resUser">...</span></div>
+                        <div><strong>Temp Password:</strong> <span id="resPass">••••••••••••</span></div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="copyCreds()">Copy Credentials</button>
+                        <button class="btn btn-primary" onclick="resetForm()">Create Another</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- --- DISTRIBUTION --- -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Doctors by Hospital</h2>
+                    <p class="card-subtitle">Network distribution overview.</p>
+                </div>
+                
+                <div class="distribution-list">
+                    <div class="dist-item">
+                        <div class="dist-info"><span>MediLife Hospital</span><span>51</span></div>
+                        <div class="dist-track"><div class="dist-bar" style="width: 85%;"></div></div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-info"><span>Apollo Care Hospital</span><span>42</span></div>
+                        <div class="dist-track"><div class="dist-bar secondary" style="width: 70%;"></div></div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-info"><span>Zenith Healthcare</span><span>39</span></div>
+                        <div class="dist-track"><div class="dist-bar" style="width: 65%;"></div></div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-info"><span>Sunrise Medical Center</span><span>36</span></div>
+                        <div class="dist-track"><div class="dist-bar secondary" style="width: 60%;"></div></div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-info"><span>Green Valley Hospital</span><span>31</span></div>
+                        <div class="dist-track"><div class="dist-bar" style="width: 50%;"></div></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="background: var(--bg-main); padding: 16px; border-radius: 16px;">
+                        <span style="font-size: 12px; color: var(--text-sec);">Total Doctors</span>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--primary);">486</div>
+                    </div>
+                    <div style="background: var(--bg-main); padding: 16px; border-radius: 16px;">
+                        <span style="font-size: 12px; color: var(--text-sec);">Avg/Hospital</span>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--accent);">20.3</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- --- HOSPITAL TABLE --- -->
+        <section class="table-section" id="hospitalNetwork">
+            <div class="dashboard-header" style="margin-bottom: 24px;">
+                <div>
+                    <h2 class="card-title">Hospital Network</h2>
+                    <p class="card-subtitle">Manage hospitals connected to AarogyaConnect.</p>
+                </div>
+                <div style="position: relative;">
+                    <input type="text" placeholder="Search hospitals..." style="padding-left: 40px; min-width: 300px;" onkeyup="filterHospitals(this.value)">
+                    <span style="position: absolute; left: 16px; top: 12px; color: var(--text-sec);">🔍</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hospital</th>
+                            <th>Location</th>
+                            <th>Doctors</th>
+                            <th>Admin</th>
+                            <th>Status</th>
+                            <th>Last Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hospitalTableBody">
+                        <tr>
+                            <td><div class="hospital-cell">🏥 MediLife Hospital</div></td>
+                            <td>Bangalore</td>
+                            <td>51 Doctors</td>
+                            <td>medi_admin</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>2 min ago</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View</button>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Manage</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><div class="hospital-cell">🏥 Apollo Care Hospital</div></td>
+                            <td>Chennai</td>
+                            <td>42 Doctors</td>
+                            <td>apollo_admin</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>5 min ago</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View</button>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Manage</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><div class="hospital-cell">🏥 Zenith Healthcare</div></td>
+                            <td>Hyderabad</td>
+                            <td>39 Doctors</td>
+                            <td>zenith_admin</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>12 min ago</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View</button>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Manage</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><div class="hospital-cell">🏥 Sunrise Medical Center</div></td>
+                            <td>Mumbai</td>
+                            <td>36 Doctors</td>
+                            <td>sunrise_admin</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>18 min ago</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View</button>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Manage</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><div class="hospital-cell">🏥 Green Valley Hospital</div></td>
+                            <td>Pune</td>
+                            <td>31 Doctors</td>
+                            <td>green_admin</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>25 min ago</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View</button>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Manage</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- --- ACTIVITY & STATUS --- -->
+        <div class="activity-grid">
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent System Activity</h2>
+                    <p class="card-subtitle">Overview of network-wide actions.</p>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon"></div>
+                        <div class="activity-content">
+                            <p>New hospital registered</p>
+                            <span>Green Valley Hospital added to the network • 12 min ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: var(--primary);"></div>
+                        <div class="activity-content">
+                            <p>Hospital admin created</p>
+                            <span>apollo_admin created for Apollo Care Hospital • 28 min ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"></div>
+                        <div class="activity-content">
+                            <p>Doctor account approved</p>
+                            <span>Dr. Priya Shah verified for Zenith Healthcare • 1 hour ago</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">System Health</h2>
+                    <p class="card-subtitle">Real-time status monitor.</p>
+                </div>
+                <div>
+                    <div class="status-row">
+                        <span>Hospital API</span>
+                        <span style="color: var(--accent); font-weight: 700;">Operational</span>
+                    </div>
+                    <div class="status-row">
+                        <span>Authentication Service</span>
+                        <span style="color: var(--accent); font-weight: 700;">Operational</span>
+                    </div>
+                    <div class="status-row">
+                        <span>Doctor Records Database</span>
+                        <span style="color: var(--accent); font-weight: 700;">Operational</span>
+                    </div>
+                    <div class="status-row">
+                        <span>Notification Engine</span>
+                        <span style="color: var(--accent); font-weight: 700;">Operational</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- --- MODALS --- -->
+    <div class="modal-overlay" id="hospitalModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('hospitalModal')">×</button>
+            <h2 class="card-title" style="margin-bottom: 8px;">Add New Hospital</h2>
+            <p class="card-subtitle" style="margin-bottom: 24px;">Register a new healthcare facility in the AarogyaConnect network.</p>
+            
+            <form class="form-grid" onsubmit="event.preventDefault(); showToast('Hospital successfully registered'); closeModal('hospitalModal');">
+                <div class="form-group full">
+                    <label>Hospital Name</label>
+                    <input type="text" placeholder="e.g. CityCare Hospital" required>
+                </div>
+                <div class="form-group">
+                    <label>Hospital ID</label>
+                    <input type="text" placeholder="e.g. AC-2024-001" required>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" placeholder="City" required>
+                </div>
+                <div class="form-group full">
+                    <label>Contact Email</label>
+                    <input type="email" placeholder="contact@hospital.com" required>
+                </div>
+                <div class="form-group full">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Register Hospital</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- --- NOTIFICATION TOAST --- -->
+    <div id="toast" style="position: fixed; bottom: 40px; right: 40px; background: var(--primary); color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: translateY(200px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999;">
+        Hospital successfully registered
+    </div>
+
+    <!-- --- JAVASCRIPT --- -->
+    <script>
+        // --- Navigation Interactions ---
+        function switchView(viewId) {
+            const links = document.querySelectorAll('.nav-link');
+            links.forEach(link => {
+                link.classList.remove('active');
+                if(link.getAttribute('onclick').includes(viewId)) link.classList.add('active');
+            });
+            showToast(`Navigating to ${viewId.charAt(0).toUpperCase() + viewId.slice(1)}...`);
+        }
+
+        // SURGICAL CHANGE: TOGGLE VISIBILITY ONLY (GENERATION REMOVED AS PER INSTRUCTIONS)
+        function toggleVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+
+        function checkPassStrength(val) {
+            const bar = document.getElementById('passStrength');
+            if(val.length === 0) {
+                bar.style.width = '0%';
+            } else if(val.length < 5) {
+                bar.style.width = '20%';
+                bar.style.background = '#FF4D4D';
+            } else if(val.length < 10) {
+                bar.style.width = '60%';
+                bar.style.background = '#FFCC00';
+            } else {
+                bar.style.width = '100%';
+                bar.style.background = '#0F766E';
+            }
+        }
+
+        // --- Admin Creation ---
+        function handleAdminCreation(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPass').value;
+            const confirm = document.getElementById('adminConfirm').value;
+            
+            if(pass !== confirm) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            document.getElementById('adminForm').style.display = 'none';
+            document.getElementById('adminSuccess').style.display = 'block';
+            
+            document.getElementById('resHosp').innerText = document.getElementById('hospSelect').value;
+            document.getElementById('resUser').innerText = document.getElementById('adminUser').value;
+            
+            showToast("Admin account created successfully");
+        }
+
+        function resetForm() {
+            document.getElementById('adminForm').style.display = 'block';
+            document.getElementById('adminSuccess').style.display = 'none';
+            document.getElementById('adminForm').reset();
+            document.getElementById('passStrength').style.width = '0%';
+        }
+
+        function copyCreds() {
+            showToast("Credentials copied to clipboard");
+        }
+
+        // --- Utilities ---
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(200px)';
+            }, 3000);
+        }
+
+        function scrollToElement(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function filterHospitals(val) {
+            const rows = document.querySelectorAll('#hospitalTableBody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(val.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal-overlay');
+                modals.forEach(m => m.style.display = 'none');
+            }
+        });
+    </script>
+</body>
+</html>

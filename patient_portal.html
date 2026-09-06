@@ -332,7 +332,7 @@
             </select>
             <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--soft-border); padding-left: 20px;">
                 <div style="text-align: right;">
-                    <p style="font-size: 0.85rem; font-weight: 700;">Ram</p>
+                    <p id="patientDisplayName" style="font-size: 0.85rem; font-weight: 700;">Patient</p>
                     <p style="font-size: 0.7rem; color: var(--slate-gray);" data-i18n="patient">Patient</p>
                 </div>
                 <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--soft-aqua); display: grid; place-items: center; color: var(--rich-teal); font-weight: 700;">R</div>
@@ -342,7 +342,7 @@
 
     <section class="hero">
         <div class="hero-text">
-            <h2 data-i18n="greeting">Good Morning, Ram</h2>
+            <h2 id="patientGreeting" data-i18n="greeting">Good Morning, Patient</h2>
             <h1 data-i18n="heroTitle">Your healthcare, <br><span>connected</span> in one place.</h1>
             <p data-i18n="heroDesc">Access your medical records, appointments, consultations, referrals, medicines and emergency support from one secure platform.</p>
         </div>
@@ -354,22 +354,22 @@
     <div class="snapshot-bar">
         <div class="snapshot-item">
             <span class="snapshot-label" data-i18n="blood">Blood Group</span>
-            <span class="snapshot-value">O+</span>
+            <span id="bloodGroupValue" class="snapshot-value">Not available</span>
         </div>
         <div class="snapshot-sep"></div>
         <div class="snapshot-item">
             <span class="snapshot-label" data-i18n="nextApt">Next Appointment</span>
-            <span class="snapshot-value" data-i18n="aptDate">Today, 10:30 AM</span>
+            <span id="nextAppointmentValue" class="snapshot-value">No appointment</span>
         </div>
         <div class="snapshot-sep"></div>
         <div class="snapshot-item">
             <span class="snapshot-label" data-i18n="activeRef">Active Referrals</span>
-            <span class="snapshot-value">1</span>
+            <span id="activeReferralsValue" class="snapshot-value">0</span>
         </div>
         <div class="snapshot-sep"></div>
         <div class="snapshot-item">
             <span class="snapshot-label" data-i18n="recordsCount">Health Records</span>
-            <span class="snapshot-value">12</span>
+            <span id="recordsCountValue" class="snapshot-value">0</span>
         </div>
     </div>
 
@@ -405,9 +405,9 @@
         <div class="card feat-queue">
             <div class="icon-box"><i data-lucide="users"></i></div>
             <h3 data-i18n="queueTitle">Queue Status</h3>
-            <p style="margin-bottom: 10px; font-weight: 700; color: var(--deep-indigo);">A-17</p>
+            <p id="queueTokenValue" style="margin-bottom: 10px; font-weight: 700; color: var(--deep-indigo);">No queue</p>
             <div class="queue-viz"><div class="queue-progress"></div></div>
-            <p style="font-size: 0.8rem;" data-i18n="queuePatients">4 patients ahead</p>
+            <p id="queuePatientsValue" style="font-size: 0.8rem;" data-i18n="queuePatients">No patients ahead</p>
         </div>
 
         <!-- Teleconsultation -->
@@ -567,12 +567,18 @@
             
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => {
+                    async (pos) => {
                         status.innerText = `Location Detected: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
-                        setTimeout(() => {
-                            alert("Finding nearest emergency centres...");
-                            closeSOS();
-                        }, 1500);
+                        const response = await fetch('/api/v1/emergency/sos', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ latitude: pos.coords.latitude, longitude: pos.coords.longitude })
+                        });
+                        status.innerText = response.ok
+                            ? 'Emergency request saved. Nearby facilities are being located.'
+                            : 'Please log in as a patient before requesting emergency help.';
+                        if (response.ok) setTimeout(closeSOS, 1500);
                     },
                     (err) => { status.innerText = "Location access denied."; status.style.color = "#E53E3E"; }
                 );
@@ -580,6 +586,26 @@
                 status.innerText = "Geolocation not supported.";
             }
         }
+
+        async function loadPatientDashboard() {
+            const response = await fetch('/api/v1/patient/me/dashboard', { credentials: 'same-origin' });
+            if (!response.ok) return;
+            const data = await response.json();
+            const patient = data.patient;
+            const snapshot = data.snapshot;
+            document.getElementById('patientDisplayName').textContent = patient.full_name;
+            document.getElementById('patientGreeting').textContent = `Good Morning, ${patient.full_name}`;
+            document.getElementById('bloodGroupValue').textContent = patient.blood_group;
+            document.getElementById('nextAppointmentValue').textContent = snapshot.next_appointment || 'No appointment';
+            document.getElementById('activeReferralsValue').textContent = snapshot.active_referrals;
+            document.getElementById('recordsCountValue').textContent = snapshot.records_count;
+            document.getElementById('queueTokenValue').textContent = snapshot.queue_token || 'No queue';
+            document.getElementById('queuePatientsValue').textContent = snapshot.patients_ahead == null
+                ? 'No patients ahead'
+                : `${snapshot.patients_ahead} patients ahead`;
+        }
+
+        loadPatientDashboard().catch(() => {});
 
         // Initialize Icons
         lucide.createIcons();

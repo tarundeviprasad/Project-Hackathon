@@ -683,20 +683,7 @@
 
     <script>
         // --- Data ---
-        const doctors = [
-            { id: 1, name: "Dr. Arjun Reddy", spec: "Cardiologist", hosp: "Apollo Hospitals", exp: 12, rating: 4.8, initial: "A", next: "Today, 4:30 PM", fee: 800, prev: false },
-            { id: 2, name: "Dr. Sneha Kapoor", spec: "Dermatologist", hosp: "CARE Hospitals", exp: 8, rating: 4.6, initial: "S", next: "Tomorrow, 10:00 AM", fee: 600, prev: true },
-            { id: 3, name: "Dr. Vivek Sharma", spec: "Neurologist", hosp: "Yashoda Hospitals", exp: 14, rating: 4.8, initial: "V", next: "Today, 2:00 PM", fee: 1000, prev: false },
-            { id: 4, name: "Dr. Meera Rao", spec: "Pediatrician", hosp: "KIMS Hospitals", exp: 9, rating: 4.7, initial: "M", next: "Wed, 11:30 AM", fee: 500, prev: true },
-            { id: 5, name: "Dr. Karthik Reddy", spec: "Orthopedic", hosp: "CARE Hospitals", exp: 11, rating: 4.8, initial: "K", next: "Today, 5:30 PM", fee: 750, prev: false },
-            { id: 6, name: "Dr. Ananya Rao", spec: "Cardiologist", hosp: "Apollo Hospitals", exp: 10, rating: 4.8, initial: "A", next: "Tomorrow, 9:30 AM", fee: 900, prev: true },
-            { id: 7, name: "Dr. Rahul Mehta", spec: "General Physician", hosp: "Yashoda Hospitals", exp: 15, rating: 4.7, initial: "R", next: "Today, 11:30 AM", fee: 400, prev: true },
-            { id: 8, name: "Dr. Priya Sharma", spec: "Dermatologist", hosp: "CARE Hospitals", exp: 12, rating: 4.9, initial: "P", next: "Wed, 10:30 AM", fee: 700, prev: true },
-            { id: 9, name: "Dr. Sanjay Gupta", spec: "General Physician", hosp: "Apollo Hospitals", exp: 20, rating: 4.9, initial: "S", next: "Today, 1:00 PM", fee: 1200, prev: false },
-            { id: 10, name: "Dr. Nisha Patel", spec: "Gynecologist", hosp: "KIMS Hospitals", exp: 7, rating: 4.5, initial: "N", next: "Tomorrow, 4:00 PM", fee: 600, prev: false },
-            { id: 11, name: "Dr. Amit Verma", spec: "Pediatrician", hosp: "Yashoda Hospitals", exp: 10, rating: 4.6, initial: "A", next: "Wed, 12:00 PM", fee: 550, prev: false },
-            { id: 12, name: "Dr. Pooja Iyer", spec: "General Physician", hosp: "CARE Hospitals", exp: 6, rating: 4.4, initial: "P", next: "Today, 3:30 PM", fee: 450, prev: false }
-        ];
+        let doctors = [];
 
         // --- Translation ---
         const translations = {
@@ -880,11 +867,38 @@
             document.getElementById('bookingModal').style.display = "grid";
         }
 
-        function confirmBooking() {
+        async function confirmBooking() {
             const doc = doctors.find(d => d.id === selectedDocId);
             const summary = document.getElementById('confSummary');
-            const bookingId = `AC-${new Date().getFullYear()}-${Math.floor(Math.random()*9000)+1000}`;
-            
+            const selectedTime = document.querySelector('.time-item.active')?.textContent.trim() || '09:30 AM';
+            const timeParts = selectedTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            const appointmentDate = new Date();
+            appointmentDate.setDate(appointmentDate.getDate() + 1);
+            if (timeParts) {
+                let hour = Number(timeParts[1]) % 12;
+                if (timeParts[3].toUpperCase() === 'PM') hour += 12;
+                appointmentDate.setHours(hour, Number(timeParts[2]), 0, 0);
+            }
+
+            const response = await fetch('/api/v1/appointments', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    doctor_id: doc.user,
+                    doctor_name: doc.name,
+                    appointment_time: appointmentDate.toISOString(),
+                    queue_number: 'A-17',
+                    patients_ahead: 0
+                })
+            });
+            if (!response.ok) {
+                alert(response.status === 401 || response.status === 403
+                    ? 'Please log in as a patient before booking.'
+                    : 'Unable to save this appointment. Please try again.');
+                return;
+            }
+            const appointment = await response.json();
             summary.innerHTML = `
                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                     <span style="font-size: 0.85rem; color: var(--slate-gray);">Doctor</span>
@@ -900,7 +914,7 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px dashed var(--soft-border);">
                     <span style="font-size: 0.85rem; color: var(--slate-gray);">Booking ID</span>
-                    <span style="font-weight: 800; color: var(--rich-teal);">${bookingId}</span>
+                    <span style="font-weight: 800; color: var(--rich-teal);">${appointment.id}</span>
                 </div>
             `;
 
@@ -961,7 +975,23 @@
         }
 
         // --- Init ---
-        window.onload = () => {
+        window.onload = async () => {
+            const response = await fetch('/api/v1/doctors', { credentials: 'same-origin' });
+            if (response.ok) {
+                doctors = (await response.json()).map(doctor => ({
+                    id: doctor.id,
+                    user: doctor.user,
+                    name: doctor.name,
+                    spec: doctor.specialty,
+                    hosp: doctor.facility_name || 'Assigned facility',
+                    exp: doctor.experience_years,
+                    rating: Number(doctor.rating),
+                    initial: (doctor.name || 'D').charAt(0).toUpperCase(),
+                    next: 'Available',
+                    fee: doctor.consultation_fee,
+                    prev: false
+                }));
+            }
             renderPrevDoctors();
             renderDoctors(doctors);
             changeLanguage(currentLang);
