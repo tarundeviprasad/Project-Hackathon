@@ -316,6 +316,131 @@
             border: 1px solid #FDE68A;
         }
 
+        .status-overview {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+            margin: 0 0 22px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #FBFCFF;
+        }
+
+        .status-overview h3 {
+            grid-column: 1 / -1;
+            color: var(--primary-indigo);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            flex: 0 0 9px;
+            border-radius: 50%;
+            background: #B45309;
+        }
+
+        .status-dot.accepted {
+            background: var(--healthcare-teal);
+        }
+
+        .status-dot.treatment-started {
+            background: #2563EB;
+        }
+
+        .status-dot.follow-up-due {
+            background: #C2410C;
+        }
+
+        .status-dot.completed {
+            background: #64748B;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-badge.treatment-started {
+            color: #1D4ED8;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+        }
+
+        .status-badge.follow-up-due {
+            color: #C2410C;
+            background: #FFF7ED;
+            border: 1px solid #FED7AA;
+        }
+
+        .status-badge.completed {
+            color: #475569;
+            background: #F1F5F9;
+            border: 1px solid #CBD5E1;
+        }
+
+        .followup-status {
+            display: grid;
+            gap: 5px;
+            justify-items: start;
+        }
+
+        .followup-status .label {
+            margin-bottom: 0;
+        }
+
+        .followup-status .status-badge {
+            color: #C2410C;
+            background: #FFF7ED;
+            border: 1px solid #FED7AA;
+        }
+
+        .mark-completed {
+            min-height: 42px;
+            padding: 0 16px;
+            color: var(--primary-indigo);
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #AEBBD5;
+            border-radius: 8px;
+            background: var(--panel-white);
+            cursor: pointer;
+        }
+
+        .mark-completed:hover {
+            border-color: var(--healthcare-teal);
+            color: var(--healthcare-teal);
+        }
+
+        .mark-completed.completed {
+            color: #475569;
+            border-color: #CBD5E1;
+            background: #F1F5F9;
+            cursor: default;
+        }
+
+        .followup-card {
+            grid-template-columns: 1.05fr 1.3fr 1.3fr 0.8fr 1fr auto;
+        }
+
         .tab-panel {
             display: none;
         }
@@ -377,6 +502,60 @@
 
         .detail-item.full-width {
             grid-column: 1 / -1;
+        }
+
+        .referral-timeline {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .referral-timeline h3 {
+            margin-bottom: 14px;
+            color: var(--primary-indigo);
+            font-size: 15px;
+        }
+
+        .timeline-step {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 30px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .timeline-step:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 24px;
+            left: 7px;
+            width: 1px;
+            height: 12px;
+            background: #CBD5E1;
+        }
+
+        .timeline-marker {
+            z-index: 1;
+            width: 15px;
+            height: 15px;
+            display: grid;
+            place-items: center;
+            color: var(--healthcare-teal);
+            font-size: 15px;
+            line-height: 1;
+            background: var(--panel-white);
+        }
+
+        .timeline-step.current {
+            color: var(--healthcare-teal);
+        }
+
+        .timeline-step.upcoming {
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .close-detail {
@@ -806,6 +985,14 @@
             .referral-card {
                 grid-template-columns: 1fr;
             }
+
+            .status-overview {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .status-overview h3 {
+                grid-column: 1 / -1;
+            }
         }
     </style>
 </head>
@@ -966,7 +1153,19 @@
                     <option>All Statuses</option>
                     <option>Accepted</option>
                     <option>Pending</option>
+                    <option>Treatment Started</option>
+                    <option>Follow-up Due</option>
+                    <option>Completed</option>
                 </select>
+            </div>
+
+            <div class="status-overview" aria-label="Referral Status">
+                <h3>Referral Status</h3>
+                <span class="status-option"><span class="status-dot"></span>Pending</span>
+                <span class="status-option"><span class="status-dot accepted"></span>Accepted</span>
+                <span class="status-option"><span class="status-dot treatment-started"></span>Treatment Started</span>
+                <span class="status-option"><span class="status-dot follow-up-due"></span>Follow-up Due</span>
+                <span class="status-option"><span class="status-dot completed"></span>Completed</span>
             </div>
 
             <div class="referral-card status-accepted">
@@ -1031,29 +1230,33 @@
                 <button class="filter-dropdown" type="button">All Follow-ups</button>
             </div>
 
-            <div class="referral-card">
+            <div class="referral-card followup-card">
                 <div class="patient-info">
-                    <span class="label">Patient Information</span>
+                    <span class="label">Patient</span>
                     <span class="name">Meera Reddy</span>
                     <span class="meta">P-10318 &bull; 39 yrs &bull; Female</span>
                 </div>
                 <div class="doc-info">
-                    <span class="label">Referral Contact</span>
-                    <span class="name">Dr. Rohan Kapoor</span>
-                    <span class="meta">Cardiology</span>
+                    <span class="label">Referral</span>
+                    <span class="name">PHC &rarr; District Hospital</span>
+                    <span class="meta">Dr. Rohan Kapoor &bull; Cardiology</span>
                 </div>
                 <div class="reason-info">
-                    <span class="label">Next Action</span>
-                    <p class="reason">Review consultation report</p>
-                    <p class="desc">Confirm the recommended treatment plan.</p>
+                    <span class="label">Treatment</span>
+                    <p class="reason">Blood pressure management</p>
+                    <p class="desc">Review consultation report.</p>
                 </div>
                 <div class="date-info">
-                    <span class="label">Due On</span>
-                    <div>Sep 8, 2026</div>
-                    <div class="time">In 2 days</div>
+                    <span class="label">Follow-up</span>
+                    <div>Sep 10, 2026</div>
+                </div>
+                <div class="followup-status">
+                    <span class="label">Status</span>
+                    <span class="status-badge follow-up-due">FOLLOW-UP DUE</span>
                 </div>
                 <div class="action-group">
                     <button class="btn-primary view-details" type="button">View Details</button>
+                    <button class="mark-completed" type="button">Mark Completed</button>
                 </div>
             </div>
 
@@ -1111,6 +1314,15 @@
                     <span class="label">Due Date</span>
                     <p id="detailDueDate"></p>
                 </div>
+            </div>
+            <div class="referral-timeline" aria-label="Referral Timeline">
+                <h3>Referral Timeline</h3>
+                <div class="timeline-step"><span class="timeline-marker">&#10003;</span>Referral Created</div>
+                <div class="timeline-step"><span class="timeline-marker">&#10003;</span>Referral Accepted</div>
+                <div class="timeline-step"><span class="timeline-marker">&#10003;</span>Patient Consulted</div>
+                <div class="timeline-step"><span class="timeline-marker">&#10003;</span>Treatment Given</div>
+                <div class="timeline-step current"><span class="timeline-marker">&#9679;</span>Follow-up Scheduled</div>
+                <div class="timeline-step upcoming"><span class="timeline-marker">&#9675;</span>Follow-up Completed</div>
             </div>
         </div>
     </div>
@@ -1178,6 +1390,19 @@
                 document.getElementById('detailAction').textContent = card.querySelector('.reason').textContent;
                 document.getElementById('detailDueDate').textContent = card.querySelector('.date-info').textContent.trim();
                 detailModal.classList.add('open');
+            });
+        });
+
+        document.querySelectorAll('.mark-completed').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const card = button.closest('.referral-card');
+                const status = card.querySelector('.followup-status .status-badge');
+
+                status.className = 'status-badge completed';
+                status.textContent = 'COMPLETED';
+                button.classList.add('completed');
+                button.textContent = 'Completed';
+                button.disabled = true;
             });
         });
 
