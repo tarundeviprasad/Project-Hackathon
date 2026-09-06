@@ -1015,6 +1015,30 @@
         }
 
         function finalizeConsult() {
+        async function finalizeConsult() {
+            const patientId = new URLSearchParams(window.location.search).get('patient_id');
+            if (!patientId) {
+                closeModal();
+                window.alert('Open this consultation from an assigned patient record to save it.');
+                return;
+            }
+            const textareas = Array.from(document.querySelectorAll('textarea'));
+            const response = await fetch('/api/v1/consultations', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_id: patientId,
+                    symptoms: textareas[0]?.value || '',
+                    notes: textareas[textareas.length - 1]?.value || '',
+                    prescription: Array.from(document.querySelectorAll('#medTable input')).map(input => input.value).join(' | '),
+                    status: 'Completed'
+                })
+            });
+            if (!response.ok) {
+                window.alert('Unable to save consultation. Please verify the patient assignment.');
+                return;
+            }
             closeModal();
             // Show Success Notification
             const toast = document.getElementById('toast');

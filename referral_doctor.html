@@ -1024,6 +1024,12 @@
         <button class="btn-primary" id="sendReferralButton" type="button">
             <span>+</span> Send Referral
         </button>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a class="btn-primary" href="/doctor-dashboard.html">Dashboard</a>
+            <button class="btn-primary" id="sendReferralButton" type="button">
+                <span>+</span> Send Referral
+            </button>
+        </div>
     </header>
 
     <!-- Navigation Tabs -->
@@ -1168,6 +1174,9 @@
                 <span class="status-option"><span class="status-dot completed"></span>Completed</span>
             </div>
 
+                </select>
+            </div>
+
             <div class="referral-card status-accepted">
                 <div class="patient-info">
                     <span class="label">Patient Information</span>
@@ -1233,6 +1242,9 @@
             <div class="referral-card followup-card">
                 <div class="patient-info">
                     <span class="label">Patient</span>
+            <div class="referral-card">
+                <div class="patient-info">
+                    <span class="label">Patient Information</span>
                     <span class="name">Meera Reddy</span>
                     <span class="meta">P-10318 &bull; 39 yrs &bull; Female</span>
                 </div>
@@ -1257,6 +1269,22 @@
                 <div class="action-group">
                     <button class="btn-primary view-details" type="button">View Details</button>
                     <button class="mark-completed" type="button">Mark Completed</button>
+                    <span class="label">Referral Contact</span>
+                    <span class="name">Dr. Rohan Kapoor</span>
+                    <span class="meta">Cardiology</span>
+                </div>
+                <div class="reason-info">
+                    <span class="label">Next Action</span>
+                    <p class="reason">Review consultation report</p>
+                    <p class="desc">Confirm the recommended treatment plan.</p>
+                </div>
+                <div class="date-info">
+                    <span class="label">Due On</span>
+                    <div>Sep 8, 2026</div>
+                    <div class="time">In 2 days</div>
+                </div>
+                <div class="action-group">
+                    <button class="btn-primary view-details" type="button">View Details</button>
                 </div>
             </div>
 
@@ -1378,6 +1406,24 @@
             closeSendReferralModal();
             sendReferralForm.reset();
             window.alert('Okay, permission requested.');
+        sendReferralForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const response = await fetch('/api/v1/referrals', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_id: document.getElementById('patientId').value.trim(),
+                    reason: document.getElementById('referralIssue').value.trim()
+                })
+            });
+            if (!response.ok) {
+                window.alert('Unable to save referral. Confirm the patient is assigned to you and try again.');
+                return;
+            }
+            closeSendReferralModal();
+            sendReferralForm.reset();
+            window.alert('Referral saved successfully.');
         });
 
         document.querySelectorAll('.view-details').forEach(function (button) {
@@ -1449,6 +1495,64 @@
                     </div>`;
             });
         });
+
+        function renderDatabaseReferrals(referrals) {
+            const panel = document.getElementById('incoming-panel');
+            if (!panel) return;
+            panel.querySelectorAll('.referral-card').forEach(card => card.remove());
+            const cards = referrals.map(referral => `
+                <div class="referral-card ${referral.status === 'Accepted' ? 'status-accepted' : ''}" data-referral-id="${referral.id}">
+                    <div class="patient-info">
+                        <span class="label">Patient Information</span>
+                        <span class="name">${referral.patient_id}</span>
+                        <span class="meta">${referral.status}</span>
+                    </div>
+                    <div class="doc-info">
+                        <span class="label">Referral</span>
+                        <span class="name">Clinical referral</span>
+                        <span class="meta">Database record</span>
+                    </div>
+                    <div class="reason-info">
+                        <span class="label">Reason for Referral</span>
+                        <p class="reason">${referral.reason}</p>
+                    </div>
+                    <div class="date-info">
+                        <span class="label">Created On</span>
+                        <div>${referral.created_at}</div>
+                    </div>
+                    <div class="action-group">
+                        ${referral.status === 'Pending' ? '<button class="btn-accept" type="button">Accept</button><button class="btn-decline" type="button">Decline</button>' : `<span class="accepted-badge">${referral.status}</span>`}
+                    </div>
+                </div>`).join('');
+            panel.insertAdjacentHTML('beforeend', cards || '<p>No referrals have been recorded.</p>');
+            panel.querySelectorAll('[data-referral-id] .btn-accept').forEach(button => {
+                button.addEventListener('click', () => updateReferral(button.closest('[data-referral-id]').dataset.referralId, 'Accepted'));
+            });
+            panel.querySelectorAll('[data-referral-id] .btn-decline').forEach(button => {
+                button.addEventListener('click', () => updateReferral(button.closest('[data-referral-id]').dataset.referralId, 'Rejected'));
+            });
+        }
+
+        async function updateReferral(id, status) {
+            const response = await fetch(`/api/v1/referrals/${id}`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            if (!response.ok) {
+                window.alert('Unable to update referral status.');
+                return;
+            }
+            loadDatabaseReferrals();
+        }
+
+        async function loadDatabaseReferrals() {
+            const response = await fetch('/api/v1/referrals', { credentials: 'same-origin' });
+            if (response.ok) renderDatabaseReferrals(await response.json());
+        }
+
+        loadDatabaseReferrals().catch(() => {});
     </script>
 
 </body>

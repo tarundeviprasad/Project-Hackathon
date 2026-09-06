@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from .models import User
+from .security import clear_login_failures, login_is_rate_limited, record_login_failure
 
 
 def authenticate_by_identifier(request, identifier, password):
@@ -33,28 +34,33 @@ def home(request):
     return redirect("/index.html")
 
 
+def _role_login(request, role, redirect_url):
+    identifier = request.POST.get("username", "").strip()
+    password = request.POST.get("password", "")
+
+    if not identifier or not password:
+        return JsonResponse({"error": "Invalid email/username or password."}, status=401)
+
+    if login_is_rate_limited(request, identifier):
+        record_login_failure(request, identifier, reason="rate_limited")
+        return JsonResponse({"error": "Too many failed attempts. Try again later."}, status=429)
+
+    user = authenticate_by_identifier(request, identifier, password)
+    if user is None or getattr(user, "role", None) != role:
+        record_login_failure(request, identifier)
+        return JsonResponse({"error": "Invalid email/username or password."}, status=401)
+
+    clear_login_failures(request, identifier)
+    login(request, user)
+    from api.audit import record_audit_event
+    record_audit_event(request, 'LOGIN_SUCCESS', user=user)
+    return JsonResponse({"success": True, "redirect": redirect_url})
+
+
 @csrf_protect
 def patient_login(request):
     if request.method == "POST":
-        identifier = request.POST.get("username")
-        password = request.POST.get("password")
-
-        if not identifier or not password:
-            return JsonResponse(
-                {"error": "Please provide both email/username and password."},
-                status=400
-            )
-
-        user = authenticate_by_identifier(request, identifier, password)
-
-        if user is not None and getattr(user, "role", None) == "PATIENT":
-            login(request, user)
-            return JsonResponse({"success": True, "redirect": "/patient_portal.html"})
-        
-        return JsonResponse(
-            {"error": "Invalid email/username or password. Please try again."},
-            status=401
-        )
+        return _role_login(request, "PATIENT", "/patient/dashboard/")
 
     return redirect("/patient-login.html")
 
@@ -62,25 +68,7 @@ def patient_login(request):
 @csrf_protect
 def doctor_login(request):
     if request.method == "POST":
-        identifier = request.POST.get("username")
-        password = request.POST.get("password")
-
-        if not identifier or not password:
-            return JsonResponse(
-                {"error": "Please provide both email/username and password."},
-                status=400
-            )
-
-        user = authenticate_by_identifier(request, identifier, password)
-
-        if user is not None and getattr(user, "role", None) == "DOCTOR":
-            login(request, user)
-            return JsonResponse({"success": True, "redirect": "/doctor-dashboard.html"})
-        
-        return JsonResponse(
-            {"error": "Invalid email/username or password. Please try again."},
-            status=401
-        )
+        return _role_login(request, "DOCTOR", "/doctor-dashboard.html")
 
     return redirect("/doctor-login.html")
 
@@ -88,25 +76,7 @@ def doctor_login(request):
 @csrf_protect
 def admin_login(request):
     if request.method == "POST":
-        identifier = request.POST.get("username")
-        password = request.POST.get("password")
-
-        if not identifier or not password:
-            return JsonResponse(
-                {"error": "Please provide both email/username and password."},
-                status=400
-            )
-
-        user = authenticate_by_identifier(request, identifier, password)
-
-        if user is not None and getattr(user, "role", None) == "ADMIN":
-            login(request, user)
-            return JsonResponse({"success": True, "redirect": "/index.html"})
-        
-        return JsonResponse(
-            {"error": "Invalid email/username or password. Please try again."},
-            status=401
-        )
+        return _role_login(request, "ADMIN", "/admin/dashboard/")
 
     return redirect("/admin-login.html")
 

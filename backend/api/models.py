@@ -1,6 +1,42 @@
 from django.conf import settings
 from django.db import models
 
+
+class AuditLog(models.Model):
+    ACTION_CHOICES = [
+        ('LOGIN_SUCCESS', 'Login success'),
+        ('LOGIN_FAILURE', 'Login failure'),
+        ('LOGOUT', 'Logout'),
+        ('PATIENT_VIEWED', 'Patient record viewed'),
+        ('PATIENT_CREATED', 'Patient record created'),
+        ('PATIENT_UPDATED', 'Patient record updated'),
+        ('PATIENT_DELETED', 'Patient record deleted'),
+        ('DOCTOR_CREATED', 'Doctor account created'),
+        ('UNAUTHORIZED_ACCESS', 'Unauthorized access attempt'),
+        ('PERMISSION_DENIED', 'Permission denied'),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='audit_events',
+    )
+    action = models.CharField(max_length=40, choices=ACTION_CHOICES)
+    target_type = models.CharField(max_length=100, blank=True)
+    target_id = models.CharField(max_length=100, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    success = models.BooleanField(default=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f'{self.action} ({self.timestamp:%Y-%m-%d %H:%M:%S})'
+
 class Patient(models.Model):
     GENDER_CHOICES = [
         ('Male', 'Male'),
@@ -49,6 +85,24 @@ class Facility(models.Model):
         return self.name
 
 
+class DoctorProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='doctor_profile',
+        limit_choices_to={'role': 'DOCTOR'},
+    )
+    specialty = models.CharField(max_length=120, default='General Physician')
+    facility = models.ForeignKey(Facility, on_delete=models.SET_NULL, null=True, blank=True, related_name='doctors')
+    experience_years = models.PositiveIntegerField(default=0)
+    rating = models.DecimalField(max_digits=2, decimal_places=1, default=5.0)
+    consultation_fee = models.PositiveIntegerField(default=0)
+    bio = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        return f'{self.user.username} - {self.specialty}'
+
+
 class Appointment(models.Model):
     STATUS_CHOICES = [
         ('Scheduled', 'Scheduled'),
@@ -56,6 +110,14 @@ class Appointment(models.Model):
         ('Cancelled', 'Cancelled'),
     ]
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
+    doctor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='doctor_appointments',
+        limit_choices_to={'role': 'DOCTOR'},
+    )
     doctor_name = models.CharField(max_length=150)
     facility = models.ForeignKey(Facility, on_delete=models.SET_NULL, null=True)
     appointment_time = models.DateTimeField()
@@ -65,6 +127,120 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.patient.full_name} with {self.doctor_name}"
+
+
+class Consultation(models.Model):
+    STATUS_CHOICES = [
+        ('Draft', 'Draft'),
+        ('In Progress', 'In Progress'),
+        ('Completed', 'Completed'),
+        ('Cancelled', 'Cancelled'),
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='consultations')
+    doctor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='consultations',
+        limit_choices_to={'role': 'DOCTOR'},
+    )
+    appointment = models.OneToOneField(
+        Appointment,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='consultation',
+    )
+    facility = models.ForeignKey(Facility, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Draft')
+    symptoms = models.TextField(blank=True, default='')
+    diagnosis = models.TextField(blank=True, default='')
+    treatment = models.TextField(blank=True, default='')
+    prescription = models.TextField(blank=True, default='')
+    notes = models.TextField(blank=True, default='')
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+
+class Referral(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('Rejected', 'Rejected'),
+        ('Completed', 'Completed'),
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='referrals')
+    referring_doctor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='sent_referrals',
+        limit_choices_to={'role': 'DOCTOR'},
+    )
+    receiving_doctor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='received_referrals',
+        limit_choices_to={'role': 'DOCTOR'},
+    )
+    referring_facility = models.ForeignKey(
+        Facility,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='sent_referrals',
+    )
+    receiving_facility = models.ForeignKey(
+        Facility,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='received_referrals',
+    )
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    notes = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+
+class FollowUp(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='follow_ups')
+    doctor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='follow_ups',
+        limit_choices_to={'role': 'DOCTOR'},
+    )
+    consultation = models.ForeignKey(
+        Consultation,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='follow_ups',
+    )
+    referral = models.ForeignKey(
+        Referral,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='follow_ups',
+    )
+    scheduled_for = models.DateTimeField()
+    purpose = models.TextField()
+    status = models.CharField(max_length=20, default='Scheduled')
+    notes = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class HealthTimelineRecord(models.Model):
