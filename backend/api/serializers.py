@@ -16,10 +16,17 @@ class FacilitySerializer(serializers.ModelSerializer):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     facility_name = serializers.CharField(source='facility.name', read_only=True)
+    patient_name = serializers.CharField(source='patient.full_name', read_only=True)
+    patient_gender = serializers.CharField(source='patient.gender', read_only=True)
+    patient_phone = serializers.CharField(source='patient.phone', read_only=True)
     
     class Meta:
         model = Appointment
-        fields = '__all__'
+        fields = (
+            'id', 'patient', 'doctor', 'doctor_name', 'facility', 'appointment_time',
+            'queue_number', 'patients_ahead', 'status', 'facility_name',
+            'patient_name', 'patient_gender', 'patient_phone',
+        )
 
 class HealthTimelineRecordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,9 +53,20 @@ class ConsultationSerializer(serializers.ModelSerializer):
 
 
 class ReferralSerializer(serializers.ModelSerializer):
+    referring_phc_name = serializers.CharField(source='referring_phc.username', read_only=True)
+    patient_name = serializers.CharField(source='patient.full_name', read_only=True)
+    receiving_facility_name = serializers.CharField(source='receiving_facility.name', read_only=True)
+    receiving_doctor_name = serializers.CharField(source='receiving_doctor.username', read_only=True)
+
     class Meta:
         model = Referral
-        fields = '__all__'
+        fields = (
+            'id', 'patient', 'referring_doctor', 'referring_phc',
+            'receiving_doctor', 'referring_facility', 'receiving_facility',
+            'reason', 'status', 'notes', 'created_at', 'updated_at',
+            'referring_phc_name', 'patient_name', 'receiving_facility_name',
+            'receiving_doctor_name',
+        )
 
 
 class FollowUpSerializer(serializers.ModelSerializer):

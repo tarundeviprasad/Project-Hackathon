@@ -33,6 +33,12 @@ urlpatterns = [
         name="doctor_login"
     ),
 
+    path(
+        "asha/login/",
+        login.asha_login,
+        name="asha_login"
+    ),
+
 
     # =========================
     # ADMIN LOGIN
@@ -41,6 +47,12 @@ urlpatterns = [
         "admin/login/",
         login.admin_login,
         name="admin_login"
+    ),
+
+    path(
+        "hospital-admin/login/",
+        login.hospital_admin_login,
+        name="hospital_admin_login"
     ),
 
 

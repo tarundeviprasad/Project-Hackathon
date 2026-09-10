@@ -6,7 +6,7 @@
     <title>AarogyaConnect | Appointments & Queue</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -30,7 +30,7 @@
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-family: 'Plus Jakarta Sans', 'Noto Sans Telugu', 'Noto Sans', sans-serif;
         }
 
         body { 
@@ -235,10 +235,10 @@
 <body>
 
     <aside>
-        <div class="sidebar-logo">
+        <a href="/index.html" class="sidebar-logo" style="text-decoration: none;">
             <div class="logo-icon"><i data-lucide="calendar-check-2" color="white" size="18"></i></div> 
             AarogyaConnect
-        </div>
+        </a>
         <nav class="nav-links">
             <a href="#" class="nav-item active"><i data-lucide="layout-list" size="20"></i> Appointments & Queue</a>
         </nav>
@@ -348,20 +348,30 @@
     </div>
 
     <script>
-        // Initial Mock Data
-        let appointments = [
-            { id: 1, name: "Ramesh Kumar", age: 45, gender: "Male", time: "09:00", type: "Walk-in", status: "Completed", reason: "Viral Fever Follow-up" },
-            { id: 2, name: "Lakshmi Devi", age: 52, gender: "Female", time: "09:20", type: "Online Teleconsultation", status: "Completed", reason: "Diabetes Follow-up" },
-            { id: 3, name: "Suresh Rao", age: 38, gender: "Male", time: "09:40", type: "Walk-in", status: "Completed", reason: "Blood Pressure Review" },
-            { id: 4, name: "Anitha Kumari", age: 29, gender: "Female", time: "10:00", type: "Online Teleconsultation", status: "In-Progress", reason: "General Consultation" },
-            { id: 5, name: "Mohan Babu", age: 61, gender: "Male", time: "10:20", type: "Walk-in", status: "Waiting", reason: "Joint Pain" },
-            { id: 6, name: "Priya Sharma", age: 34, gender: "Female", time: "10:40", type: "Online Teleconsultation", status: "Waiting", reason: "Respiratory Follow-up" },
-            { id: 7, name: "Vikram Singh", age: 42, gender: "Male", time: "11:00", type: "Walk-in", status: "Waiting", reason: "Chronic Migraine" },
-            { id: 8, name: "Kavita Reddy", age: 31, gender: "Female", time: "11:15", type: "Online Teleconsultation", status: "Waiting", reason: "Stomach Pain" }
-        ];
+        let appointments = [];
 
         let currentFilter = 'All';
         let activeRescheduleId = null;
+
+        async function loadAppointments() {
+            const response = await fetch('/api/v1/appointments', { credentials: 'same-origin' });
+            if (!response.ok) return;
+            const records = await response.json();
+            appointments = records.map(record => {
+                const date = new Date(record.appointment_time);
+                return {
+                    id: record.id,
+                    name: record.patient_name,
+                    age: '',
+                    gender: record.patient_gender || '',
+                    time: date.toTimeString().slice(0, 5),
+                    type: 'Scheduled Appointment',
+                    status: record.status === 'Scheduled' ? 'Waiting' : record.status,
+                    reason: 'Appointment'
+                };
+            });
+            applyFilters();
+        }
 
         function renderQueue(data = appointments) {
             const body = document.getElementById('queueBody');
@@ -509,6 +519,7 @@
         window.onclick = () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
         
         renderQueue();
+        loadAppointments().catch(() => {});
     </script>
 </body>
 </html>

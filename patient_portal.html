@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AarogyaConnect | Patient Portal</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --deep-indigo: #1E2A5A;
@@ -23,7 +23,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Noto Sans Telugu', 'Noto Sans', sans-serif;
         }
 
         body {
@@ -45,7 +45,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 60px;
+            padding: 0 32px;
             z-index: 1000;
         }
 
@@ -80,6 +80,38 @@
         .nav-links a:hover, .nav-links a.active { color: var(--deep-indigo); }
 
         .nav-right { display: flex; align-items: center; gap: 24px; }
+
+        .patient-profile-trigger {
+            border: 0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0;
+            color: inherit;
+            cursor: pointer;
+            text-align: right;
+        }
+
+        .patient-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--soft-aqua);
+            display: grid;
+            place-items: center;
+            color: var(--rich-teal);
+            font-weight: 700;
+        }
+
+        .doctor-modal-content {
+            text-align: left;
+        }
+
+        .doctor-modal-content p {
+            margin: 8px 0;
+            color: var(--slate-gray);
+        }
 
         /* --- Hero Section --- */
         .hero {
@@ -302,6 +334,7 @@
 
         /* --- Responsive --- */
         @media (max-width: 1024px) {
+            nav { padding: 0 24px; }
             .hero { grid-template-columns: 1fr; text-align: center; padding: 120px 24px 40px; }
             .hero-text p { margin: 0 auto 40px; }
             .snapshot-bar { flex-wrap: wrap; gap: 20px; padding: 24px; margin: 20px; }
@@ -312,10 +345,8 @@
 <body>
 
     <nav>
-        <a href="index.html" class="logo">
-            <div class="logo-mark"><i data-lucide="plus"></i></div>
-            AarogyaConnect
-        </a>
+        <a href="/index.html" class="logo" aria-label="AarogyaConnect home"><div class="logo-mark"><i data-lucide="plus"></i></div>
+            AarogyaConnect</a>
         <div class="nav-links">
             <a href="patient_portal.html" class="active" data-i18n="navDash">Dashboard</a>
             <a href="booking_an_appointment.html" data-i18n="navApt">Appointments</a>
@@ -330,13 +361,13 @@
                 <option value="te">🌐 తెలుగు</option>
                 <option value="mr">🌐 मराठी</option>
             </select>
-            <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--soft-border); padding-left: 20px;">
+            <button id="doctorProfileTrigger" class="patient-profile-trigger" type="button" aria-label="View assigned doctor">
                 <div style="text-align: right;">
-                    <p id="patientDisplayName" style="font-size: 0.85rem; font-weight: 700;">Patient</p>
+                    <p id="patientDisplayName" style="font-size: 0.85rem; font-weight: 700;">Loading patient...</p>
                     <p style="font-size: 0.7rem; color: var(--slate-gray);" data-i18n="patient">Patient</p>
                 </div>
-                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--soft-aqua); display: grid; place-items: center; color: var(--rich-teal); font-weight: 700;">R</div>
-            </div>
+                <div id="patientAvatar" class="patient-avatar">?</div>
+            </button>
         </div>
     </nav>
 
@@ -447,12 +478,9 @@
             <div class="icon-box"><i data-lucide="pill"></i></div>
             <h3 data-i18n="medTitle">Medicine Availability</h3>
             <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-                <input type="text" placeholder="Search medicine..." style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--soft-border);">
+                <input id="medicineSearchInput" type="text" placeholder="Search medicine..." style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--soft-border);">
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
-                <span>Paracetamol 500mg</span>
-                <span style="color: var(--rich-teal); font-weight: 700;" data-i18n="avail">AVAILABLE</span>
-            </div>
+            <div id="medicineSearchResults" style="font-size: 0.85rem;">Search for a medicine to view availability.</div>
             <button class="btn btn-outline" type="button" onclick="window.location.href='symptom_checker.html'" style="margin-top: 18px;">Check Medicines</button>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
@@ -480,6 +508,14 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="doctorProfileModal" role="dialog" aria-modal="true" aria-labelledby="doctorProfileTitle">
+        <div class="modal doctor-modal-content">
+            <button class="btn btn-outline" type="button" onclick="closeDoctorProfile()" style="float: right;">Close</button>
+            <h2 id="doctorProfileTitle" style="color: var(--deep-indigo); margin-bottom: 20px;">Assigned Doctor</h2>
+            <div id="doctorProfileDetails">No doctor information available.</div>
+        </div>
+    </div>
+
     <script>
         document.querySelectorAll('a[href="#"]').forEach((link) => {
             link.addEventListener('click', (event) => {
@@ -491,7 +527,7 @@
         const translations = {
             en: {
                 navDash: "Dashboard", navApt: "Appointments", navRec: "Health Records", navRef: "Referrals", navMed: "Medicines",
-                patient: "Patient", greeting: "Good Morning, Ram", heroTitle: "Your healthcare, connected in one place.",
+                patient: "Patient", greeting: "Good Morning", heroTitle: "Your healthcare, connected in one place.",
                 heroDesc: "Access your medical records, appointments, consultations, referrals, medicines and emergency support from one secure platform.",
                 blood: "Blood Group", nextApt: "Next Appointment", aptDate: "Today, 10:30 AM", activeRef: "Active Referrals", recordsCount: "Health Records",
                 needToday: "What do you need today?", bookTitle: "Book an Appointment", bookDesc: "Find the right doctor or centre.", bookBtn: "Book Appointment",
@@ -504,7 +540,7 @@
             },
             hi: {
                 navDash: "डैशबोर्ड", navApt: "अपॉइंटमेंट", navRec: "स्वास्थ्य रिकॉर्ड", navRef: "रेफरल", navMed: "दवाएं",
-                patient: "मरीज", greeting: "सुप्रभात, राम", heroTitle: "आपका स्वास्थ्य, एक स्थान पर जुड़ा हुआ।",
+                patient: "मरीज", greeting: "सुप्रभात", heroTitle: "आपका स्वास्थ्य, एक स्थान पर जुड़ा हुआ।",
                 heroDesc: "एक सुरक्षित मंच से अपने मेडिकल रिकॉर्ड, अपॉइंटमेंट, परामर्श, रेफरल और आपातकालीन सहायता प्राप्त करें।",
                 blood: "रक्त समूह", nextApt: "अगला अपॉइंटमेंट", aptDate: "आज, 10:30 बजे", activeRef: "सक्रिय रेफरल", recordsCount: "स्वास्थ्य रिकॉर्ड",
                 needToday: "आज आपको क्या चाहिए?", bookTitle: "अपॉइंटमेंट बुक करें", bookDesc: "सही डॉक्टर या केंद्र खोजें।", bookBtn: "अपॉइंटमेंट बुक करें",
@@ -517,7 +553,7 @@
             },
             te: {
                 navDash: "డ్యాష్‌బోర్డ్", navApt: "అపాయింట్‌మెంట్లు", navRec: "ఆరోగ్య రికార్డులు", navRef: "రిఫరల్స్", navMed: "మందులు",
-                patient: "రోగి", greeting: "శుభోదయం, రామ్", heroTitle: "మీ ఆరోగ్యం, ఒకే చోట అనుసంధానించబడింది.",
+                patient: "రోగి", greeting: "శుభోదయం", heroTitle: "మీ ఆరోగ్యం, ఒకే చోట అనుసంధానించబడింది.",
                 heroDesc: "ఒకే సురక్షిత ప్లాట్‌ఫారమ్ నుండి మీ వైద్య రికార్డులు, అపాయింట్‌మెంట్లు, సంప్రదింపులు మరియు అత్యవసర సహాయాన్ని పొందండి.",
                 blood: "రక్త గ్రూపు", nextApt: "తదుపరి అపాయింట్‌మెంట్", aptDate: "ఈరోజు, 10:30 AM", activeRef: "క్రియాశీల రిఫరల్స్", recordsCount: "ఆరోగ్య రికార్డులు",
                 needToday: "ఈరోజు మీకు ఏమి కావాలి?", bookTitle: "అపాయింట్‌మెంట్ బుక్ చేయండి", bookDesc: "సరైన వైద్యుడిని కనుగొనండి.", bookBtn: "బుక్ చేయండి",
@@ -530,7 +566,7 @@
             },
             mr: {
                 navDash: "डॅशबोर्ड", navApt: "अपॉइंटमेंट्स", navRec: "आरोग्य रेकॉर्ड", navRef: "रेफरल", navMed: "औषधे",
-                patient: "रुग्ण", greeting: "नमस्कार, राम", heroTitle: "तुमचे आरोग्य, एका ठिकाणी जोडलेले.",
+                patient: "रुग्ण", greeting: "नमस्कार", heroTitle: "तुमचे आरोग्य, एका ठिकाणी जोडलेले.",
                 heroDesc: "एका सुरक्षित प्लॅटफॉर्मवरून तुमचे वैद्यकीय रेकॉर्ड, अपॉइंटमेंट, सल्लामसलत, रेफरल आणि आपत्कालीन मदत मिळवा.",
                 blood: "रक्त गट", nextApt: "पुढील अपॉइंटमेंट", aptDate: "आज, 10:30 AM", activeRef: "सक्रिय रेफरल", recordsCount: "आरोग्य रेकॉर्ड",
                 needToday: "आज तुम्हाला काय हवे आहे?", bookTitle: "अपॉइंटमेंट बुक करा", bookDesc: "योग्य डॉक्टर किंवा केंद्र निवडा.", bookBtn: "अपॉइंटमेंट बुक करा",
@@ -560,6 +596,49 @@
         // --- SOS & Geolocation ---
         function openSOS() { document.getElementById('sosModal').style.display = 'grid'; }
         function closeSOS() { document.getElementById('sosModal').style.display = 'none'; }
+
+        function closeDoctorProfile() {
+            document.getElementById('doctorProfileModal').style.display = 'none';
+        }
+
+        function openDoctorProfile() {
+            document.getElementById('doctorProfileModal').style.display = 'grid';
+        }
+
+        function renderDoctorProfile(doctor) {
+            const details = document.getElementById('doctorProfileDetails');
+            if (!doctor) {
+                details.textContent = 'No doctor information available.';
+                return;
+            }
+            details.innerHTML = `
+                <p><strong>${doctor.name}</strong></p>
+                <p>${doctor.specialty || 'Doctor'}</p>
+                <p>${doctor.facility_name || 'Facility not available'}</p>
+                ${doctor.email ? `<p>${doctor.email}</p>` : ''}
+                ${doctor.phone ? `<p>${doctor.phone}</p>` : ''}
+            `;
+        }
+
+        async function searchMedicines(query) {
+            const results = document.getElementById('medicineSearchResults');
+            const trimmedQuery = query.trim();
+            if (!trimmedQuery) {
+                results.textContent = 'Search for a medicine to view availability.';
+                return;
+            }
+            const response = await fetch(`/api/v1/medicines?q=${encodeURIComponent(trimmedQuery)}`, {
+                credentials: 'same-origin'
+            });
+            if (!response.ok) {
+                results.textContent = 'Unable to search medicines right now.';
+                return;
+            }
+            const medicines = await response.json();
+            results.innerHTML = medicines.length
+                ? medicines.map(medicine => `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${medicine.name} ${medicine.dosage}</span><strong style="color:var(--rich-teal);">${medicine.is_available ? 'AVAILABLE' : 'OUT OF STOCK'}</strong></div>`).join('')
+                : 'No medicines found.';
+        }
 
         function getLocation() {
             const status = document.getElementById('locationStatus');
@@ -595,6 +674,13 @@
             const snapshot = data.snapshot;
             document.getElementById('patientDisplayName').textContent = patient.full_name;
             document.getElementById('patientGreeting').textContent = `Good Morning, ${patient.full_name}`;
+            document.getElementById('patientAvatar').textContent = patient.full_name
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map(part => part[0].toUpperCase())
+                .join('') || '?';
+            renderDoctorProfile(data.doctor);
             document.getElementById('bloodGroupValue').textContent = patient.blood_group;
             document.getElementById('nextAppointmentValue').textContent = snapshot.next_appointment || 'No appointment';
             document.getElementById('activeReferralsValue').textContent = snapshot.active_referrals;
@@ -604,6 +690,14 @@
                 ? 'No patients ahead'
                 : `${snapshot.patients_ahead} patients ahead`;
         }
+
+        document.getElementById('doctorProfileTrigger').addEventListener('click', openDoctorProfile);
+        document.getElementById('medicineSearchInput').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') searchMedicines(event.target.value).catch(() => {});
+        });
+        document.getElementById('medicineSearchInput').addEventListener('input', (event) => {
+            if (!event.target.value.trim()) searchMedicines('').catch(() => {});
+        });
 
         loadPatientDashboard().catch(() => {});
 

@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AarogyaConnect | PHC Portal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* AarogyaConnect Colour Palette */
+            --primary-indigo: #1E2A5A;
+            --healthcare-teal: #0F766E;
+            --soft-aqua: #CFF7F2;
+            --main-bg: #F8F7F4; /* Soft Ivory */
+            --card-white: #FFFFFF;
+            --text-main: #172033; /* Charcoal Navy */
+            --text-secondary: #667085; /* Slate Gray */
+            --border-color: #E6E8EE; /* Soft Gray */
+            --danger: #d93025;
+            --warning: #f9ab00;
+            --success: #1e8e3e;
+            --shadow: 0 2px 10px rgba(0,0,0,0.05);
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--main-bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- TOP NAVIGATION --- */
+        header {
+            background: var(--primary-indigo);
+            color: white;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .brand { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; cursor: pointer; }
+        .brand span { color: var(--soft-aqua); font-size: 0.8rem; display: block; font-weight: 400; margin-top: -4px; }
+
+        .search-container { position: relative; width: 300px; }
+        .search-container input {
+            width: 100%;
+            padding: 8px 15px 8px 35px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 0.9rem;
+        }
+        .search-container input::placeholder { color: rgba(255,255,255,0.6); }
+
+        .top-actions { display: flex; align-items: center; gap: 20px; }
+        .icon-btn { cursor: pointer; position: relative; font-size: 1.2rem; }
+        .badge {
+            position: absolute; top: -5px; right: -8px;
+            background: var(--danger); color: white;
+            font-size: 0.6rem; padding: 2px 5px; border-radius: 10px;
+        }
+
+        /* Main Menu */
+        nav {
+            background: var(--primary-indigo);
+            display: flex;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        nav::-webkit-scrollbar { display: none; }
+        
+        .nav-item {
+            padding: 12px 18px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-item:hover { color: white; }
+        .nav-item.active {
+            color: white;
+            border-bottom: 3px solid var(--soft-aqua);
+        }
+
+        /* --- LAYOUT --- */
+        main { padding: 2rem; max-width: 1400px; margin: 0 auto; min-height: calc(100vh - 120px); }
+        .view { display: none; animation: fadeIn 0.3s ease; }
+        .view.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- UI COMPONENTS --- */
+        .card {
+            background: var(--card-white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card {
+            background: white; padding: 1.2rem; border-radius: var(--radius);
+            border-left: 4px solid var(--healthcare-teal); box-shadow: var(--shadow);
+        }
+        .stat-card h4 { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 5px; }
+        .stat-card p { font-size: 1.5rem; font-weight: 700; color: var(--primary-indigo); }
+
+        .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .title-group h2 { font-size: 1.4rem; color: var(--primary-indigo); }
+        .title-group p { font-size: 0.9rem; color: var(--text-secondary); }
+
+        .btn {
+            padding: 10px 20px; border-radius: var(--radius); border: none;
+            font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--healthcare-teal); color: white; }
+        .btn-primary:hover { background: #0b5e56; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { background: var(--main-bg); }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        tr:hover { background: #fcfcfc; cursor: pointer; }
+
+        .badge-status {
+            padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+        }
+        .bg-pending { background: #fff4e5; color: #663c00; }
+        .bg-success { background: #e6f4ea; color: #1e8e3e; }
+        .bg-priority { background: #fce8e6; color: #d93025; }
+
+        /* Timeline */
+        .timeline { position: relative; padding: 20px 0; }
+        .timeline::before { content: ''; position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background: var(--border-color); }
+        .timeline-item { position: relative; padding-left: 45px; margin-bottom: 25px; }
+        .timeline-item::after {
+            content: ''; position: absolute; left: 10px; top: 5px;
+            width: 12px; height: 12px; border-radius: 50%; background: var(--healthcare-teal); border: 3px solid white; box-shadow: 0 0 0 2px var(--healthcare-teal);
+        }
+        .timeline-content h5 { font-size: 0.9rem; font-weight: 600; }
+        .timeline-content span { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal {
+            background: white; padding: 2rem; border-radius: var(--radius); width: 90%; max-width: 600px;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; outline: none;
+        }
+
+        /* Notifications Panel */
+        #notif-panel {
+            position: absolute; top: 60px; right: 2rem; width: 320px;
+            background: white; border: 1px solid var(--border-color); border-radius: var(--radius);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: none; z-index: 1001;
+        }
+        .notif-header { padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: 600; display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--primary-indigo); }
+        .notif-item { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.8rem; cursor: pointer; }
+        .notif-item:hover { background: var(--main-bg); }
+
+        /* Triage Styles */
+        .triage-result {
+            margin-top: 20px; padding: 15px; border-radius: var(--radius); text-align: center; font-weight: 700; display: none;
+        }
+
+        /* Tele-consult placeholder */
+        .video-box {
+            width: 100%; aspect-ratio: 16/9; background: #222; border-radius: var(--radius);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; position: relative;
+        }
+        .video-controls {
+            position: absolute; bottom: 20px; display: flex; gap: 15px;
+        }
+        .ctrl-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; }
+        .ctrl-btn.hangup { background: var(--danger); }
+
+        /* Profile Details Grid */
+        .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border-color); font-size: 0.85rem; }
+        .info-label { color: var(--text-secondary); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .search-container { display: none; }
+            main { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="top-bar">
+            <div class="brand" onclick="navigateTo('dashboard')">
+                AarogyaConnect
+                <span>PRIMARY HEALTH CENTRE</span>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="globalSearch" placeholder="Search Patient ID or Name..." onkeyup="handleGlobalSearch(event)">
+            </div>
+
+            <div class="top-actions">
+                <div class="icon-btn" onclick="toggleNotifs()">
+                    🔔 <span class="badge" id="notif-count">0</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <div style="text-align: right; line-height: 1.2;">
+                        <div id="phcUserName" style="font-size: 0.85rem; font-weight: 600;">Loading...</div>
+                        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.7);">PHC User</div>
+                    </div>
+                    <div id="phcUserAvatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--soft-aqua); color: var(--primary-indigo); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;">?</div>
+                </div>
+            </div>
+        </div>
+
+        <nav id="mainNav">
+            <div class="nav-item active" onclick="navigateTo('dashboard')">Dashboard</div>
+            <div class="nav-item" onclick="navigateTo('patients')">Patients</div>
+            <div class="nav-item" onclick="navigateTo('appointments')">Appointments</div>
+            <div class="nav-item" onclick="navigateTo('consultations')">Consultations</div>
+            <div class="nav-item" onclick="navigateTo('referrals')">Referral Tracking</div>
+            <div class="nav-item" onclick="navigateTo('teleconsult')">Tele-Consult</div>
+            <div class="nav-item" onclick="navigateTo('labs')">Lab Requests</div>
+            <div class="nav-item" onclick="navigateTo('inventory')">Medicine Inventory</div>
+            <div class="nav-item" onclick="navigateTo('asha')">ASHA Tasks</div>
+            <div class="nav-item" onclick="navigateTo('analytics')">Analytics</div>
+        </nav>
+    </header>
+
+    <div id="notif-panel">
+        <div class="notif-header">
+            Notifications
+            <span style="font-weight: 400; cursor: pointer; color: var(--healthcare-teal);" onclick="clearNotifs()">Clear All</span>
+        </div>
+        <div id="notif-list">
+            <!-- Dynamic Notifs -->
+        </div>
+    </div>
+
+    <main id="appContent">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view active">
+            <div class="flex-header">
+                <div class="title-group">
+                    <h2>Welcome back, Medical Officer</h2>
+                    <p>Primary Health Centre - Sector 12 | <span id="currentDate"></span></p>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('regModal')">+ New Registration</button>
+            </div>
+
+            <div class="grid-stats">
+                <div class="stat-card"><h4>Patients Registered</h4><p id="stat-total">0</p></div>
+                <div class="stat-card"><h4>Today's Appointments</h4><p id="stat-appts">42</p></div>
+                <div class="stat-card" style="border-left-color: var(--warning);"><h4>Patients Waiting</h4><p id="stat-waiting">12</p></div>
+                <div class="stat-card" style="border-left-color: var(--danger);"><h4>Medicine Low Stock</h4><p id="stat-stock">8</p></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                <div class="card">
+                    <h3 style="font-size: 1rem; margin-bottom: 1rem;">Today's Patient Queue</h3>
+                    <table id="queue-table">
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>Patient</th>
+                                <th>ID</th>
+                                <th>Priority</th>
+                                <th>Wait</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-queue-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size: 1rem; margin-bottom: 1rem;">Quick Triage Guidance</h3>
+                    <div class="form-group">
+                        <label>Symptom Selection</label>
+                        <select id="triage-symptom">
+                            <option value="none">Select primary symptom...</option>
+                            <option value="emergency">Severe Chest Pain / Breathing Difficulty</option>
+                            <option value="priority">High Fever (>102F) / Persistent Vomiting</option>
+                            <option value="routine">Mild Cold / General Wellness Check</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="runTriage()">Assess Urgency</button>
+                    <div id="triage-result" class="triage-result"></div>
+                    <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 10px; text-align: center;">
+                        "This tool provides urgency guidance and is not a medical diagnosis."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PATIENTS VIEW -->
+        <section id="view-patients" class="view">
+            <div class="flex-header">
+                <h2>Patient Registry</h2>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" class="btn-outline" style="padding: 8px 15px; border-radius: 8px;" placeholder="Search names..." id="patientFilter" onkeyup="filterPatients()">
+                    <button class="btn btn-primary" onclick="openModal('regModal')">+ Add New</button>
+                </div>
+            </div>
+            <div class="card" style="padding: 0;">
+                <table id="patients-table">
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Age/Gender</th>
+                            <th>Priority</th>
+                            <th>Last Visit</th>
+                            <th>Follow-up</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patients-list-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PATIENT PROFILE VIEW -->
+        <section id="view-profile" class="view">
+            <button class="btn btn-outline" style="margin-bottom: 1.5rem;" onclick="navigateTo('patients')">← Back to Patients</button>
+            <div id="profile-content"></div>
+        </section>
+
+        <!-- CONSULTATIONS VIEW -->
+        <section id="view-consultations" class="view">
+            <div class="flex-header">
+                <h2>Consultation Workspace</h2>
+            </div>
+            <div class="card" id="consult-workspace">
+                <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                    Select a patient from the <strong>Dashboard Queue</strong> or <strong>Patient List</strong> to start a consultation.
+                </div>
+            </div>
+        </section>
+
+        <!-- REFERRALS VIEW -->
+        <section id="view-referrals" class="view">
+            <div class="flex-header">
+                <h2>Referral Tracking System</h2>
+                <button class="btn btn-primary" onclick="openReferralModal()">+ Create Referral</button>
+            </div>
+            <div class="card" style="padding: 0;">
+                <table id="referral-table">
+                    <thead>
+                        <tr>
+                            <th>Referral ID</th>
+                            <th>Patient</th>
+                            <th>Destination Facility</th>
+                            <th>Specialty</th>
+                            <th>Urgency</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referral-list-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TELECONSULT VIEW -->
+        <section id="view-teleconsult" class="view">
+            <div class="flex-header">
+                <h2>Tele-Consultation Hub</h2>
+            </div>
+            <div class="grid-stats">
+                <div class="card" style="margin-bottom: 0;">
+                    <h3 style="font-size: 0.9rem; margin-bottom: 10px;">Available Specialists</h3>
+                    <div id="specialist-list">
+                        <!-- Specialist cards -->
+                    </div>
+                </div>
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="video-box">
+                        <span>Waiting for connection...</span>
+                        <div class="video-controls">
+                            <button class="ctrl-btn">🎤</button>
+                            <button class="ctrl-btn">📷</button>
+                            <button class="ctrl-btn hangup">📞</button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <textarea style="width: 100%; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px;" rows="4" placeholder="Type specialist notes here..."></textarea>
+                        <button class="btn btn-primary" style="margin-top: 10px; width: 100%; justify-content: center;" onclick="alert('Consultation Notes Saved')">Complete Session</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OTHER VIEWS (Dynamic Content Shells) -->
+        <section id="view-appointments" class="view"><div class="flex-header"><h2>Appointments</h2></div><div class="card" id="appointments-content"></div></section>
+        <section id="view-labs" class="view"><div class="flex-header"><h2>Lab Requests</h2></div><div class="card" id="labs-content"></div></section>
+        <section id="view-inventory" class="view"><div class="flex-header"><h2>Medicine Inventory</h2></div><div class="card" id="inventory-content"></div></section>
+        <section id="view-asha" class="view"><div class="flex-header"><h2>ASHA Follow-up Tasks</h2></div><div class="card" id="asha-content"></div></section>
+        <section id="view-analytics" class="view"><div class="flex-header"><h2>PHC Performance Analytics</h2></div><div class="card" id="analytics-content"></div></section>
+
+    </main>
+
+    <!-- REGISTRATION MODAL -->
+    <div class="modal-overlay" id="regModal">
+        <div class="modal">
+            <div class="flex-header">
+                <h3>New Patient Registration</h3>
+                <button class="btn-outline" onclick="closeModal('regModal')">✕</button>
+            </div>
+            <form id="regForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="regName" required></div>
+                    <div class="form-group"><label>Age</label><input type="number" id="regAge" required></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="regGender"><option>Male</option><option>Female</option><option>Other</option></select>
+                    </div>
+                    <div class="form-group"><label>Phone</label><input type="tel" id="regPhone" required></div>
+                </div>
+                <div class="form-group"><label>Address</label><textarea id="regAddress" rows="2"></textarea></div>
+                <div class="form-group"><label>Primary Concern</label><input type="text" id="regReason"></div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem;">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('regModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Register Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- REFERRAL MODAL -->
+    <div class="modal-overlay" id="referralModal">
+        <div class="modal">
+            <div class="flex-header">
+                <h3>Create Specialist Referral</h3>
+                <button class="btn-outline" onclick="closeModal('referralModal')">✕</button>
+            </div>
+            <div class="form-group"><label>Select Patient</label><select id="refPatientSelect"></select></div>
+            <div class="form-group"><label>Destination</label><select id="refFacility"><option value="">Select a facility</option></select></div>
+            <div class="form-group"><label>Receiving Doctor</label><select id="refDoctor"><option value="">Select a doctor</option></select></div>
+            <div class="form-group"><label>Specialty</label><select id="refSpecialty"><option>Cardiology</option><option>Neurology</option><option>Pediatrics</option><option>Orthopedics</option></select></div>
+            <div class="form-group"><label>Urgency</label><select id="refUrgency"><option>Routine</option><option>Urgent</option><option>Emergency</option></select></div>
+            <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="submitReferral()">Create Referral</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- CENTRALIZED STATE --- */
+        const state = { patients: [], appointments: [], referrals: [], notifs: [], specialists: [] };
+
+        /* --- CORE FUNCTIONS --- */
+        async function loadPhcData() {
+            const response = await fetch('/api/v1/phc/me/dashboard', { credentials: 'same-origin' });
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    window.location.assign('/doctor-login.html');
+                    return;
+                }
+                throw new Error(`PHC dashboard API failed (${response.status}).`);
+            }
+            const data = await response.json();
+            document.querySelector('.brand span').textContent = data.phc.name;
+            document.getElementById('phcUserName').textContent = data.phc.user_name;
+            document.getElementById('phcUserAvatar').textContent = data.phc.user_name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('') || '?';
+            document.querySelector('.title-group h2').textContent = `Welcome back, ${data.phc.name}`;
+            document.querySelector('.title-group p').innerHTML = `${data.phc.centre_id} | <span id="currentDate"></span>`;
+            state.patients = data.patients.map(patient => ({
+                id: patient.patient_id,
+                name: patient.full_name,
+                gender: patient.gender,
+                phone: patient.phone,
+                priority: 'Routine',
+                lastVisit: patient.created_at ? patient.created_at.slice(0, 10) : 'Not available',
+                history: patient.active_conditions || 'Not recorded',
+                timeline: []
+            }));
+            state.appointments = data.appointments.map(appointment => ({
+                id: appointment.id,
+                patientId: appointment.patient,
+                time: new Date(appointment.appointment_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                token: appointment.queue_number,
+                status: appointment.status === 'Scheduled' ? 'Waiting' : appointment.status,
+                priority: 'Routine'
+            }));
+            state.referrals = data.referrals.map(referral => ({
+                id: referral.id,
+                patientId: referral.patient,
+                patientName: referral.patient_name,
+                facility: referral.receiving_facility_name || 'Not assigned',
+                specialty: referral.receiving_doctor_name || 'Doctor referral',
+                urgency: 'Routine',
+                status: referral.status,
+                progress: referral.status === 'Completed' ? 100 : referral.status === 'Accepted' ? 60 : 10
+            }));
+            document.getElementById('stat-total').textContent = data.stats.patients;
+            document.getElementById('stat-appts').textContent = data.stats.appointments;
+            document.getElementById('stat-waiting').textContent = data.stats.waiting;
+            document.getElementById('stat-stock').textContent = '0';
+            const [facilitiesResponse, doctorsResponse] = await Promise.all([
+                fetch('/api/v1/facilities', { credentials: 'same-origin' }),
+                fetch('/api/v1/doctors', { credentials: 'same-origin' })
+            ]);
+            if (facilitiesResponse.ok) {
+                const facilities = await facilitiesResponse.json();
+                document.getElementById('refFacility').innerHTML = '<option value="">Select a facility</option>' + facilities.map(facility => `<option value="${facility.id}">${facility.name}</option>`).join('');
+            }
+            if (doctorsResponse.ok) {
+                const doctors = await doctorsResponse.json();
+                document.getElementById('refDoctor').innerHTML = '<option value="">Select a doctor</option>' + doctors.map(doctor => `<option value="${doctor.user}">${doctor.name} - ${doctor.specialty}</option>`).join('');
+            }
+        }
+
+        async function init() {
+            await loadPhcData();
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            renderAll();
+        }
+
+        function renderAll() {
+            renderDashboardQueue();
+            renderPatientTable();
+            renderReferrals();
+            renderNotifs();
+            renderTeleconsult();
+            renderInventory();
+            renderASHA();
+            renderLabs();
+            renderAppointments();
+            renderAnalytics();
+        }
+
+        function navigateTo(viewId) {
+            // Update Nav Items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.innerText.toLowerCase() === viewId.replace('-',' ').toLowerCase() || (viewId === 'dashboard' && item.innerText === 'Dashboard')) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Update Views
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.add('active');
+            
+            // Special renders
+            if (viewId === 'dashboard') renderDashboardQueue();
+            if (viewId === 'patients') renderPatientTable();
+            if (viewId === 'referrals') renderReferrals();
+
+            window.scrollTo(0,0);
+        }
+
+        /* --- DASHBOARD LOGIC --- */
+        function renderDashboardQueue() {
+            const body = document.getElementById('dashboard-queue-body');
+            body.innerHTML = '';
+            state.appointments.filter(a => a.status === 'Waiting' || a.status === 'In-Consult').forEach(appt => {
+                const p = state.patients.find(x => x.id === appt.patientId);
+                const row = document.createElement('tr');
+                row.onclick = () => openProfile(p.id);
+                row.innerHTML = `
+                    <td style="font-weight:600; color:var(--healthcare-teal)">${appt.token}</td>
+                    <td>${p.name}</td>
+                    <td>${p.id}</td>
+                    <td><span class="badge-status bg-${appt.priority.toLowerCase()}">${appt.priority}</span></td>
+                    <td>${appt.status === 'In-Consult' ? '---' : '15 mins'}</td>
+                    <td><button class="btn btn-outline" style="padding:4px 10px; font-size:0.7rem;" onclick="event.stopPropagation(); startConsultation('${p.id}')">Start Consult</button></td>
+                `;
+                body.appendChild(row);
+            });
+        }
+
+        function runTriage() {
+            const sym = document.getElementById('triage-symptom').value;
+            const res = document.getElementById('triage-result');
+            res.style.display = 'block';
+            if (sym === 'emergency') {
+                res.innerHTML = "EMERGENCY: Immediate medical attention required. Alerting trauma team.";
+                res.style.background = "#fce8e6"; res.style.color = "#d93025";
+            } else if (sym === 'priority') {
+                res.innerHTML = "PRIORITY: Consult Medical Officer soon (Estimated wait: 20m).";
+                res.style.background = "#fff4e5"; res.style.color = "#663c00";
+            } else if (sym === 'routine') {
+                res.innerHTML = "ROUTINE: Normal PHC visit recommended.";
+                res.style.background = "#e6f4ea"; res.style.color = "#1e8e3e";
+            } else {
+                res.style.display = 'none';
+            }
+        }
+
+        /* --- PATIENT REGISTRY --- */
+        function renderPatientTable(filtered = null) {
+            const body = document.getElementById('patients-list-body');
+            body.innerHTML = '';
+            const list = filtered || state.patients;
+            list.forEach(p => {
+                const row = document.createElement('tr');
+                row.onclick = () => openProfile(p.id);
+                row.innerHTML = `
+                    <td>${p.id}</td>
+                    <td style="font-weight:600">${p.name}</td>
+                    <td>${p.age} / ${p.gender}</td>
+                    <td><span class="badge-status bg-${p.priority.toLowerCase()}">${p.priority}</span></td>
+                    <td>${p.lastVisit}</td>
+                    <td><span style="font-size:0.8rem">12 Dec 2023</span></td>
+                    <td><button class="btn btn-outline" style="padding:4px 10px; font-size:0.7rem;">View</button></td>
+                `;
+                body.appendChild(row);
+            });
+        }
+
+        function filterPatients() {
+            const val = document.getElementById('patientFilter').value.toLowerCase();
+            const filtered = state.patients.filter(p => p.name.toLowerCase().includes(val) || p.id.toLowerCase().includes(val));
+            renderPatientTable(filtered);
+        }
+
+        /* --- PATIENT PROFILE & TIMELINE --- */
+        function openProfile(pid) {
+            const p = state.patients.find(x => x.id === pid);
+            navigateTo('profile');
+            const container = document.getElementById('profile-content');
+            container.innerHTML = `
+                <div class="profile-grid">
+                    <div class="card">
+                        <div style="text-align:center; margin-bottom:1.5rem;">
+                            <div style="width:80px; height:80px; border-radius:50%; background:var(--soft-aqua); margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:700; color:var(--primary-indigo)">${p.name.charAt(0)}</div>
+                            <h3>${p.name}</h3>
+                            <p style="color:var(--text-secondary)">ID: ${p.id}</p>
+                        </div>
+                        <div class="info-row"><span class="info-label">Age/Gender</span><span>${p.age} / ${p.gender}</span></div>
+                        <div class="info-row"><span class="info-label">Phone</span><span>${p.phone}</span></div>
+                        <div class="info-row"><span class="info-label">Medical History</span><span>${p.history}</span></div>
+                        <div class="info-row"><span class="info-label">Allergies</span><span style="color:var(--danger)">None Known</span></div>
+                        <button class="btn btn-primary" style="width:100%; margin-top:1.5rem; justify-content:center;" onclick="startConsultation('${p.id}')">Start New Consultation</button>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-bottom:1rem;">Longitudinal Health Timeline</h3>
+                        <div class="timeline">
+                            ${p.timeline.map((item, idx) => `
+                                <div class="timeline-item">
+                                    <div class="timeline-content">
+                                        <h5>${item}</h5>
+                                        <span>Step ${idx + 1} of Care Journey</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* --- CONSULTATION FLOW --- */
+        function startConsultation(pid) {
+            const p = state.patients.find(x => x.id === pid);
+            navigateTo('consultations');
+            const workspace = document.getElementById('consult-workspace');
+            workspace.innerHTML = `
+                <div class="flex-header">
+                    <div>
+                        <h3>Consultation: ${p.name}</h3>
+                        <p>History: ${p.history} | Age: ${p.age}</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="openReferralModal('${p.id}')">Create Referral</button>
+                </div>
+                <hr style="border:0; border-top:1px solid var(--border-color); margin:1rem 0;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <div class="form-group"><label>Clinical Notes</label><textarea id="consNotes" rows="6" placeholder="Enter patient complaints and physical exam notes..."></textarea></div>
+                        <div class="form-group"><label>Diagnosis</label><input type="text" id="consDiag" placeholder="Final or suspected diagnosis"></div>
+                    </div>
+                    <div>
+                        <div class="form-group"><label>Prescription (Medication / Dosage / Duration)</label><textarea id="consPresc" rows="4" placeholder="Ex: Paracetamol 500mg - 1-0-1 - 3 Days"></textarea></div>
+                        <div class="form-group"><label>Follow-up Date</label><input type="date"></div>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:1rem;">
+                    <button class="btn btn-primary" onclick="finishConsultation('${p.id}')">Complete & Save Record</button>
+                </div>
+            `;
+        }
+
+        function finishConsultation(pid) {
+            const p = state.patients.find(x => x.id === pid);
+            p.timeline.push('New Consultation Completed at PHC');
+            p.lastVisit = new Date().toISOString().split('T')[0];
+            // Update queue
+            state.appointments = state.appointments.filter(a => a.patientId !== pid);
+            alert('Consultation for ' + p.name + ' has been saved to the longitudinal record.');
+            navigateTo('dashboard');
+        }
+
+        /* --- REFERRALS --- */
+        function renderReferrals() {
+            const body = document.getElementById('referral-list-body');
+            body.innerHTML = '';
+            state.referrals.forEach(r => {
+                const p = state.patients.find(x => x.id === r.patientId);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-weight:600">${r.id}</td>
+                    <td>${p.name}</td>
+                    <td>${r.facility}</td>
+                    <td>${r.specialty}</td>
+                    <td><span class="badge-status bg-${r.urgency.toLowerCase() === 'routine' ? 'success' : 'priority'}">${r.urgency}</span></td>
+                    <td>${r.status}</td>
+                    <td>
+                        <div style="width:100px; height:8px; background:#eee; border-radius:4px; overflow:hidden;">
+                            <div style="width:${r.progress}%; height:100%; background:var(--healthcare-teal)"></div>
+                        </div>
+                    </td>
+                `;
+                body.appendChild(row);
+            });
+        }
+
+        function openReferralModal(pid = null) {
+            openModal('referralModal');
+            const select = document.getElementById('refPatientSelect');
+            select.innerHTML = '';
+            state.patients.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id; opt.innerText = p.name + ' (' + p.id + ')';
+                if (pid && p.id === pid) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        async function submitReferral() {
+            const pid = document.getElementById('refPatientSelect').value;
+            const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+            const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
+            const response = await fetch('/api/v1/referrals', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({
+                    patient_id: pid,
+                    reason: `${document.getElementById('refSpecialty').value} referral (${document.getElementById('refUrgency').value})`,
+                    receiving_facility_id: document.getElementById('refFacility').value || null,
+                    receiving_doctor_id: document.getElementById('refDoctor').value || null
+                })
+            });
+            if (!response.ok) {
+                alert('Unable to create referral for this patient.');
+                return;
+            }
+            closeModal('referralModal');
+            await init();
+            navigateTo('referrals');
+        }
+
+        /* --- TELECONSULT --- */
+        function renderTeleconsult() {
+            const list = document.getElementById('specialist-list');
+            list.innerHTML = '';
+            state.specialists.forEach(s => {
+                list.innerHTML += `
+                    <div style="padding:10px; border:1px solid var(--border-color); border-radius:var(--radius); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:600; font-size:0.85rem;">${s.name}</div>
+                            <div style="font-size:0.75rem; color:var(--text-secondary)">${s.dept} | ${s.facility}</div>
+                        </div>
+                        <button class="btn btn-outline" style="padding:4px 8px; font-size:0.65rem;" ${s.avail === 'Busy' ? 'disabled' : ''} onclick="alert('Connecting to ' + '${s.name}' + '...')">${s.avail === 'Busy' ? 'Busy' : 'Connect'}</button>
+                    </div>
+                `;
+            });
+        }
+
+        /* --- DATA TABLES (OTHER SECTIONS) --- */
+        function renderInventory() {
+            const cont = document.getElementById('inventory-content');
+            cont.innerHTML = '<p>No inventory records available.</p>';
+        }
+
+        function renderASHA() {
+            document.getElementById('asha-content').innerHTML = '<p>No ASHA tasks available.</p>';
+        }
+
+        function renderLabs() {
+            document.getElementById('labs-content').innerHTML = '<p>No lab requests available.</p>';
+        }
+
+        function renderAppointments() {
+            document.getElementById('appointments-content').innerHTML = '<table><thead><tr><th>Patient</th><th>Time</th><th>Token</th><th>Status</th></tr></thead><tbody>' + 
+                state.appointments.map(a => {
+                    const p = state.patients.find(x => x.id === a.patientId);
+                    return `<tr><td>${p.name}</td><td>${a.time}</td><td>${a.token}</td><td>${a.status}</td></tr>`;
+                }).join('') + '</tbody></table>';
+        }
+
+        function renderAnalytics() {
+            document.getElementById('analytics-content').innerHTML = '<p>No analytics data available.</p>';
+        }
+
+        /* --- UTILS --- */
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function renderNotifs() {
+            const list = document.getElementById('notif-list');
+            const count = document.getElementById('notif-count');
+            list.innerHTML = '';
+            const unreadCount = state.notifs.filter(n => n.unread).length;
+            count.innerText = unreadCount;
+            count.style.display = unreadCount > 0 ? 'block' : 'none';
+            
+            state.notifs.forEach(n => {
+                list.innerHTML += `<div class="notif-item" style="${n.unread ? 'border-left: 3px solid var(--healthcare-teal)' : ''}">
+                    <div style="font-weight:600">${n.msg}</div>
+                    <div style="font-size:0.7rem; color:var(--text-secondary)">${n.time}</div>
+                </div>`;
+            });
+        }
+
+        function toggleNotifs() {
+            const p = document.getElementById('notif-panel');
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function clearNotifs() {
+            state.notifs = [];
+            renderNotifs();
+            toggleNotifs();
+        }
+
+        function handleGlobalSearch(e) {
+            const val = e.target.value.toLowerCase();
+            if (val.length > 2) {
+                const found = state.patients.find(p => p.id.toLowerCase().includes(val) || p.name.toLowerCase().includes(val));
+                if (found && e.key === 'Enter') {
+                    openProfile(found.id);
+                    e.target.value = '';
+                }
+            }
+        }
+
+        // Handle Registration Form
+        document.getElementById('regForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+            const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
+            const response = await fetch('/api/v1/auth/register', {
+                method: 'POST', credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({
+                    full_name: document.getElementById('regName').value.trim(),
+                    phone: document.getElementById('regPhone').value.trim(),
+                    gender: document.getElementById('regGender').value,
+                    address: document.getElementById('regAddress').value.trim(),
+                    active_conditions: document.getElementById('regReason').value.trim(),
+                    village: '', district: ''
+                })
+            });
+            if (!response.ok) { alert('Unable to register patient.'); return; }
+            closeModal('regModal');
+            await init();
+            navigateTo('patients');
+        };
+
+        // Initialize App
+        window.onload = () => init().catch(error => {
+            console.error('PHC dashboard load failed:', error);
+            document.getElementById('appContent').innerHTML = '<section class="view active"><div class="card" style="padding:2rem; color:var(--danger);">Unable to load PHC data. Please try again without signing out.</div></section>';
+        });
+    </script>
+</body>
+</html>

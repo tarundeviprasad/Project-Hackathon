@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleconsultation | AarogyaConnect</title>
+    <style>
+        :root {
+            --primary-indigo: #1E2A5A;
+            --accent-teal: #0F766E;
+            --light-aqua: #CFF7F2;
+            --bg-ivory: #F8F7F4;
+            --card-white: #FFFFFF;
+            --text-navy: #172033;
+            --text-gray: #667085;
+            --border-gray: #E6E8EE;
+            --call-bg: #0F172A;
+            --radius: 12px;
+            --transition: all 0.25s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-ivory);
+            color: var(--text-navy);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- NAVBAR STYLES (FROM IMAGE 3) --- */
+        .navbar {
+            background-color: var(--card-white);
+            padding: 1rem 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .logo-box {
+            background: var(--primary-indigo);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .logo-text { color: var(--primary-indigo); font-weight: 700; font-size: 1.25rem; }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        .nav-links a.active { color: var(--accent-teal); border-bottom: 2px solid var(--accent-teal); }
+        .nav-links a:hover { color: var(--accent-teal); }
+
+        .nav-right { display: flex; align-items: center; color: var(--primary-indigo); font-weight: 600; gap: 5px; cursor: pointer; }
+
+        /* --- HERO SECTION (FROM IMAGE 3) --- */
+        .hero-section {
+            padding: 3rem 4rem 1rem 4rem;
+            background: linear-gradient(to bottom, #ffffff, var(--bg-ivory));
+        }
+        .greeting {
+            color: #5BA4A4; /* Light teal color from image */
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .main-headline {
+            font-size: 3.5rem;
+            color: var(--primary-indigo);
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.1;
+            max-width: 600px;
+        }
+
+        /* --- TELECONSULTATION CONTENT --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem 4rem; }
+
+        .page-header { margin-bottom: 2rem; border-top: 1px solid var(--border-gray); padding-top: 2rem; }
+        .page-header h1 { color: var(--primary-indigo); margin: 0; font-size: 2rem; }
+        .page-header p { color: var(--text-gray); }
+
+        .section-title { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            margin: 2rem 0 1rem; 
+            color: var(--primary-indigo);
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+
+        .urgent-badge { background: #FFEBEE; color: #C62828; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; }
+
+        /* DOCTOR CARDS */
+        .doctor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        
+        .doctor-card {
+            background: var(--card-white);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+        .doctor-card:hover { transform: translateY(-5px); border-color: var(--light-aqua); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+        .dr-header { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .dr-img { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--light-aqua); }
+        .dr-name { font-weight: 700; color: var(--primary-indigo); margin: 0; }
+        .dr-spec { font-size: 0.85rem; color: var(--accent-teal); font-weight: 600; }
+
+        .status-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-top: 5px; }
+        .status-available { background: #E8F5E9; color: #2E7D32; }
+        .status-busy { background: #FFF3E0; color: #E65100; }
+
+        /* BUTTONS */
+        .btn {
+            width: 100%; padding: 0.8rem; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; margin-top: 1rem; transition: var(--transition);
+        }
+        .btn-indigo { background: var(--primary-indigo); color: white; }
+        .btn-teal { background: var(--accent-teal); color: white; }
+        .btn-outline { background: transparent; border: 1.5px solid var(--border-gray); color: var(--text-navy); }
+        .btn-outline:hover { background: var(--bg-ivory); }
+        .btn:disabled { background: var(--border-gray); cursor: not-allowed; color: var(--text-gray); }
+
+        /* VIDEO CALL OVERLAY */
+        #video-overlay {
+            position: fixed; inset: 0; background: var(--call-bg); z-index: 9999;
+            display: none; flex-direction: column;
+        }
+        .video-content { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .doctor-view { width: 80%; height: 70%; background: #1E293B; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        
+        .call-controls {
+            height: 120px; background: rgba(15, 23, 42, 0.9);
+            display: flex; align-items: center; justify-content: center; gap: 40px;
+        }
+        .circle-btn {
+            width: 65px; height: 65px; border-radius: 50%; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: var(--transition);
+        }
+        .btn-mic { background: #3B4A81; color: white; }
+        .btn-end { background: #F84C4C; color: white; }
+        .circle-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
+
+        /* HISTORY */
+        .history-table { width: 100%; background: white; border-radius: var(--radius); border: 1px solid var(--border-gray); border-collapse: collapse; overflow: hidden; margin-top: 1rem; }
+        .history-table th { background: var(--bg-ivory); padding: 1rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; }
+        .history-table td { padding: 1rem; border-top: 1px solid var(--bg-ivory); }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo-box">+</div>
+            <div class="logo-text">AarogyaConnect</div>
+        </div>
+        <div class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Appointments</a>
+            <a href="#">Health Records</a>
+            <a href="#">Referrals</a>
+            <a href="#">Medicines</a>
+        </div>
+        <div class="nav-right">
+            <span>🌐 English</span>
+        </div>
+    </nav>
+
+    <!-- HERO HEADER SECTION -->
+    <header class="hero-section">
+        <div class="greeting">Good morning, Ram</div>
+        <h1 class="main-headline">Your healthcare,<br>connected in one place.</h1>
+    </header>
+
+    <!-- TELECONSULTATION MAIN CONTENT -->
+    <div class="container">
+        <header class="page-header">
+            <h1>Teleconsultation</h1>
+            <p>Remote healthcare consultation via secure video link.</p>
+        </header>
+
+        <!-- URGENT SECTION -->
+        <section>
+            <div class="section-title"><span class="urgent-badge">LIVE</span> Urgent Consultations</div>
+            <div class="doctor-grid" id="urgent-grid"></div>
+        </section>
+
+        <!-- MAIN DIRECTORY -->
+        <section>
+            <div class="section-title">Specialist Directory</div>
+            <div class="doctor-grid" id="main-grid"></div>
+        </section>
+
+        <!-- HISTORY -->
+        <section>
+            <div class="section-title">Previous Consultations</div>
+            <table class="history-table">
+                <thead>
+                    <tr><th>Doctor</th><th>Date</th><th>Duration</th><th>Action</th></tr>
+                </thead>
+                <tbody id="history-body">
+                    <tr>
+                        <td><strong>Dr. Rahul Sharma</strong></td>
+                        <td>Sep 06, 2024</td>
+                        <td>18 min</td>
+                        <td><button class="btn btn-outline" style="margin:0; width:auto; padding:5px 15px;">View Summary</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <!-- VIDEO CALL UI (ONLY MIC AND END CALL) -->
+    <div id="video-overlay">
+        <div class="video-content">
+            <div class="doctor-view">
+                <img src="" id="active-dr-img" style="width:120px; height:120px; border-radius:50%; margin-bottom:20px; border:4px solid var(--accent-teal);">
+                <h2 id="active-dr-name" style="margin:0">Dr. Name</h2>
+                <p id="call-status" style="color:var(--light-aqua)">Connecting to secure server...</p>
+                <div id="timer" style="font-size: 1.5rem; font-family: monospace; margin-top:10px;">00:00</div>
+            </div>
+        </div>
+        <div class="call-controls">
+            <button class="circle-btn btn-mic" onclick="toggleMic()" id="mic-btn">🎙️</button>
+            <button class="circle-btn btn-end" onclick="endCall()">📞</button>
+        </div>
+    </div>
+
+    <script>
+        const doctors = [
+            { id: 1, name: "Dr. Ananya Rao", spec: "General Physician", status: "available", urgent: true, avatar: "https://images.unsplash.com/photo-1559839734-2b71f1e3c7e5?auto=format&fit=crop&q=80&w=200" },
+            { id: 2, name: "Dr. Priya Reddy", spec: "Pediatrics", status: "available", urgent: true, avatar: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=200" },
+            { id: 3, name: "Dr. Rahul Sharma", spec: "Internal Medicine", status: "busy", urgent: false, avatar: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200" },
+            { id: 4, name: "Dr. Kiran Kumar", spec: "Cardiology", status: "offline", urgent: false, avatar: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=200" }
+        ];
+
+        function render() {
+            const uGrid = document.getElementById('urgent-grid');
+            const mGrid = document.getElementById('main-grid');
+            uGrid.innerHTML = ''; mGrid.innerHTML = '';
+
+            doctors.forEach(doc => {
+                const isBusy = doc.status === 'busy';
+                const isOffline = doc.status === 'offline';
+                
+                const card = `
+                    <div class="doctor-card">
+                        <div class="dr-header">
+                            <img src="${doc.avatar}" class="dr-img">
+                            <div>
+                                <h3 class="dr-name">${doc.name}</h3>
+                                <div class="dr-spec">${doc.spec}</div>
+                                <span class="status-badge status-${doc.status}">
+                                    ${doc.status === 'available' ? '● Available' : isBusy ? '○ Busy' : '◌ Offline'}
+                                </span>
+                            </div>
+                        </div>
+                        <button class="btn ${isBusy ? 'btn-outline' : 'btn-indigo'} ${doc.urgent ? 'btn-teal' : ''}" 
+                                onclick="handleAction(${doc.id})" 
+                                ${isOffline ? 'disabled' : ''}>
+                            ${isBusy ? 'Book an Appointment' : (doc.urgent ? 'Request Urgent Call' : 'Start Consultation')}
+                        </button>
+                    </div>
+                `;
+                if(doc.urgent && doc.status === 'available') uGrid.innerHTML += card;
+                mGrid.innerHTML += card;
+            });
+        }
+
+        function handleAction(id) {
+            const doc = doctors.find(d => d.id === id);
+            if (doc.status === 'busy') {
+                alert("Redirecting to Appointment Booking for " + doc.name);
+                return;
+            }
+            if (doc.status === 'available') {
+                triggerCall(doc);
+            }
+        }
+
+        let timerInt;
+        function triggerCall(doc) {
+            document.getElementById('video-overlay').style.display = 'flex';
+            document.getElementById('active-dr-img').src = doc.avatar;
+            document.getElementById('active-dr-name').innerText = doc.name;
+            
+            let sec = 0;
+            timerInt = setInterval(() => {
+                sec++;
+                let m = Math.floor(sec/60).toString().padStart(2, '0');
+                let s = (sec%60).toString().padStart(2, '0');
+                document.getElementById('timer').innerText = `${m}:${s}`;
+                if(sec === 3) document.getElementById('call-status').innerText = "Connected - Secure";
+            }, 1000);
+        }
+
+        function endCall() {
+            clearInterval(timerInt);
+            document.getElementById('video-overlay').style.display = 'none';
+            document.getElementById('timer').innerText = "00:00";
+            document.getElementById('call-status').innerText = "Connecting to secure server...";
+        }
+
+        let muted = false;
+        function toggleMic() {
+            muted = !muted;
+            const btn = document.getElementById('mic-btn');
+            btn.innerText = muted ? '🔇' : '🎙️';
+            btn.style.background = muted ? '#ef4444' : '#3B4A81';
+        }
+
+        render();
+    </script>
+</body>
+</html>

@@ -9,6 +9,9 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from datetime import datetime, date
 import random
 import hashlib
@@ -16,6 +19,7 @@ import hashlib
 from .models import (
     Patient, Facility, Appointment, HealthTimelineRecord, MedicineStock,
     SOSAlert, Consultation, Referral, FollowUp, DoctorProfile,
+    HospitalAdminProfile, ASHAProfile, PHCProfile,
 )
 from .serializers import (
     PatientSerializer, FacilitySerializer, AppointmentSerializer,
@@ -72,6 +76,9 @@ def _can_access_patient(request, patient):
         return True
     if request.user.role == 'PATIENT':
         return patient.user_id == request.user.id
+    if request.user.role == 'PHC':
+        profile = PHCProfile.objects.filter(user=request.user).first()
+        return bool(profile and profile.assigned_patients.filter(pk=patient.pk).exists())
     return _doctor_queryset(request).filter(pk=patient.pk).exists()
 
 
@@ -118,6 +125,15 @@ def register_patient(request):
         preferred_language=data.get('language', 'en')
     )
 
+    if getattr(request.user, 'role', None) == 'ASHA':
+        profile = ASHAProfile.objects.filter(user=request.user).first()
+        if profile:
+            profile.assigned_patients.add(patient)
+    elif getattr(request.user, 'role', None) == 'PHC':
+        profile = PHCProfile.objects.filter(user=request.user).first()
+        if profile:
+            profile.assigned_patients.add(patient)
+
     # Seed a default timeline entry for the new patient
     HealthTimelineRecord.objects.create(
         patient=patient,
@@ -126,7 +142,7 @@ def register_patient(request):
         status='Completed',
         event_date=date.today(),
         facility_name=f"PHC {patient.village or 'Primary'}",
-        doctor_name='Dr. Priya Sharma',
+        doctor_name='',
         health_issue='General Health Checkup',
         diagnosis='Baseline parameters recorded'
     )
@@ -176,6 +192,101 @@ def login_view(request):
     return Response(response, status=status.HTTP_200_OK)
 
 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def hospital_admins_api(request):
+    if request.user.role != 'ADMIN':
+        record_audit_event(request, 'PERMISSION_DENIED', user=request.user, success=False)
+        return Response({'error': 'System administrator access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'GET':
+        profiles = HospitalAdminProfile.objects.select_related('user', 'facility').order_by('-created_at')
+        return Response([
+            {
+                'id': profile.id,
+                'hospital_name': profile.facility.name,
+                'location': profile.facility.latitude,
+                'address': profile.address,
+                'admin_name': profile.admin_name,
+                'username': profile.user.username,
+                'email': profile.user.email,
+                'phone': profile.phone,
+                'is_active': profile.user.is_active,
+                'created_at': profile.created_at,
+            }
+            for profile in profiles
+        ])
+
+    data = request.data
+    username = str(data.get('username', '')).strip()
+    email = str(data.get('email', '')).strip().lower()
+    password = data.get('password', '')
+    password_confirm = data.get('password_confirm', '')
+    admin_name = str(data.get('admin_name', '')).strip()
+    hospital_name = str(data.get('hospital_name', '')).strip()
+    phone = str(data.get('phone', '')).strip()
+    address = str(data.get('address', '')).strip()
+    errors = {}
+
+    if not hospital_name:
+        errors['hospital_name'] = 'Hospital name is required.'
+    if not admin_name:
+        errors['admin_name'] = 'Administrator name is required.'
+    if not username:
+        errors['username'] = 'Username is required.'
+    elif get_user_model().objects.filter(username__iexact=username).exists():
+        errors['username'] = 'Username already exists.'
+    if not email:
+        errors['email'] = 'Email is required.'
+    else:
+        try:
+            validate_email(email)
+        except ValidationError:
+            errors['email'] = 'Enter a valid email address.'
+        if get_user_model().objects.filter(email__iexact=email).exists():
+            errors['email'] = 'Email already exists.'
+    if password != password_confirm:
+        errors['password_confirm'] = 'Passwords do not match.'
+    try:
+        validate_password(password)
+    except ValidationError as error:
+        errors['password'] = error.messages
+    if not phone:
+        errors['phone'] = 'Phone number is required.'
+    if errors:
+        return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    with transaction.atomic():
+        facility, _ = Facility.objects.get_or_create(name=hospital_name, defaults={'facility_type': 'Hospital'})
+        user = get_user_model().objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=admin_name,
+            role='HOSPITAL_ADMIN',
+        )
+        profile = HospitalAdminProfile.objects.create(
+            user=user,
+            facility=facility,
+            admin_name=admin_name,
+            phone=phone,
+            address=address,
+        )
+    record_audit_event(request, 'HOSPITAL_ADMIN_CREATED', user=request.user, target=user)
+    return Response({
+        'message': 'Hospital administrator account created successfully.',
+        'hospital_admin': {
+            'id': profile.id,
+            'hospital_name': facility.name,
+            'admin_name': profile.admin_name,
+            'username': user.username,
+            'email': user.email,
+            'phone': profile.phone,
+            'address': profile.address,
+        },
+    }, status=status.HTTP_201_CREATED)
+
+
 # 3. Patient Dashboard Snapshot
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -189,8 +300,43 @@ def get_patient_dashboard(request, patient_id):
     records_count = HealthTimelineRecord.objects.filter(patient=patient).count()
     active_referrals = HealthTimelineRecord.objects.filter(patient=patient, record_type='REFERRAL', status='Pending').count()
 
+    doctor = None
+    appointment_doctor = Appointment.objects.filter(
+        patient=patient,
+        doctor__isnull=False,
+    ).select_related('doctor', 'facility').order_by('appointment_time').first()
+    consultation_doctor = Consultation.objects.filter(
+        patient=patient,
+    ).select_related('doctor', 'facility').order_by('-created_at').first()
+    referral_doctor = Referral.objects.filter(
+        patient=patient,
+    ).select_related('receiving_doctor', 'receiving_facility', 'referring_doctor').order_by('-created_at').first()
+    if appointment_doctor:
+        doctor = appointment_doctor.doctor
+        doctor_facility = appointment_doctor.facility
+    elif consultation_doctor:
+        doctor = consultation_doctor.doctor
+        doctor_facility = consultation_doctor.facility
+    elif referral_doctor:
+        doctor = referral_doctor.receiving_doctor or referral_doctor.referring_doctor
+        doctor_facility = referral_doctor.receiving_facility or referral_doctor.referring_facility
+
+    doctor_details = None
+    if doctor:
+        doctor_profile = getattr(doctor, 'doctor_profile', None)
+        doctor_details = {
+            'name': doctor.get_full_name().strip() or doctor.username,
+            'specialty': doctor_profile.specialty if doctor_profile else 'Doctor',
+            'facility_name': doctor_facility.name if doctor_facility else (
+                doctor_profile.facility.name if doctor_profile and doctor_profile.facility else None
+            ),
+            'phone': doctor.phone if hasattr(doctor, 'phone') else '',
+            'email': doctor.email,
+        }
+
     return Response({
         'patient': PatientSerializer(patient).data,
+        'doctor': doctor_details,
         'snapshot': {
             'blood_group': patient.blood_group,
             'next_appointment': next_apt.appointment_time.strftime('%I:%M %p') if next_apt else None,
@@ -272,6 +418,17 @@ def get_doctor_worklist(request):
     referrals = referral_queryset[:50]
 
     return Response({
+        'doctor': {
+            'name': request.user.get_full_name().strip() or request.user.username,
+            'username': request.user.username,
+            'specialty': getattr(getattr(request.user, 'doctor_profile', None), 'specialty', 'Doctor'),
+        },
+        'stats': {
+            'appointments': appointment_queryset.count(),
+            'consultations': consultation_queryset.count(),
+            'patients': _doctor_queryset(request).count(),
+            'referrals': referral_queryset.count(),
+        },
         'referrals': [
             {
                 'id': referral.id,
@@ -311,13 +468,136 @@ def get_doctor_worklist(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_asha_dashboard(request):
+    if request.user.role != 'ASHA':
+        record_audit_event(request, 'PERMISSION_DENIED', user=request.user, success=False)
+        return Response({'error': 'ASHA access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    profile = ASHAProfile.objects.filter(user=request.user).prefetch_related('assigned_patients').first()
+    if not profile:
+        return Response({'error': 'ASHA profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
+
+    assigned_patients = profile.assigned_patients.all()
+    patient_ids = assigned_patients.values_list('id', flat=True)
+    return Response({
+        'worker': {
+            'name': request.user.get_full_name().strip() or request.user.username,
+            'username': request.user.username,
+            'email': request.user.email,
+            'worker_id': profile.worker_id,
+            'area': profile.area,
+        },
+        'stats': {
+            'patients_registered': assigned_patients.count(),
+            'followups_due': FollowUp.objects.filter(patient_id__in=patient_ids, status='Scheduled').count(),
+            'active_referrals': Referral.objects.filter(patient_id__in=patient_ids, status='Pending').count(),
+            'households_covered': 0,
+        },
+        'patients': PatientSerializer(assigned_patients.order_by('full_name'), many=True).data,
+        'followups': [],
+        'tasks': [],
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_phc_dashboard(request):
+    if request.user.role != 'PHC':
+        record_audit_event(request, 'PERMISSION_DENIED', user=request.user, success=False)
+        return Response({'error': 'PHC access required.'}, status=status.HTTP_403_FORBIDDEN)
+    profile = PHCProfile.objects.filter(user=request.user).select_related('facility').prefetch_related('assigned_patients').first()
+    if not profile:
+        return Response({'error': 'PHC profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
+    patients = profile.assigned_patients.all()
+    patient_ids = patients.values_list('id', flat=True)
+    appointments = Appointment.objects.filter(patient_id__in=patient_ids).order_by('appointment_time')
+    referrals = Referral.objects.filter(
+        Q(referring_phc=request.user) | Q(patient_id__in=patient_ids)
+    ).select_related('patient', 'receiving_doctor', 'receiving_facility').order_by('-created_at')
+    return Response({
+        'phc': {
+            'name': profile.facility.name,
+            'centre_id': profile.centre_id,
+            'facility_id': profile.facility_id,
+            'user_name': request.user.get_full_name().strip() or request.user.username,
+        },
+        'stats': {
+            'patients': patients.count(),
+            'appointments': appointments.filter(status='Scheduled').count(),
+            'waiting': appointments.filter(status='Scheduled').count(),
+            'active_referrals': referrals.filter(status='Pending').count(),
+        },
+        'patients': PatientSerializer(patients.order_by('full_name'), many=True).data,
+        'appointments': AppointmentSerializer(appointments[:50], many=True).data,
+        'referrals': ReferralSerializer(referrals[:50], many=True).data,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_hospital_dashboard(request):
+    if request.user.role != 'HOSPITAL_ADMIN':
+        record_audit_event(request, 'PERMISSION_DENIED', user=request.user, success=False)
+        return Response({'error': 'Hospital administrator access required.'}, status=status.HTTP_403_FORBIDDEN)
+    profile = HospitalAdminProfile.objects.filter(user=request.user).select_related('facility').first()
+    if not profile:
+        return Response({'error': 'Hospital administrator profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
+
+    facility = profile.facility
+    patients = Patient.objects.filter(
+        Q(appointments__facility=facility)
+        | Q(consultations__facility=facility)
+        | Q(referrals__referring_facility=facility)
+        | Q(referrals__receiving_facility=facility)
+    ).distinct()
+    appointments = Appointment.objects.filter(facility=facility).select_related('patient', 'doctor').order_by('appointment_time')
+    referrals = Referral.objects.filter(
+        Q(referring_facility=facility) | Q(receiving_facility=facility)
+    ).select_related('patient', 'receiving_doctor').order_by('-created_at')
+    doctors = DoctorProfile.objects.filter(facility=facility).select_related('user')
+    return Response({
+        'hospital': {
+            'name': facility.name,
+            'facility_id': facility.id,
+            'facility_type': facility.facility_type,
+            'admin_name': profile.admin_name,
+            'admin_email': profile.user.email,
+            'phone': profile.phone,
+            'address': profile.address,
+        },
+        'stats': {
+            'patients': patients.count(),
+            'doctors': doctors.count(),
+            'appointments': appointments.filter(status='Scheduled').count(),
+            'pending_referrals': referrals.filter(status='Pending').count(),
+        },
+        'patients': PatientSerializer(patients.order_by('full_name')[:100], many=True).data,
+        'appointments': AppointmentSerializer(appointments[:100], many=True).data,
+        'referrals': ReferralSerializer(referrals[:100], many=True).data,
+        'doctors': DoctorProfileSerializer(doctors, many=True).data,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def list_patients(request):
     if request.user.role == 'PATIENT':
         patients = Patient.objects.filter(user=request.user)
     elif request.user.role in {'DOCTOR', 'ADMIN'}:
         patients = _doctor_queryset(request)
+    elif request.user.role == 'PHC':
+        profile = PHCProfile.objects.filter(user=request.user).first()
+        patients = profile.assigned_patients.all() if profile else Patient.objects.none()
     else:
         return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
+    query = request.GET.get('search', '').strip()
+    if query:
+        patients = patients.filter(
+            Q(full_name__icontains=query)
+            | Q(patient_id__icontains=query)
+            | Q(phone__icontains=query)
+            | Q(email__icontains=query)
+        )
     return Response(PatientSerializer(patients, many=True).data)
 
 
@@ -326,6 +606,12 @@ def list_patients(request):
 def list_doctors(request):
     profiles = DoctorProfile.objects.select_related('user', 'facility').filter(user__is_active=True)
     return Response(DoctorProfileSerializer(profiles, many=True).data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_facilities(request):
+    return Response(FacilitySerializer(Facility.objects.order_by('name'), many=True).data)
 
 
 @api_view(['GET', 'POST'])
@@ -338,6 +624,9 @@ def appointments_api(request):
             appointments = Appointment.objects.filter(doctor=request.user)
         elif request.user.role == 'ADMIN':
             appointments = Appointment.objects.all()
+        elif request.user.role == 'PHC':
+            profile = PHCProfile.objects.filter(user=request.user).first()
+            appointments = Appointment.objects.filter(patient__in=profile.assigned_patients.all()) if profile else Appointment.objects.none()
         else:
             return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
         return Response(AppointmentSerializer(appointments, many=True).data)
@@ -455,6 +744,10 @@ def referrals_api(request, referral_id=None):
             queryset = Referral.objects.filter(patient__user=request.user)
         elif request.user.role == 'DOCTOR':
             queryset = Referral.objects.filter(Q(referring_doctor=request.user) | Q(receiving_doctor=request.user)).distinct()
+        elif request.user.role == 'PHC':
+            queryset = Referral.objects.filter(
+                Q(referring_phc=request.user) | Q(patient__phc_centres__user=request.user)
+            ).distinct()
         elif request.user.role == 'ADMIN':
             queryset = Referral.objects.all()
         else:
@@ -468,19 +761,27 @@ def referrals_api(request, referral_id=None):
 
     referral = Referral.objects.filter(id=referral_id).first() if referral_id else None
     if request.method == 'POST':
-        if request.user.role not in {'DOCTOR', 'ADMIN'}:
-            return Response({'error': 'Doctor access required.'}, status=status.HTTP_403_FORBIDDEN)
+        if request.user.role not in {'DOCTOR', 'PHC', 'ADMIN'}:
+            return Response({'error': 'Doctor or PHC access required.'}, status=status.HTTP_403_FORBIDDEN)
         patient, error = _get_patient_from_request(request, request.data.get('patient_id'))
         if error:
             return error
-        referring_doctor = request.user if request.user.role == 'DOCTOR' else get_user_model().objects.filter(
-            id=request.data.get('referring_doctor_id'), role='DOCTOR'
-        ).first()
-        if not referring_doctor:
-            return Response({'error': 'Referring doctor not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        referring_doctor = request.user if request.user.role == 'DOCTOR' else None
+        referring_phc = request.user if request.user.role == 'PHC' else None
+        if request.user.role == 'PHC':
+            profile = PHCProfile.objects.filter(user=request.user).first()
+            if not profile or not profile.assigned_patients.filter(pk=patient.pk).exists():
+                return Response({'error': 'Patient is not assigned to this PHC.'}, status=status.HTTP_403_FORBIDDEN)
+        if request.user.role == 'ADMIN':
+            referring_doctor = get_user_model().objects.filter(
+                id=request.data.get('referring_doctor_id'), role='DOCTOR'
+            ).first()
+            if not referring_doctor:
+                return Response({'error': 'Referring doctor not found.'}, status=status.HTTP_400_BAD_REQUEST)
         referral = Referral.objects.create(
             patient=patient,
             referring_doctor=referring_doctor,
+            referring_phc=referring_phc,
             receiving_doctor_id=request.data.get('receiving_doctor_id') or None,
             referring_facility_id=request.data.get('referring_facility_id') or None,
             receiving_facility_id=request.data.get('receiving_facility_id') or None,
@@ -494,7 +795,7 @@ def referrals_api(request, referral_id=None):
             status='Pending',
             event_date=timezone.localdate(),
             facility_name=referral.referring_facility.name if referral.referring_facility else 'Assigned facility',
-            doctor_name=referring_doctor.username,
+            doctor_name=(referring_doctor.username if referring_doctor else request.user.username),
             referral_reason=referral.reason,
             referral_target=referral.receiving_facility.name if referral.receiving_facility else '',
         )
@@ -503,6 +804,8 @@ def referrals_api(request, referral_id=None):
     if not referral:
         return Response({'error': 'Referral not found.'}, status=status.HTTP_404_NOT_FOUND)
     if request.user.role == 'DOCTOR' and request.user.id not in {referral.referring_doctor_id, referral.receiving_doctor_id}:
+        return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
+    if request.user.role == 'PHC' and referral.referring_phc_id != request.user.id:
         return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
     if request.method == 'PATCH':
         if request.user.role not in {'DOCTOR', 'ADMIN'}:

@@ -7,6 +7,8 @@ from django.db import IntegrityError
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.http import FileResponse
+from pathlib import Path
 from django.middleware.csrf import get_token
 from .models import User
 from .security import clear_login_failures, login_is_rate_limited, record_login_failure
@@ -46,7 +48,8 @@ def _role_login(request, role, redirect_url):
         return JsonResponse({"error": "Too many failed attempts. Try again later."}, status=429)
 
     user = authenticate_by_identifier(request, identifier, password)
-    if user is None or getattr(user, "role", None) != role:
+    allowed_roles = role if isinstance(role, (set, tuple, list)) else {role}
+    if user is None or getattr(user, "role", None) not in allowed_roles:
         record_login_failure(request, identifier)
         return JsonResponse({"error": "Invalid email/username or password."}, status=401)
 
@@ -54,7 +57,8 @@ def _role_login(request, role, redirect_url):
     login(request, user)
     from api.audit import record_audit_event
     record_audit_event(request, 'LOGIN_SUCCESS', user=user)
-    return JsonResponse({"success": True, "redirect": redirect_url})
+    destination = redirect_url.get(user.role, redirect_url) if isinstance(redirect_url, dict) else redirect_url
+    return JsonResponse({"success": True, "redirect": destination})
 
 
 @csrf_protect
@@ -68,17 +72,37 @@ def patient_login(request):
 @csrf_protect
 def doctor_login(request):
     if request.method == "POST":
-        return _role_login(request, "DOCTOR", "/doctor-dashboard.html")
+        return _role_login(request, {"DOCTOR", "PHC"}, {
+            "DOCTOR": "/doctor-dashboard.html",
+            "PHC": "/phc/dashboard/",
+        })
 
     return redirect("/doctor-login.html")
 
 
 @csrf_protect
+def asha_login(request):
+    if request.method == "POST":
+        return _role_login(request, "ASHA", "/asha/dashboard/")
+    return redirect("/Asha%20login.html")
+
+
+@csrf_protect
 def admin_login(request):
     if request.method == "POST":
-        return _role_login(request, "ADMIN", "/admin/dashboard/")
+        return _role_login(request, {"ADMIN", "HOSPITAL_ADMIN"}, {
+            "ADMIN": "/admin/dashboard/",
+            "HOSPITAL_ADMIN": "/hospital/dashboard/",
+        })
 
     return redirect("/admin-login.html")
+
+
+@csrf_protect
+def hospital_admin_login(request):
+    if request.method == "POST":
+        return _role_login(request, "HOSPITAL_ADMIN", "/hospital/dashboard/")
+    return FileResponse((Path(__file__).resolve().parent.parent / "hospital admin.html").open("rb"))
 
 
 @csrf_protect

@@ -6,7 +6,7 @@
     <title>Patient Management | AarogyaConnect</title>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --deep-indigo: #1E2A5A;
@@ -24,7 +24,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Sans Telugu', 'Noto Sans', sans-serif;
         }
 
         body {
@@ -207,7 +207,7 @@
     <!-- TOP HORIZONTAL NAVIGATION -->
     <nav>
         <div class="nav-left">
-            <a href="#" class="brand">
+            <a href="/index.html" class="brand">
                 <div class="brand-logo"></div> <!-- New Plus-Logo Reference -->
                 <span class="brand-name">AarogyaConnect</span>
             </a>
@@ -248,7 +248,7 @@
         <section class="search-area">
             <div class="search-wrapper">
                 <i data-lucide="search" size="20"></i>
-                <input type="text" placeholder="Search by Patient ID, ABHA ID, Name or Phone Number">
+                <input id="patientSearchInput" type="text" placeholder="Search by Patient ID, ABHA ID, Name or Phone Number">
             </div>
             <button class="btn-add">
                 <i data-lucide="user-plus" size="20"></i>
@@ -290,7 +290,7 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="patientResultsBody">
                         <tr class="selected">
                             <td><strong style="color: var(--deep-indigo)">Rahul Santhosh</strong></td>
                             <td>PT-88219</td>
@@ -344,6 +344,40 @@
 
     <script>
         lucide.createIcons();
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            })[character]);
+        }
+
+        async function searchPatients(query) {
+            const body = document.getElementById('patientResultsBody');
+            const response = await fetch(`/api/v1/patients?search=${encodeURIComponent(query.trim())}`, {
+                credentials: 'same-origin'
+            });
+            if (!response.ok) {
+                body.innerHTML = '<tr><td colspan="6">Unable to load patient records.</td></tr>';
+                return;
+            }
+            const patients = await response.json();
+            body.innerHTML = patients.length ? patients.map(patient => `
+                <tr>
+                    <td><strong style="color: var(--deep-indigo)">${escapeHtml(patient.full_name)}</strong></td>
+                    <td>${escapeHtml(patient.patient_id)}</td>
+                    <td>Not available</td>
+                    <td>${escapeHtml(patient.gender)}</td>
+                    <td>Not available</td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>`).join('') : '<tr><td colspan="6">No patients found.</td></tr>';
+        }
+
+        document.getElementById('patientSearchInput').addEventListener('keydown', event => {
+            if (event.key === 'Enter') searchPatients(event.target.value).catch(() => {});
+        });
+        document.getElementById('patientSearchInput').addEventListener('input', event => {
+            if (!event.target.value.trim()) searchPatients('').catch(() => {});
+        });
     </script>
 </body>
 </html>

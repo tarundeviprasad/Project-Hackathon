@@ -428,7 +428,6 @@
 
     <!-- TOP BRAND HEADER -->
     <header class="top-header">
-        <a href="#" class="brand">
         <a href="/index.html" class="brand">
             <div class="brand-logo">
                 <i data-lucide="plus" stroke-width="3"></i>
@@ -439,11 +438,10 @@
             </div>
         </a>
         <div class="header-actions">
-            <button class="header-btn">
+            <button class="header-btn" type="button">
                 <i data-lucide="globe" size="16"></i>
                 English
             </button>
-            <a href="#" class="header-btn">
             <a href="/index.html" class="header-btn">
                 <i data-lucide="arrow-left" size="16"></i>
                 Back to Home
@@ -555,19 +553,29 @@
             lucide.createIcons();
         });
 
-        // Simple Submission UI Feedback
         const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
             const btn = loginForm.querySelector('.login-btn');
             const originalContent = btn.innerHTML;
             btn.innerHTML = 'Verifying...';
-            btn.style.opacity = '0.7';
-            setTimeout(() => {
-                alert('Authentication Verified.');
+            btn.disabled = true;
+            try {
+                const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+                const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
+                const response = await fetch('/hospital-admin/login/', {
+                    method: 'POST', credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrfToken },
+                    body: new URLSearchParams({ username: document.getElementById('adminId').value, password: document.getElementById('password').value })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.error || 'Invalid credentials.');
+                window.location.href = result.redirect || '/hospital admin.html';
+            } catch (error) {
+                alert(error.message);
                 btn.innerHTML = originalContent;
-                btn.style.opacity = '1';
-            }, 1000);
+                btn.disabled = false;
+            }
         });
     </script>
 </body>

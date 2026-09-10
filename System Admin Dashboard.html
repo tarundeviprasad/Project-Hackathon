@@ -425,6 +425,17 @@
             margin-top: 24px;
         }
 
+        .form-error {
+            display: none;
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #B42318;
+            background: #FEF3F2;
+            border: 1px solid #FECDCA;
+            font-size: 14px;
+        }
+
         .secure-creds-box {
             background: var(--white);
             border: 1px dashed var(--accent);
@@ -641,24 +652,30 @@
 
     <!-- --- TOP NAVIGATION --- -->
     <nav class="top-nav">
-        <div class="nav-left">
+        <a class="nav-left" href="/index.html" aria-label="AarogyaConnect home" style="text-decoration: none;">
             <svg class="logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M24 2C26.2 15.8 31.9 21.6 46 24C31.9 26.4 26.2 32.2 24 46C21.8 32.2 16.1 26.4 2 24C16.1 21.6 21.8 15.8 24 2Z" fill="currentColor"/>
                 <circle cx="24" cy="24" r="4" fill="#0F766E"/>
             </svg>
             <span class="brand-name">AarogyaConnect</span>
-        </div>
+        </a>
 
         <div class="nav-center">
-            <a onclick="switchView('dashboard')" class="nav-link active">Dashboard</a>
-            <a onclick="switchView('hospitals')" class="nav-link">Hospitals</a>
-            <a onclick="switchView('doctors')" class="nav-link">Doctors</a>
-            <a onclick="switchView('admins')" class="nav-link">Hospital Admins</a>
+            <a onclick="switchView('dashboard')" class="nav-link active" data-i18n="Dashboard">Dashboard</a>
+            <a onclick="switchView('hospitals')" class="nav-link" data-i18n="Hospitals">Hospitals</a>
+            <a onclick="switchView('doctors')" class="nav-link" data-i18n="Doctors">Doctors</a>
+            <a onclick="switchView('admins')" class="nav-link" data-i18n="Hospital Admins">Hospital Admins</a>
             <a onclick="switchView('credentials')" class="nav-link">Credentials</a>
             <a onclick="switchView('reports')" class="nav-link">Reports</a>
         </div>
 
         <div class="nav-right">
+            <select id="languageSelector" aria-label="Select language" onchange="updateLanguage(this.value)" style="border: 1px solid var(--border); border-radius: 10px; padding: 8px; font-family: inherit;">
+                <option value="en">English</option>
+                <option value="hi">हिन्दी</option>
+                <option value="te">తెలుగు</option>
+                <option value="mr">मराठी</option>
+            </select>
             <div class="status-pill">
                 <div class="status-dot"></div>
                 System Online
@@ -673,8 +690,8 @@
         
         <header class="dashboard-header">
             <div>
-                <span class="eyebrow">System Administration</span>
-                <h1 class="page-title">AarogyaConnect System Overview</h1>
+                <span class="eyebrow" data-i18n="System Administration">System Administration</span>
+                <h1 class="page-title" data-i18n="AarogyaConnect System Overview">AarogyaConnect System Overview</h1>
                 <p style="color: var(--text-sec); margin-top: 4px;">Monitor hospitals, doctors, and network administrators.</p>
             </div>
             <div class="btn-group">
@@ -682,7 +699,7 @@
                     <span>+</span> Add Hospital
                 </button>
                 <button class="btn btn-primary" onclick="scrollToElement('adminAccess')">
-                    Create Hospital Admin
+                    <span data-i18n="Create Hospital Admin">Create Hospital Admin</span>
                 </button>
             </div>
         </header>
@@ -762,6 +779,14 @@
                             <label>Email Address</label>
                             <input type="email" placeholder="admin@hospital.com" required id="adminEmail">
                         </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" placeholder="Hospital administrator phone" required id="adminPhone">
+                        </div>
+                        <div class="form-group">
+                            <label>Hospital Address</label>
+                            <input type="text" placeholder="City or hospital address" id="adminAddress">
+                        </div>
                         
                         <!-- SURGICAL CHANGE: PASSWORD FIELD -->
                         <div class="form-group">
@@ -793,6 +818,8 @@
                         </div>
                         <!-- END SURGICAL CHANGE -->
                     </div>
+
+                    <div class="form-error" id="adminError" role="alert"></div>
 
                     <div style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
                         <input type="checkbox" id="requireChange">
@@ -1098,21 +1125,50 @@
         }
 
         // --- Admin Creation ---
-        function handleAdminCreation(e) {
+        async function handleAdminCreation(e) {
             e.preventDefault();
             const pass = document.getElementById('adminPass').value;
             const confirm = document.getElementById('adminConfirm').value;
+            const errorBox = document.getElementById('adminError');
+            errorBox.style.display = 'none';
             
             if(pass !== confirm) {
-                alert("Passwords do not match!");
+                errorBox.textContent = 'Passwords do not match.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+            const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
+            const response = await fetch('/api/v1/admin/hospital-admins', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({
+                    hospital_name: document.getElementById('hospSelect').value,
+                    admin_name: document.getElementById('adminName').value,
+                    username: document.getElementById('adminUser').value,
+                    email: document.getElementById('adminEmail').value,
+                    phone: document.getElementById('adminPhone').value,
+                    address: document.getElementById('adminAddress').value,
+                    password: pass,
+                    password_confirm: confirm
+                })
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                const errors = result.errors || { form: result.error || 'Unable to create the account.' };
+                errorBox.textContent = Object.values(errors).flat().join(' ');
+                errorBox.style.display = 'block';
                 return;
             }
 
             document.getElementById('adminForm').style.display = 'none';
             document.getElementById('adminSuccess').style.display = 'block';
             
-            document.getElementById('resHosp').innerText = document.getElementById('hospSelect').value;
-            document.getElementById('resUser').innerText = document.getElementById('adminUser').value;
+            document.getElementById('resHosp').innerText = result.hospital_admin.hospital_name;
+            document.getElementById('resUser').innerText = result.hospital_admin.username;
+            loadHospitalAdmins();
             
             showToast("Admin account created successfully");
         }
@@ -1122,6 +1178,7 @@
             document.getElementById('adminSuccess').style.display = 'none';
             document.getElementById('adminForm').reset();
             document.getElementById('passStrength').style.width = '0%';
+            document.getElementById('adminError').style.display = 'none';
         }
 
         function copyCreds() {
@@ -1157,6 +1214,42 @@
                 row.style.display = text.includes(val.toLowerCase()) ? '' : 'none';
             });
         }
+
+        async function loadHospitalAdmins() {
+            const response = await fetch('/api/v1/admin/hospital-admins', { credentials: 'same-origin' });
+            if (!response.ok) return;
+            const admins = await response.json();
+            const rows = admins.map(admin => `<tr>
+                <td><div class="hospital-cell">🏥 ${admin.hospital_name}</div></td>
+                <td>${admin.address || 'Not provided'}</td>
+                <td>—</td>
+                <td>${admin.username}</td>
+                <td><span class="badge badge-success">${admin.is_active ? 'Active' : 'Inactive'}</span></td>
+                <td>${new Date(admin.created_at).toLocaleDateString()}</td>
+                <td><div class="action-btns"><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View</button></div></td>
+            </tr>`).join('');
+            if (rows) document.getElementById('hospitalTableBody').insertAdjacentHTML('afterbegin', rows);
+        }
+
+        const translations = {
+            en: { 'System Administration': 'System Administration', 'AarogyaConnect System Overview': 'AarogyaConnect System Overview', Dashboard: 'Dashboard', Hospitals: 'Hospitals', Doctors: 'Doctors', 'Hospital Admins': 'Hospital Admins', 'Create Hospital Admin': 'Create Hospital Admin' },
+            hi: { 'System Administration': 'सिस्टम प्रशासन', 'AarogyaConnect System Overview': 'आरोग्यकनेक्ट सिस्टम अवलोकन', Dashboard: 'डैशबोर्ड', Hospitals: 'अस्पताल', Doctors: 'डॉक्टर', 'Hospital Admins': 'अस्पताल प्रशासक', 'Create Hospital Admin': 'अस्पताल प्रशासक बनाएं' },
+            te: { 'System Administration': 'సిస్టమ్ పరిపాలన', 'AarogyaConnect System Overview': 'ఆరోగ్యకనెక్ట్ సిస్టమ్ అవలోకనం', Dashboard: 'డ్యాష్‌బోర్డ్', Hospitals: 'ఆసుపత్రులు', Doctors: 'వైద్యులు', 'Hospital Admins': 'ఆసుపత్రి నిర్వాహకులు', 'Create Hospital Admin': 'ఆసుపత్రి నిర్వాహకుడిని సృష్టించండి' },
+            mr: { 'System Administration': 'सिस्टम प्रशासन', 'AarogyaConnect System Overview': 'आरोग्यकनेक्ट सिस्टम आढावा', Dashboard: 'डॅशबोर्ड', Hospitals: 'रुग्णालये', Doctors: 'डॉक्टर', 'Hospital Admins': 'रुग्णालय प्रशासक', 'Create Hospital Admin': 'रुग्णालय प्रशासक तयार करा' }
+        };
+
+        function updateLanguage(lang) {
+            const dictionary = translations[lang] || translations.en;
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                element.textContent = dictionary[element.dataset.i18n] || element.dataset.i18n;
+            });
+            document.documentElement.lang = lang;
+            localStorage.setItem('selectedLanguage', lang);
+            document.getElementById('languageSelector').value = lang;
+        }
+
+        updateLanguage(localStorage.getItem('selectedLanguage') || 'en');
+        loadHospitalAdmins();
 
         // Close modal on escape
         document.addEventListener('keydown', (e) => {

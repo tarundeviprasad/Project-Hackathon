@@ -284,12 +284,31 @@
             .illustration-box { display: none; }
             .asha-title { font-size: 56px; }
         }
+
+        @media (max-width: 640px) {
+            header {
+                width: calc(100vw - 32px);
+                margin-top: 16px;
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .header-controls {
+                width: 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+
+            .btn-header {
+                padding: 9px 12px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="#" class="brand-logo">
         <a href="/index.html" class="brand-logo">
             <div class="logo-box"><i data-lucide="plus" stroke-width="3" size="20"></i></div>
             <div class="logo-text">
@@ -299,7 +318,6 @@
         </a>
         <div class="header-controls">
             <button class="btn-header"><i data-lucide="globe" size="16"></i> English</button>
-            <a href="#" class="btn-header"><i data-lucide="arrow-left" size="16"></i> Back to Home</a>
             <a href="/index.html" class="btn-header"><i data-lucide="arrow-left" size="16"></i> Back to Home</a>
         </div>
     </header>
@@ -388,21 +406,37 @@
             lucide.createIcons();
         });
 
-        // Demo Login Logic
-        document.getElementById('ashaLoginForm').addEventListener('submit', (e) => {
+        document.getElementById('ashaLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
             btn.innerHTML = 'Signing in...';
             btn.disabled = true;
             btn.style.opacity = '0.7';
-
-            setTimeout(() => {
-                alert("Successful demonstration of ASHA Portal Login.");
+            try {
+                const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+                const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
+                const response = await fetch('/asha/login/', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: new URLSearchParams({
+                        username: document.getElementById('ashaId').value.trim(),
+                        password: document.getElementById('password').value
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Unable to sign in.');
+                window.location.assign(result.redirect);
+            } catch (error) {
+                window.alert(error.message);
                 btn.innerHTML = 'Login <i data-lucide="arrow-right" size="18"></i>';
                 btn.disabled = false;
                 btn.style.opacity = '1';
                 lucide.createIcons();
-            }, 1000);
+            }
         });
 
         function handleHelp() {

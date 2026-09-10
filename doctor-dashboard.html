@@ -6,7 +6,7 @@
     <title>AarogyaConnect | Doctor Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -39,7 +39,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Noto Sans Telugu', 'Noto Sans', sans-serif;
         }
 
         body {
@@ -564,7 +564,8 @@
             <h2 class="modal-title">New Appointment</h2>
             <div class="form-group">
                 <label>Patient Name</label>
-                <input type="text" placeholder="Search patient database...">
+                <input id="appointmentPatientSearch" list="appointmentPatientOptions" type="text" placeholder="Search patient database...">
+                <datalist id="appointmentPatientOptions"></datalist>
             </div>
             <div class="form-group">
                 <label>Appointment Type</label>
@@ -585,36 +586,41 @@
     <!-- HEADER -->
     <header>
         <div class="container header-content">
-            <a href="#" class="logo-area">
+            <a href="/index.html" class="logo-area">
                 <div class="logo-mark"><i data-lucide="plus" size="18"></i></div>
                 <span class="logo-text">AarogyaConnect</span>
             </a>
 
             <nav class="desktop-nav">
-                <a href="#" class="nav-item active">Overview</a>
-                <a href="#" class="nav-item">Appointments</a>
-                <a href="#" class="nav-item">Consultations</a>
-                <a href="#" class="nav-item">Patients</a>
-                <a href="#" class="nav-item">e-Prescriptions</a>
-                <a href="#" class="nav-item">Lab Reports</a>
-                <a href="#" class="nav-item">Referrals</a>
+                <a href="/doctor-dashboard.html" class="nav-item active">Overview</a>
+                <a href="/Appointment.html" class="nav-item">Appointments</a>
+                <a href="/Consultation.html" class="nav-item">Consultations</a>
+                <a href="/patient%20management%20doctor.html" class="nav-item">Patients</a>
+                <a href="/Consultation.html" class="nav-item">e-Prescriptions</a>
+                <a href="/digital_health_record.html" class="nav-item">Lab Reports</a>
+                <a href="/referral_doctor.html" class="nav-item">Referrals</a>
             </nav>
 
             <div class="header-actions">
                 <button class="icon-btn mobile-toggle"><i data-lucide="menu"></i></button>
                 <button class="icon-btn desktop-only"><i data-lucide="search"></i></button>
-                <button class="icon-btn" style="position: relative;">
+                <a class="icon-btn" href="/referral_doctor.html" aria-label="Notifications" style="position: relative;">
                     <i data-lucide="bell"></i>
                     <span style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #EF4444; border-radius: 50%; border: 2px solid white;"></span>
-                </button>
-                <div class="profile-trigger">
+                </a>
+                <a class="profile-trigger" href="/Consultation.html" aria-label="Doctor profile">
                     <div class="avatar">AS</div>
                     <div class="profile-info desktop-only">
+<<<<<<< HEAD
                         <span class="name">Dr. Kranthi Prabha</span>
                         <span class="role">General Physician</span>
+=======
+                        <span id="doctorDisplayName" class="name">Loading...</span>
+                        <span id="doctorDisplayRole" class="role">Doctor</span>
+>>>>>>> f174809 (final)
                     </div>
                     <i data-lucide="chevron-down" size="14" color="#667085"></i>
-                </div>
+                </a>
             </div>
         </div>
     </header>
@@ -624,7 +630,11 @@
         <section class="hero-section">
             <div class="welcome-card">
                 <div class="welcome-text">
+<<<<<<< HEAD
                     <h1>Good morning, Dr. Kranthi Prabha</h1>
+=======
+                    <h1 id="doctorGreeting">Good morning</h1>
+>>>>>>> f174809 (final)
                     <p>Here's what's happening at your facility today.</p>
                 </div>
                 <div class="hero-visual">
@@ -645,30 +655,30 @@
         <section class="overview-stats">
             <div class="stat-card">
                 <div class="stat-icon-wrapper" style="background: #EEF2FF; color: #4338CA;"><i data-lucide="calendar"></i></div>
-                <div class="stat-content"><h3>24</h3><p>Appointments Today</p></div>
+                <div class="stat-content"><h3 id="doctorAppointmentsCount">0</h3><p>Appointments Today</p></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon-wrapper" style="background: var(--soft-aqua); color: var(--rich-teal);"><i data-lucide="activity"></i></div>
-                <div class="stat-content"><h3>04</h3><p>Active Consultations</p></div>
+                <div class="stat-content"><h3 id="doctorConsultationsCount">0</h3><p>Active Consultations</p></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon-wrapper" style="background: #FFF4E5; color: #B45309;"><i data-lucide="users"></i></div>
-                <div class="stat-content"><h3>02</h3><p>Patients in Queue</p></div>
+                <div class="stat-content"><h3 id="doctorPatientsCount">0</h3><p>Patients in Queue</p></div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon-wrapper" style="background: #FCE7F3; color: #BE185D;"><i data-lucide="file-text"></i></div>
-                <div class="stat-content"><h3>06</h3><p>Prescriptions Today</p></div>
+                <div class="stat-content"><h3 id="doctorReferralsCount">0</h3><p>Pending Referrals</p></div>
             </div>
         </section>
 
         <!-- QUICK ACTIONS -->
         <div class="quick-actions-bar">
             <button class="btn btn-indigo" onclick="openModal('apptModal')"><i data-lucide="plus" size="18"></i> New Appointment</button>
-            <button class="btn btn-teal"><i data-lucide="play" size="18"></i> Start Consultation</button>
-            <button class="btn btn-outline"><i data-lucide="list" size="18"></i> View Queue</button>
-            <button class="btn btn-outline"><i data-lucide="file-plus" size="18"></i> Add Prescription</button>
-            <button class="btn btn-outline"><i data-lucide="clipboard" size="18"></i> View Lab Reports</button>
-            <button class="btn btn-outline"><i data-lucide="arrow-up-right" size="18"></i> Create Referral</button>
+            <a class="btn btn-teal" href="/Consultation.html"><i data-lucide="play" size="18"></i> Start Consultation</a>
+            <a class="btn btn-outline" href="/Appointment.html"><i data-lucide="list" size="18"></i> View Queue</a>
+            <a class="btn btn-outline" href="/Consultation.html"><i data-lucide="file-plus" size="18"></i> Add Prescription</a>
+            <a class="btn btn-outline" href="/digital_health_record.html"><i data-lucide="clipboard" size="18"></i> View Lab Reports</a>
+            <a class="btn btn-outline" href="/referral_doctor.html"><i data-lucide="arrow-up-right" size="18"></i> Create Referral</a>
         </div>
 
         <!-- MAIN DASHBOARD -->
@@ -677,7 +687,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Appointments for Today</h3>
-                    <a href="#" class="card-link">View all →</a>
+                    <a href="/Appointment.html" class="card-link">View all →</a>
                 </div>
                 <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
                     <div>
@@ -695,37 +705,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="appt-list">
-                    <div class="appt-row">
-                        <div class="appt-info">
-                            <span class="appt-time">09:30 AM</span>
-                            <div>
-                                <p class="patient-name">Ramesh Kumar</p>
-                                <p class="visit-type">General Consultation</p>
-                            </div>
-                        </div>
-                        <span class="badge badge-waiting">Waiting</span>
-                    </div>
-                    <div class="appt-row">
-                        <div class="appt-info">
-                            <span class="appt-time">10:00 AM</span>
-                            <div>
-                                <p class="patient-name">Sunita Devi</p>
-                                <p class="visit-type">Follow-up</p>
-                            </div>
-                        </div>
-                        <span class="badge badge-confirmed">Confirmed</span>
-                    </div>
-                    <div class="appt-row">
-                        <div class="appt-info">
-                            <span class="appt-time">10:30 AM</span>
-                            <div>
-                                <p class="patient-name">Anjali Rao</p>
-                                <p class="visit-type">General Consultation</p>
-                            </div>
-                        </div>
-                        <span class="badge badge-completed">Completed</span>
-                    </div>
+                <div id="doctorAppointmentsList" class="appt-list">
+                    <p>No appointments scheduled.</p>
                 </div>
             </div>
 
@@ -733,44 +714,19 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Consultations</h3>
-                    <a href="#" class="card-link">History →</a>
+                    <a href="/Consultation.html" class="card-link">History →</a>
                 </div>
                 <div style="background: var(--bg-ivory); border-radius: 16px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
                     <p style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px;">CURRENTLY ACTIVE</p>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 1.5rem;">
-                        <div class="avatar" style="width: 48px; height: 48px;">AR</div>
-                        <div style="text-align: left;">
-                            <p style="font-weight: 800; font-size: 1rem;">Anjali Rao (#03)</p>
-                            <p style="font-size: 0.8rem; color: var(--rich-teal);">In Progress (12:04 min)</p>
-                        </div>
-                    </div>
-                    <button class="btn btn-teal" style="width: 100%; justify-content: center;">Continue Consultation</button>
+                    <div id="activeConsultation" style="margin-bottom: 1.5rem;">No active consultation.</div>
+                    <a class="btn btn-teal" href="/Consultation.html" style="width: 100%; justify-content: center;">Continue Consultation</a>
                 </div>
                 
                 <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--text-secondary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
                     <i data-lucide="radio" size="14" color="red"></i> TELECONSULTATION QUEUE
                 </h4>
-                <div class="queue-item">
-                    <div class="queue-patient">
-                        <div class="q-number">01</div>
-                        <div>
-                            <p style="font-weight: 700; font-size: 0.9rem;">Ravi Kumar</p>
-                            <p style="font-size: 0.75rem; color: var(--text-secondary);">General Consultation</p>
-                        </div>
-                    </div>
-                    <span style="font-weight: 700; font-size: 0.75rem; color: var(--rich-teal);">Waiting 08 min</span>
-                </div>
-                <div class="queue-item">
-                    <div class="queue-patient">
-                        <div class="q-number">02</div>
-                        <div>
-                            <p style="font-weight: 700; font-size: 0.9rem;">Meena Devi</p>
-                            <p style="font-size: 0.75rem; color: var(--text-secondary);">Routine Follow-up</p>
-                        </div>
-                    </div>
-                    <span style="font-weight: 700; font-size: 0.75rem; color: var(--text-secondary);">Waiting 14 min</span>
-                </div>
-                <a href="#" class="card-link" style="display: block; text-align: center; margin-top: 1rem;">View Full Queue →</a>
+                <div id="doctorQueueList"><p>No patients in queue.</p></div>
+                <a href="/Appointment.html" class="card-link" style="display: block; text-align: center; margin-top: 1rem;">View Full Queue →</a>
             </div>
         </div>
 
@@ -780,7 +736,7 @@
                 <h3 class="card-title">Recent Patient Activity</h3>
                 <div style="display: flex; gap: 1rem;">
                     <div style="position: relative;">
-                        <input type="text" placeholder="Search patients..." style="padding: 8px 12px 8px 35px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.85rem;">
+                        <input id="doctorPatientSearch" type="text" placeholder="Search patients..." style="padding: 8px 12px 8px 35px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.85rem;">
                         <i data-lucide="search" size="14" style="position: absolute; left: 12px; top: 10px; color: var(--text-secondary);"></i>
                     </div>
                 </div>
@@ -797,40 +753,7 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td style="font-weight: 700;">Ravi Kumar</td>
-                            <td>General Consultation</td>
-                            <td>Medicine</td>
-                            <td><span class="badge badge-completed">Completed</span></td>
-                            <td>10:30 AM</td>
-                            <td><a href="#" style="color: var(--rich-teal); font-weight: 700;">View</a></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Meena Devi</td>
-                            <td>Follow-up</td>
-                            <td>General Medicine</td>
-                            <td><span class="badge badge-waiting">Waiting</span></td>
-                            <td>10:45 AM</td>
-                            <td><a href="#" style="color: var(--rich-teal); font-weight: 700;">View</a></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Anjali Rao</td>
-                            <td>General Consultation</td>
-                            <td>Medicine</td>
-                            <td><span class="badge badge-confirmed">Confirmed</span></td>
-                            <td>11:00 AM</td>
-                            <td><a href="#" style="color: var(--rich-teal); font-weight: 700;">View</a></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Suresh Patel</td>
-                            <td>Routine Checkup</td>
-                            <td>General Medicine</td>
-                            <td><span class="badge badge-pending">Pending</span></td>
-                            <td>11:15 AM</td>
-                            <td><a href="#" style="color: var(--rich-teal); font-weight: 700;">View</a></td>
-                        </tr>
-                    </tbody>
+                    <tbody id="doctorPatientResults"><tr><td colspan="6">No patient activity available.</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -838,37 +761,37 @@
         <!-- CLINICAL TOOLS -->
         <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-indigo); margin-bottom: 2rem; text-align: center;">Clinical Tools</h2>
         <div class="clinical-tools-grid">
-            <a href="#" class="tool-card">
+            <a href="/patient%20management%20doctor.html" class="tool-card">
                 <div class="tool-icon"><i data-lucide="users"></i></div>
                 <h4>Patient Management</h4>
                 <p>View patient profiles, medical history and digital health records.</p>
                 <div class="tool-cta">Manage Patients <i data-lucide="arrow-right" size="14"></i></div>
             </a>
-            <a href="#" class="tool-card">
+            <a href="/Appointment.html" class="tool-card">
                 <div class="tool-icon"><i data-lucide="calendar"></i></div>
                 <h4>Appointments</h4>
                 <p>Manage today's schedule and upcoming facility visits.</p>
                 <div class="tool-cta">View Appointments <i data-lucide="arrow-right" size="14"></i></div>
             </a>
-            <a href="#" class="tool-card">
+            <a href="/Consultation.html" class="tool-card">
                 <div class="tool-icon"><i data-lucide="stethoscope"></i></div>
                 <h4>Consultations</h4>
                 <p>Start and manage patient consultations and clinical notes.</p>
                 <div class="tool-cta">Open Consultations <i data-lucide="arrow-right" size="14"></i></div>
             </a>
-            <a href="#" class="tool-card">
+            <a href="/Consultation.html" class="tool-card">
                 <div class="tool-icon"><i data-lucide="file-edit"></i></div>
                 <h4>e-Prescriptions</h4>
                 <p>Create and manage digital prescriptions for your patients.</p>
                 <div class="tool-cta">Open Prescriptions <i data-lucide="arrow-right" size="14"></i></div>
             </a>
-            <a href="#" class="tool-card">
+            <a href="/digital_health_record.html" class="tool-card">
                 <div class="tool-icon"><i data-lucide="clipboard-list"></i></div>
                 <h4>Lab Reports</h4>
                 <p>Review patient laboratory reports and diagnostic results.</p>
                 <div class="tool-cta">View Lab Reports <i data-lucide="arrow-right" size="14"></i></div>
             </a>
-            <a href="#" class="tool-card">
+            <a href="/referral_doctor.html" class="tool-card">
                 <div class="tool-icon"><i data-lucide="git-branch"></i></div>
                 <h4>Referral Management</h4>
                 <p>Track and manage patient referrals across the network.</p>
@@ -881,7 +804,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Recent Lab Reports</h3>
-                    <a href="#" class="card-link">View all reports →</a>
+                    <a href="/digital_health_record.html" class="card-link">View all reports →</a>
                 </div>
                 <div class="table-container">
                     <table>
@@ -908,7 +831,7 @@
                     <div class="flow-step"><div class="flow-dot">3</div><span class="flow-label">Accepted</span></div>
                     <div class="flow-step"><div class="flow-dot">4</div><span class="flow-label">Done</span></div>
                 </div>
-                <button class="btn btn-outline" style="width: 100%; justify-content: center; margin-top: 2rem;">Manage Referrals →</button>
+                <a class="btn btn-outline" href="/referral_doctor.html" style="width: 100%; justify-content: center; margin-top: 2rem;">Manage Referrals →</a>
             </div>
         </div>
     </main>
@@ -975,15 +898,75 @@
             });
         });
 
-        // Basic Search feedback
-        const searchInput = document.querySelector('input[type="text"]');
-        if(searchInput) {
-            searchInput.addEventListener('keypress', function(e) {
-                if(e.key === 'Enter') {
-                    alert('Searching for: ' + this.value);
-                }
-            });
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            })[character]);
         }
+
+        async function searchDoctorPatients(query) {
+            const response = await fetch(`/api/v1/patients?search=${encodeURIComponent(query.trim())}`, {
+                credentials: 'same-origin'
+            });
+            const body = document.getElementById('doctorPatientResults');
+            if (!response.ok) {
+                body.innerHTML = '<tr><td colspan="6">Unable to load patient records.</td></tr>';
+                return;
+            }
+            const patients = await response.json();
+            body.innerHTML = patients.length ? patients.map(patient => `
+                <tr>
+                    <td style="font-weight: 700;">${escapeHtml(patient.full_name)}</td>
+                    <td>Patient</td>
+                    <td>${escapeHtml(patient.district || 'Not available')}</td>
+                    <td><span class="badge badge-pending">Available</span></td>
+                    <td>--</td>
+                    <td><a href="/patient%20management%20doctor.html" style="color: var(--rich-teal); font-weight: 700;">View</a></td>
+                </tr>`).join('') : '<tr><td colspan="6">No patients found.</td></tr>';
+        }
+
+        document.getElementById('doctorPatientSearch').addEventListener('keydown', event => {
+            if (event.key === 'Enter') searchDoctorPatients(event.target.value).catch(() => {});
+        });
+
+        document.getElementById('appointmentPatientSearch').addEventListener('input', event => {
+            const query = event.target.value.trim();
+            if (query.length < 2) return;
+            fetch(`/api/v1/patients?search=${encodeURIComponent(query)}`, { credentials: 'same-origin' })
+                .then(response => response.ok ? response.json() : [])
+                .then(patients => {
+                    document.getElementById('appointmentPatientOptions').innerHTML = patients.map(patient =>
+                        `<option value="${escapeHtml(patient.full_name)} (${escapeHtml(patient.patient_id)})"></option>`).join('');
+                })
+                .catch(() => {});
+        });
+
+        async function loadDoctorDashboard() {
+            const response = await fetch('/api/v1/doctor/worklist', { credentials: 'same-origin' });
+            if (!response.ok) return;
+            const data = await response.json();
+            document.getElementById('doctorDisplayName').textContent = data.doctor.name;
+            document.getElementById('doctorDisplayRole').textContent = data.doctor.specialty;
+            document.getElementById('doctorGreeting').textContent = `Good morning, ${data.doctor.name}`;
+            document.getElementById('doctorAppointmentsCount').textContent = data.stats.appointments;
+            document.getElementById('doctorConsultationsCount').textContent = data.stats.consultations;
+            document.getElementById('doctorPatientsCount').textContent = data.stats.patients;
+            document.getElementById('doctorReferralsCount').textContent = data.stats.referrals;
+            const appointmentList = document.getElementById('doctorAppointmentsList');
+            appointmentList.innerHTML = data.appointments.length ? data.appointments.map(appointment => `
+                <div class="appt-row">
+                    <div class="appt-info"><span class="appt-time">${new Date(appointment.appointment_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span><div><p class="patient-name">${appointment.patient_name}</p><p class="visit-type">Appointment</p></div></div>
+                    <span class="badge badge-confirmed">${appointment.status}</span>
+                </div>`).join('') : '<p>No appointments scheduled.</p>';
+            document.getElementById('doctorQueueList').innerHTML = data.appointments.length
+                ? data.appointments.map((appointment, index) => `<div class="queue-item"><div class="queue-patient"><div class="q-number">${String(index + 1).padStart(2, '0')}</div><div><p style="font-weight:700;font-size:.9rem;">${appointment.patient_name}</p><p style="font-size:.75rem;color:var(--text-secondary);">Appointment</p></div></div><span style="font-weight:700;font-size:.75rem;color:var(--rich-teal);">${appointment.status}</span></div>`).join('')
+                : '<p>No patients in queue.</p>';
+            document.getElementById('doctorPatientResults').innerHTML = data.appointments.length
+                ? data.appointments.map(appointment => `<tr><td style="font-weight:700;">${appointment.patient_name}</td><td>Appointment</td><td>${appointment.doctor_name || data.doctor.specialty}</td><td><span class="badge badge-confirmed">${appointment.status}</span></td><td>${new Date(appointment.appointment_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td><td><a href="/patient%20management%20doctor.html" style="color:var(--rich-teal);font-weight:700;">View</a></td></tr>`).join('')
+                : '<tr><td colspan="6">No patient activity available.</td></tr>';
+        }
+
+        loadDoctorDashboard().catch(() => {});
     </script>
 </body>
 </html>

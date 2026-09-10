@@ -12,6 +12,7 @@ class AuditLog(models.Model):
         ('PATIENT_UPDATED', 'Patient record updated'),
         ('PATIENT_DELETED', 'Patient record deleted'),
         ('DOCTOR_CREATED', 'Doctor account created'),
+        ('HOSPITAL_ADMIN_CREATED', 'Hospital admin account created'),
         ('UNAUTHORIZED_ACCESS', 'Unauthorized access attempt'),
         ('PERMISSION_DENIED', 'Permission denied'),
     ]
@@ -103,6 +104,55 @@ class DoctorProfile(models.Model):
         return f'{self.user.username} - {self.specialty}'
 
 
+class ASHAProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='asha_profile',
+        limit_choices_to={'role': 'ASHA'},
+    )
+    worker_id = models.CharField(max_length=40, unique=True)
+    area = models.CharField(max_length=200, blank=True, default='')
+    assigned_patients = models.ManyToManyField(Patient, blank=True, related_name='asha_workers')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.worker_id} - {self.user.username}'
+
+
+class PHCProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='phc_profile',
+        limit_choices_to={'role': 'PHC'},
+    )
+    facility = models.ForeignKey(Facility, on_delete=models.PROTECT, related_name='phc_profiles')
+    centre_id = models.CharField(max_length=40, unique=True)
+    assigned_patients = models.ManyToManyField(Patient, blank=True, related_name='phc_centres')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.centre_id} - {self.facility.name}'
+
+
+class HospitalAdminProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='hospital_admin_profile',
+        limit_choices_to={'role': 'HOSPITAL_ADMIN'},
+    )
+    facility = models.ForeignKey(Facility, on_delete=models.PROTECT, related_name='hospital_admins')
+    admin_name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=20)
+    address = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.admin_name} - {self.facility.name}'
+
+
 class Appointment(models.Model):
     STATUS_CHOICES = [
         ('Scheduled', 'Scheduled'),
@@ -179,8 +229,18 @@ class Referral(models.Model):
     referring_doctor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name='sent_referrals',
         limit_choices_to={'role': 'DOCTOR'},
+    )
+    referring_phc = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='phc_referrals',
+        limit_choices_to={'role': 'PHC'},
     )
     receiving_doctor = models.ForeignKey(
         settings.AUTH_USER_MODEL,

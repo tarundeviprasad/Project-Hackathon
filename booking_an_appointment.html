@@ -424,7 +424,7 @@
 
     <!-- Navigation -->
     <nav>
-        <a href="patient_portal.html" class="logo">
+        <a href="/index.html" class="logo">
             <div class="logo-mark"><i data-lucide="plus" size="18"></i></div>
             AarogyaConnect
         </a>
@@ -561,7 +561,7 @@
             <main>
                 <div class="results-header">
                     <span><span id="resCount">24</span> <span data-i18n="docFound">doctors found</span></span>
-                    <select class="lang-select" style="font-size: 0.85rem;">
+                    <select class="lang-select" onchange="changeLanguage(this.value)" style="font-size: 0.85rem;">
                         <option data-i18n="sortRec">Sort by: Recommended</option>
                         <option data-i18n="sortExp">Experience</option>
                         <option data-i18n="sortRate">Rating</option>

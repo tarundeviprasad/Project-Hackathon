@@ -7,7 +7,7 @@
     <!-- Font: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -35,7 +35,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Noto Sans Telugu', 'Noto Sans', sans-serif;
         }
 
         body {
@@ -658,18 +658,18 @@
 
     <!-- TOP HEADER -->
     <header class="top-nav">
-        <a href="#" class="brand">
+        <a href="/doctor-dashboard.html" class="brand">
             <!-- BRAND LOGO UPDATED FROM UPLOADED REFERENCE -->
             <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTg0IiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMTg0IDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0PSIzMiIgaGVpZ2h0PSIzMiIgeD0iOCIgeT0iOCIgcng9IjgiIGZpbGw9IiMwRjc2NkUiLz4KPHBhdGggZD0iTTIxIDhWMjRNMTMgMTZIMjkiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjx0ZXh0IHg9IjUyIiB5PSIzMSIgZmlsbD0iIzFFMkE1QSIgc3R5bGU9ImZvbnQ6IDgwMCAyNHB4ICdQbHVzIEpha2FydGEgU2FucycsIHNhbnMtc2VyaWYiPkFhcm9neWE8dHNwYW4gZmlsbD0iIzBGNzY2RSI+Q29ubmVjdDwvdHNwYW4+PC90ZXh0Pgo8L3N2Zz4=" alt="AarogyaConnect Logo">
         </a>
 
         <nav class="nav-links">
-            <a href="#" class="nav-item"><i data-lucide="layout-dashboard" size="18"></i>Dashboard</a>
-            <a href="#" class="nav-item"><i data-lucide="calendar" size="18"></i>Appointments</a>
-            <a href="#" class="nav-item"><i data-lucide="list" size="18"></i>Queue</a>
-            <a href="#" class="nav-item"><i data-lucide="users" size="18"></i>Patients</a>
-            <a href="#" class="nav-item active"><i data-lucide="stethoscope" size="18"></i>Consultation</a>
-            <a href="#" class="nav-item"><i data-lucide="settings" size="18"></i>Settings</a>
+            <a href="/doctor-dashboard.html" class="nav-item"><i data-lucide="layout-dashboard" size="18"></i>Dashboard</a>
+            <a href="/Appointment.html" class="nav-item"><i data-lucide="calendar" size="18"></i>Appointments</a>
+            <a href="/Appointment.html" class="nav-item"><i data-lucide="list" size="18"></i>Queue</a>
+            <a href="/patient%20management%20doctor.html" class="nav-item"><i data-lucide="users" size="18"></i>Patients</a>
+            <a href="/Consultation.html" class="nav-item active"><i data-lucide="stethoscope" size="18"></i>Consultation</a>
+            <a href="/doctor-dashboard.html" class="nav-item"><i data-lucide="settings" size="18"></i>Settings</a>
         </nav>
 
         <div class="user-profile">
@@ -907,7 +907,8 @@
                     </div>
                     <div class="vital-input" style="margin-bottom: 12px;">
                         <label>Specialist / Facility</label>
-                        <input type="text" placeholder="Search specialist...">
+                        <input id="specialistSearch" list="specialistOptions" type="text" placeholder="Search specialist...">
+                        <datalist id="specialistOptions"></datalist>
                     </div>
                     <button class="btn-add-inline">
                         <i data-lucide="plus" size="14"></i> Add Referral
@@ -963,6 +964,14 @@
         // Init Lucide
         lucide.createIcons();
 
+        fetch('/api/v1/doctors', { credentials: 'same-origin' })
+            .then(response => response.ok ? response.json() : [])
+            .then(doctors => {
+                document.getElementById('specialistOptions').innerHTML = doctors.map(doctor =>
+                    `<option value="${doctor.name} - ${doctor.specialty}"></option>`).join('');
+            })
+            .catch(() => {});
+
         // Save Draft Interaction
         function saveDraft() {
             const toast = document.getElementById('toast');
@@ -1014,7 +1023,6 @@
             document.getElementById('modalOverlay').style.display = 'none';
         }
 
-        function finalizeConsult() {
         async function finalizeConsult() {
             const patientId = new URLSearchParams(window.location.search).get('patient_id');
             if (!patientId) {
@@ -1023,10 +1031,12 @@
                 return;
             }
             const textareas = Array.from(document.querySelectorAll('textarea'));
+            const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+            const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
             const response = await fetch('/api/v1/consultations', {
                 method: 'POST',
                 credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
                 body: JSON.stringify({
                     patient_id: patientId,
                     symptoms: textareas[0]?.value || '',

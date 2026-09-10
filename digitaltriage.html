@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Triage | AarogyaConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* AarogyaConnect Palette */
+            --primary: #1E2A5A;      /* Deep Indigo */
+            --accent: #0F766E;       /* Rich Teal */
+            --highlight: #CFF7F2;    /* Soft Aqua */
+            --bg: #F8F7F4;           /* Soft Ivory */
+            --white: #FFFFFF;        /* Pure White */
+            --text-main: #172033;    /* Charcoal Navy */
+            --text-sec: #667085;     /* Slate Gray */
+            --border: #E6E8EE;       /* Soft Gray */
+            
+            /* Triage Priority Colors */
+            --emergency: #DC2626;    /* Red */
+            --medium: #EA580C;       /* Orange */
+            --low: #16A34A;          /* Green */
+            
+            --radius: 16px;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .triage-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header & Progress */
+        .triage-header { padding: 24px 32px; border-bottom: 1px solid var(--border); background: var(--white); }
+        .brand-label { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .logo-box { background: var(--accent); width: 28px; height: 28px; border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
+        .brand-name { font-size: 1rem; font-weight: 700; color: var(--primary); }
+        .progress-container { height: 6px; background: var(--bg); border-radius: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--accent); width: 20%; transition: width 0.4s ease; }
+
+        /* Body Content */
+        .triage-body { padding: 40px 32px; min-height: 420px; }
+        .step-view { display: none; animation: slideIn 0.3s ease-out; }
+        .step-view.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; line-height: 1.3; }
+        p.subtitle { color: var(--text-sec); margin-bottom: 24px; font-size: 0.95rem; }
+
+        /* Inputs & Options */
+        input[type="text"] {
+            width: 100%; padding: 18px; border: 2px solid var(--border); border-radius: 12px;
+            font-size: 1rem; transition: var(--transition); outline: none; margin-top: 8px;
+        }
+        input[type="text"]:focus { border-color: var(--accent); background: var(--highlight); }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .option-card {
+            border: 1px solid var(--border); padding: 16px; border-radius: 12px; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; gap: 12px; font-weight: 500;
+        }
+        .option-card:hover { border-color: var(--accent); background: var(--highlight); }
+        .option-card.selected { border-color: var(--accent); background: var(--accent); color: white; }
+
+        /* Footer Buttons */
+        .triage-footer { padding: 24px 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .btn { padding: 12px 28px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; transition: var(--transition); display: flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:disabled { background: var(--border); cursor: not-allowed; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sec); }
+        
+        /* Loader */
+        .loader-box { text-align: center; padding-top: 50px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid var(--highlight); border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Results */
+        .priority-banner { padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .bg-emergency { background: #FEE2E2; color: var(--emergency); border: 1px solid var(--emergency); }
+        .bg-medium { background: #FFEDD5; color: var(--medium); border: 1px solid var(--medium); }
+        .bg-low { background: #DCFCE7; color: var(--low); border: 1px solid var(--low); }
+        
+        .result-details { background: var(--bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .detail-item { margin-bottom: 12px; font-size: 0.9rem; }
+        .detail-item strong { color: var(--primary); display: block; margin-bottom: 2px; }
+
+        .disclaimer { font-size: 0.75rem; color: var(--text-sec); text-align: center; padding: 12px; background: #f1f1f1; border-radius: 8px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="triage-container">
+    <!-- Header -->
+    <div class="triage-header">
+        <div class="brand-label">
+            <div class="logo-box">A</div>
+            <span class="brand-name">AarogyaConnect Digital Triage</span>
+        </div>
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Triage Body -->
+    <div class="triage-body">
+        
+        <!-- Step 1: Main Symptom -->
+        <div id="step1" class="step-view active">
+            <h2>What symptom are you experiencing?</h2>
+            <p class="subtitle">Please describe your main health concern in a few words.</p>
+            <input type="text" id="mainSymptom" placeholder="e.g., fever, chest pain, headache, cough...">
+        </div>
+
+        <!-- Step 2: Duration -->
+        <div id="step2" class="step-view">
+            <h2>How long have you been experiencing this?</h2>
+            <p class="subtitle">Select the duration that best matches your situation.</p>
+            <div class="options-grid" id="durationOptions">
+                <div class="option-card" data-val="Less than 1 day">Less than 1 day</div>
+                <div class="option-card" data-val="1–2 days">1–2 days</div>
+                <div class="option-card" data-val="3–7 days">3–7 days</div>
+                <div class="option-card" data-val="More than 1 week">More than 1 week</div>
+                <div class="option-card" data-val="More than 1 month">More than 1 month</div>
+            </div>
+        </div>
+
+        <!-- Step 3: Additional Symptoms -->
+        <div id="step3" class="step-view">
+            <h2>Any other symptoms?</h2>
+            <p class="subtitle">Select all that apply to help us understand better.</p>
+            <div class="options-grid" id="otherSymptoms">
+                <div class="option-card multi" data-val="Fever">Fever</div>
+                <div class="option-card multi" data-val="Difficulty breathing">Difficulty breathing</div>
+                <div class="option-card multi" data-val="Chest pain">Chest pain</div>
+                <div class="option-card multi" data-val="Dizziness">Dizziness</div>
+                <div class="option-card multi" data-val="Vomiting/Diarrhea">Vomiting/Diarrhea</div>
+                <div class="option-card multi" data-val="Severe headache">Severe headache</div>
+                <div class="option-card multi" data-val="Loss of consciousness">Loss of consciousness</div>
+                <div class="option-card multi" data-val="None of these">None of these</div>
+            </div>
+        </div>
+
+        <!-- Step 4: Follow-up Questions -->
+        <div id="step4" class="step-view">
+            <h2 id="followUpTitle">A few more details...</h2>
+            <p class="subtitle">These specific questions help refine the priority level.</p>
+            <div class="options-grid" id="followUpQuestions">
+                <!-- Dynamically Inserted -->
+            </div>
+        </div>
+
+        <!-- Step 5: Loading -->
+        <div id="step5" class="step-view">
+            <div class="loader-box">
+                <div class="spinner"></div>
+                <h2>Assessing your symptoms...</h2>
+                <p>Analyzing inputs against public healthcare triage protocols.</p>
+            </div>
+        </div>
+
+        <!-- Step 6: Result -->
+        <div id="step6" class="step-view">
+            <div id="priorityBanner" class="priority-banner"></div>
+            <h2 id="resultTitle">Triage Result</h2>
+            <p id="resultDesc" style="margin-bottom: 20px;"></p>
+            
+            <div class="result-details">
+                <div class="detail-item"><strong>Reported Symptoms:</strong> <span id="resSymptom"></span></div>
+                <div class="detail-item"><strong>Duration:</strong> <span id="resDuration"></span></div>
+                <div class="detail-item"><strong>Other Signs:</strong> <span id="resOthers"></span></div>
+            </div>
+
+            <div id="resultActions" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Dynamically Inserted Buttons -->
+            </div>
+            
+            <div class="disclaimer">
+                This assessment is for preliminary triage only and does not replace professional medical advice.
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="triage-footer" id="triageFooter">
+        <button class="btn btn-outline" id="prevBtn" onclick="changeStep(-1)" style="visibility: hidden;">Back</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Continue</button>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    const totalSteps = 6;
+    
+    // Data Storage
+    const triageData = {
+        mainSymptom: "",
+        duration: "",
+        others: [],
+        followUps: []
+    };
+
+    // --- Interaction Logic ---
+
+    // Duration selection (Single)
+    document.querySelectorAll('#durationOptions .option-card').forEach(card => {
+        card.onclick = function() {
+            document.querySelectorAll('#durationOptions .option-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            triageData.duration = this.dataset.val;
+        };
+    });
+
+    // Other symptoms selection (Multi)
+    document.querySelectorAll('#otherSymptoms .option-card').forEach(card => {
+        card.onclick = function() {
+            if(this.dataset.val === "None of these") {
+                document.querySelectorAll('#otherSymptoms .option-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            } else {
+                document.querySelector('[data-val="None of these"]').classList.remove('selected');
+                this.classList.toggle('selected');
+            }
+            
+            triageData.others = Array.from(document.querySelectorAll('#otherSymptoms .option-card.selected'))
+                                    .map(c => c.dataset.val);
+        };
+    });
+
+    // --- Navigation ---
+
+    function changeStep(dir) {
+        // Validation before moving forward
+        if (dir === 1) {
+            if (currentStep === 1 && !document.getElementById('mainSymptom').value.trim()) return alert("Please enter your symptom.");
+            if (currentStep === 2 && !triageData.duration) return alert("Please select a duration.");
+            if (currentStep === 3 && triageData.others.length === 0) return alert("Please select an option.");
+            
+            if (currentStep === 1) triageData.mainSymptom = document.getElementById('mainSymptom').value;
+        }
+
+        // Logic for branching to Follow-up questions (Step 4)
+        if (currentStep === 3 && dir === 1) {
+            generateFollowUps();
+        }
+
+        // Logic for triggering Assessment (Step 5)
+        if (currentStep === 4 && dir === 1) {
+            startAssessment();
+            return;
+        }
+
+        updateStepUI(currentStep + dir);
+    }
+
+    function updateStepUI(step) {
+        document.querySelectorAll('.step-view').forEach(v => v.classList.remove('active'));
+        currentStep = step;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+
+        // Update Progress
+        document.getElementById('progressBar').style.width = (currentStep / totalSteps * 100) + "%";
+
+        // Update Footer Buttons
+        document.getElementById('prevBtn').style.visibility = (currentStep > 1 && currentStep < 5) ? 'visible' : 'hidden';
+        
+        if (currentStep === 6) {
+            document.getElementById('triageFooter').style.display = 'none';
+        }
+    }
+
+    // --- Follow-up Generation (Step 4) ---
+
+    function generateFollowUps() {
+        const container = document.getElementById('followUpQuestions');
+        container.innerHTML = "";
+        const combinedText = (triageData.mainSymptom + triageData.others.join(" ")).toLowerCase();
+        
+        let questions = [];
+
+        if (combinedText.includes("chest pain") || combinedText.includes("heart")) {
+            questions.push("Is the pain sharp or crushing?", "Does the pain radiate to your arm or jaw?", "Are you feeling faint?");
+        } else if (combinedText.includes("breathing") || combinedText.includes("breath")) {
+            questions.push("Are you struggling to speak in full sentences?", "Did this start suddenly?", "Is there a whistling sound (wheezing)?");
+        } else if (combinedText.includes("fever")) {
+            questions.push("Is your temperature above 103°F (39.4°C)?", "Do you have a severe stiff neck?", "Are you experiencing confusion?");
+        } else {
+            questions.push("Are your symptoms getting rapidly worse?", "Are you able to perform daily activities?");
+        }
+
+        questions.forEach(q => {
+            const div = document.createElement('div');
+            div.className = "option-card follow-q";
+            div.innerText = q;
+            div.onclick = function() { this.classList.toggle('selected'); };
+            container.appendChild(div);
+        });
+    }
+
+    // --- Assessment & Triage Logic (Step 5 & 6) ---
+
+    function startAssessment() {
+        updateStepUI(5);
+        
+        // Collect follow-up answers
+        triageData.followUps = Array.from(document.querySelectorAll('.follow-q.selected')).map(el => el.innerText);
+
+        setTimeout(() => {
+            performTriageLogic();
+            updateStepUI(6);
+        }, 2000);
+    }
+
+    function performTriageLogic() {
+        const main = triageData.mainSymptom.toLowerCase();
+        const others = triageData.others.map(s => s.toLowerCase());
+        const combined = main + " " + others.join(" ");
+        const followCount = triageData.followUps.length;
+
+        let priority = "LOW"; // Default
+        let reason = "";
+
+        // 1. EMERGENCY RULES
+        if (combined.includes("chest pain") || combined.includes("breathing") || combined.includes("unconscious") || 
+            others.includes("difficulty breathing") || others.includes("loss of consciousness") || 
+            triageData.followUps.some(f => f.includes("crushing") || f.includes("speak in full sentences") || f.includes("confusion"))) {
+            priority = "EMERGENCY";
+            reason = "Your responses indicate critical warning signs that require immediate medical intervention.";
+        } 
+        // 2. MEDIUM RULES
+        else if (followCount > 0 || triageData.duration.includes("week") || others.includes("fever") || others.includes("vomiting")) {
+            priority = "MEDIUM";
+            reason = "Your symptoms are significant and require a professional evaluation soon to prevent worsening.";
+        } 
+        // 3. LOW RULES
+        else {
+            priority = "LOW";
+            reason = "Your symptoms currently appear stable. However, home monitoring is essential.";
+        }
+
+        displayResult(priority, reason);
+    }
+
+    function displayResult(priority, reason) {
+        const banner = document.getElementById('priorityBanner');
+        const actions = document.getElementById('resultActions');
+        
+        banner.className = "priority-banner";
+        actions.innerHTML = "";
+
+        if (priority === "EMERGENCY") {
+            banner.innerText = "🔴 EMERGENCY";
+            banner.classList.add("bg-emergency");
+            document.getElementById('resultDesc').innerText = reason;
+            
+            actions.innerHTML = `
+                <button class="btn btn-primary" style="background:#DC2626" onclick="location.reload()">Find Nearest Emergency Care</button>
+                <button class="btn btn-outline" onclick="alert('Calling 102/108 Emergency Services...')">Call Ambulance (108)</button>
+            `;
+        } else if (priority === "MEDIUM") {
+            banner.innerText = "🟠 MEDIUM PRIORITY";
+            banner.classList.add("bg-medium");
+            document.getElementById('resultDesc').innerText = reason;
+
+            actions.innerHTML = `
+                <button class="btn btn-primary" onclick="alert('Opening Booking Interface...')">Book PHC Appointment</button>
+                <button class="btn btn-outline" onclick="alert('Redirecting to Tele-consultation...')">Start Tele-Consultation</button>
+            `;
+        } else {
+            banner.innerText = "🟢 LOW PRIORITY";
+            banner.classList.add("bg-low");
+            document.getElementById('resultDesc').innerText = reason;
+
+            actions.innerHTML = `
+                <button class="btn btn-primary" onclick="location.reload()">Return to Dashboard</button>
+                <button class="btn btn-outline" onclick="alert('Self-care guide opened.')">View Self-Care Advice</button>
+            `;
+        }
+
+        // Summary Details
+        document.getElementById('resSymptom').innerText = triageData.mainSymptom;
+        document.getElementById('resDuration').innerText = triageData.duration;
+        document.getElementById('resOthers').innerText = triageData.others.join(", ");
+    }
+</script>
+
+</body>
+</html>

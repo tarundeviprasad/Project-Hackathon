@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
-from .models import AuditLog, Appointment, Consultation, FollowUp, Patient, Referral
+from .models import ASHAProfile, AuditLog, Appointment, Consultation, DoctorProfile, Facility, FollowUp, HospitalAdminProfile, Patient, PHCProfile, Referral
 
 
 User = get_user_model()
@@ -51,6 +51,91 @@ class HealthcareSecurityTests(TestCase):
 		self.client.force_authenticate(self.patient_user)
 		response = self.client.get(f'/api/v1/patient/{self.patient.patient_id}/records')
 		self.assertEqual(response.status_code, 200)
+
+	def test_patient_search_only_returns_matching_owned_patient(self):
+		self.client.force_authenticate(self.patient_user)
+		response = self.client.get('/api/v1/patients?search=Patient%20One')
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual([item['patient_id'] for item in response.data], [self.patient.patient_id])
+
+	def test_asha_login_redirects_to_asha_dashboard_and_is_not_doctor(self):
+		asha = User.objects.create_user(username='asha-test', password='StrongPass123!', role='ASHA')
+		response = self.client.post('/asha/login/', {'username': 'asha-test', 'password': 'StrongPass123!'})
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.json()['redirect'], '/asha/dashboard/')
+		self.client.force_login(asha)
+		self.assertEqual(self.client.get('/asha/dashboard/').status_code, 200)
+		self.assertEqual(self.client.get('/doctor-dashboard.html').status_code, 403)
+
+	def test_asha_dashboard_returns_database_backed_empty_state(self):
+		asha = User.objects.create_user(
+			username='asha-dashboard', email='asha-dashboard@example.com',
+			password='StrongPass123!', first_name='Asha Worker', role='ASHA',
+		)
+		ASHAProfile.objects.create(user=asha, worker_id='ASHA-TEST-001')
+		self.client.force_login(asha)
+		response = self.client.get('/api/v1/asha/me/dashboard')
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.data['worker']['name'], 'Asha Worker')
+		self.assertEqual(response.data['stats']['patients_registered'], 0)
+		self.assertEqual(response.data['patients'], [])
+
+	def test_non_asha_cannot_read_asha_dashboard_api(self):
+		self.client.force_authenticate(self.patient_user)
+		response = self.client.get('/api/v1/asha/me/dashboard')
+		self.assertEqual(response.status_code, 403)
+
+	def test_asha_patient_registration_assigns_patient_to_worker(self):
+		asha = User.objects.create_user(username='asha-register', password='StrongPass123!', role='ASHA')
+		profile = ASHAProfile.objects.create(user=asha, worker_id='ASHA-TEST-002')
+		self.client.force_authenticate(asha)
+		response = self.client.post('/api/v1/auth/register', {
+			'full_name': 'Assigned Patient', 'phone': '9000000099',
+			'village': 'Village', 'district': 'District',
+		}, format='json')
+		self.assertEqual(response.status_code, 201)
+		self.assertTrue(profile.assigned_patients.filter(full_name='Assigned Patient').exists())
+
+	def test_common_login_routes_phc_to_protected_phc_dashboard(self):
+		phc = User.objects.create_user(username='phc-test', password='StrongPass123!', role='PHC')
+		facility = Facility.objects.create(name='Test PHC', facility_type='PHC')
+		PHCProfile.objects.create(user=phc, facility=facility, centre_id='PHC-TEST-001')
+		response = self.client.post('/doctor/login/', {'username': 'phc-test', 'password': 'StrongPass123!'})
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.json()['redirect'], '/phc/dashboard/')
+		self.assertEqual(self.client.get('/phc/dashboard/').status_code, 200)
+		self.assertEqual(self.client.get('/doctor-dashboard.html').status_code, 403)
+
+	def test_phc_dashboard_api_returns_empty_database_state(self):
+		phc = User.objects.create_user(username='phc-empty', password='StrongPass123!', role='PHC')
+		facility = Facility.objects.create(name='Empty PHC', facility_type='PHC')
+		PHCProfile.objects.create(user=phc, facility=facility, centre_id='PHC-EMPTY-001')
+		self.client.force_login(phc)
+		response = self.client.get('/api/v1/phc/me/dashboard')
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.data['stats']['appointments'], 0)
+		self.assertEqual(response.data['appointments'], [])
+
+	def test_phc_referral_is_visible_to_assigned_doctor_and_status_is_shared(self):
+		phc = User.objects.create_user(username='phc-referrals', password='StrongPass123!', role='PHC')
+		facility = Facility.objects.create(name='Referral PHC', facility_type='PHC')
+		profile = PHCProfile.objects.create(user=phc, facility=facility, centre_id='PHC-TEST-002')
+		profile.assigned_patients.add(self.patient)
+		self.client.force_authenticate(phc)
+		created = self.client.post('/api/v1/referrals', {
+			'patient_id': self.patient.patient_id,
+			'receiving_doctor_id': self.doctor.id,
+			'receiving_facility_id': facility.id,
+			'reason': 'Specialist review required',
+		}, format='json')
+		self.assertEqual(created.status_code, 201)
+		referral_id = created.data['id']
+		self.client.force_authenticate(self.doctor)
+		self.assertTrue(any(item['id'] == referral_id for item in self.client.get('/api/v1/referrals').data))
+		updated = self.client.patch(f'/api/v1/referrals/{referral_id}', {'status': 'Accepted'}, format='json')
+		self.assertEqual(updated.status_code, 200)
+		self.client.force_authenticate(phc)
+		self.assertEqual(self.client.get(f'/api/v1/referrals/{referral_id}').data['status'], 'Accepted')
 
 	def test_api_login_creates_session_for_protected_api(self):
 		response = self.client.post('/api/v1/auth/login', {
@@ -103,6 +188,79 @@ class HealthcareSecurityTests(TestCase):
 		self.assertEqual(response.status_code, 302)
 		self.assertTrue(User.objects.filter(username='new-doctor', role='DOCTOR').exists())
 		self.assertTrue(AuditLog.objects.filter(action='DOCTOR_CREATED', user=self.admin).exists())
+
+	def test_admin_can_create_hospital_admin_with_hashed_password(self):
+		self.client.force_authenticate(self.admin)
+		response = self.client.post('/api/v1/admin/hospital-admins', {
+			'hospital_name': 'CityCare Hospital',
+			'admin_name': 'Anita Rao',
+			'username': 'citycare-admin',
+			'email': 'anita@citycare.example',
+			'phone': '9000000010',
+			'address': 'Hyderabad',
+			'password': 'StrongPass123!',
+			'password_confirm': 'StrongPass123!',
+		}, format='json')
+		self.assertEqual(response.status_code, 201)
+		user = User.objects.get(username='citycare-admin')
+		self.assertEqual(user.role, 'HOSPITAL_ADMIN')
+		self.assertTrue(user.check_password('StrongPass123!'))
+		self.assertNotEqual(user.password, 'StrongPass123!')
+		self.assertTrue(HospitalAdminProfile.objects.filter(user=user, admin_name='Anita Rao').exists())
+
+	def test_hospital_admin_creation_rejects_duplicates_and_mismatched_passwords(self):
+		self.client.force_authenticate(self.admin)
+		payload = {
+			'hospital_name': 'CityCare Hospital', 'admin_name': 'Anita Rao',
+			'username': 'citycare-admin', 'email': 'anita@citycare.example',
+			'phone': '9000000010', 'password': 'StrongPass123!',
+			'password_confirm': 'StrongPass123!',
+		}
+		self.assertEqual(self.client.post('/api/v1/admin/hospital-admins', payload, format='json').status_code, 201)
+		payload['email'] = 'another@citycare.example'
+		payload['password_confirm'] = 'different-password'
+		response = self.client.post('/api/v1/admin/hospital-admins', payload, format='json')
+		self.assertEqual(response.status_code, 400)
+		self.assertIn('username', response.data['errors'])
+		self.assertIn('password_confirm', response.data['errors'])
+
+	def test_hospital_admin_can_login_but_cannot_access_system_admin(self):
+		user = User.objects.create_user(
+			username='hospital-admin', email='hospital@example.com',
+			password='StrongPass123!', role='HOSPITAL_ADMIN',
+		)
+		self.client.force_login(user)
+		self.assertEqual(self.client.get('/System Admin Dashboard.html').status_code, 403)
+		self.client.logout()
+		response = self.client.post('/admin/login/', {
+			'username': 'hospital-admin', 'password': 'StrongPass123!',
+		})
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.json()['redirect'], '/hospital/dashboard/')
+
+	def test_hospital_admin_dashboard_is_database_backed_and_role_protected(self):
+		facility = Facility.objects.create(name='Dashboard Hospital', facility_type='Hospital')
+		hospital_admin = User.objects.create_user(
+			username='dashboard-hospital-admin', password='StrongPass123!', role='HOSPITAL_ADMIN'
+		)
+		HospitalAdminProfile.objects.create(
+			user=hospital_admin, facility=facility, admin_name='Dashboard Admin', phone='9000000099'
+		)
+		self.client.force_login(hospital_admin)
+		response = self.client.get('/api/v1/hospital/me/dashboard')
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.data['hospital']['name'], 'Dashboard Hospital')
+		self.assertEqual(response.data['stats']['patients'], 0)
+		self.client.force_authenticate(self.patient_user)
+		self.assertEqual(self.client.get('/api/v1/hospital/me/dashboard').status_code, 403)
+
+	def test_hospital_admin_login_page_is_public_and_dashboard_redirects_to_it(self):
+		login_page = self.client.get('/hospital-admin/login/')
+		self.assertEqual(login_page.status_code, 200)
+		self.assertContains(login_page, 'Hospital Login ID')
+		response = self.client.get('/hospital admin.html')
+		self.assertEqual(response.status_code, 302)
+		self.assertTrue(response.url.startswith('/hospital-admin/login/'))
 
 	def test_failed_login_attempts_are_throttled(self):
 		for _ in range(5):

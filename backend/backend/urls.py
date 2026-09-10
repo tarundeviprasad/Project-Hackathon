@@ -3,7 +3,18 @@ from pathlib import Path
 from django.contrib import admin
 from django.http import FileResponse, Http404
 from django.urls import include, path
-from auth.dashboard import admin_dashboard, doctor_dashboard, doctor_referrals, patient_dashboard
+from auth.dashboard import (
+    admin_dashboard,
+    asha_dashboard,
+    doctor_appointments,
+    doctor_consultation,
+    doctor_dashboard,
+    doctor_patients,
+    doctor_referrals,
+    patient_dashboard,
+    phc_dashboard,
+    hospital_admin_dashboard,
+)
 
 ROOT_HTML_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -23,13 +34,16 @@ urlpatterns = [
     path('admin-login.html', lambda request: serve_html(request, 'admin-login.html')),
     path('patient_portal.html', patient_dashboard, name='patient_dashboard_page'),
     path('doctor-dashboard.html', doctor_dashboard, name='doctor_dashboard_page'),
-    path('Appointment.html', lambda request: serve_html(request, 'Appointment.html')),
-    path('Consultation.html', lambda request: serve_html(request, 'Consultation.html')),
-    path('patient management doctor.html', lambda request: serve_html(request, 'patient management doctor.html')),
+    path('Appointment.html', doctor_appointments, name='doctor_appointments_page'),
+    path('Consultation.html', doctor_consultation, name='doctor_consultation_page'),
+    path('patient management doctor.html', doctor_patients, name='doctor_patients_page'),
     path('referral_doctor.html', doctor_referrals, name='doctor_referrals_page'),
     path('Asha login.html', lambda request: serve_html(request, 'Asha login.html')),
+    path('asha/dashboard/', asha_dashboard, name='asha_dashboard_page'),
+    path('phc/dashboard/', phc_dashboard, name='phc_dashboard_page'),
     path('System Admin Dashboard.html', admin_dashboard, name='admin_dashboard_page'),
-    path('hospital admin.html', lambda request: serve_html(request, 'hospital admin.html')),
+    path('hospital admin.html', hospital_admin_dashboard, name='hospital_admin_dashboard_page'),
+    path('hospital/dashboard/', hospital_admin_dashboard, name='hospital_dashboard_page'),
     path('booking_an_appointment.html', lambda request: serve_html(request, 'booking_an_appointment.html')),
     path('digital_health_record.html', lambda request: serve_html(request, 'digital_health_record.html')),
     path('symptom_checker.html', lambda request: serve_html(request, 'symptom_checker.html')),

@@ -496,7 +496,7 @@
             <header class="top-header">
                 <div class="header-left">
                     <div class="brand-block">
-                        <a href="#" class="logo-container" aria-label="AarogyaConnect home">
+                        <a href="/index.html" class="logo-container" aria-label="AarogyaConnect home">
                             <div class="logo-box">
                                 <i data-lucide="plus" size="28" stroke-width="3"></i>
                             </div>
@@ -516,10 +516,15 @@
                 </div>
                 <div class="header-right">
                     <a href="#portals" class="btn-outline-dark system-nav" style="padding: 8px 16px;">System Admin</a>
-                    <a href="/hospital%20admin.html" class="btn-outline-dark" style="padding: 8px 16px;">Hospital Admin Portal</a>
+                    <a href="/hospital-admin/login/" class="btn-outline-dark" style="padding: 8px 16px;" data-i18n="hospitalAdminPortal">Hospital Admin Portal</a>
                     <a href="#portals" class="btn-outline-dark" style="padding: 8px 16px;">Asha Worker Portal</a>
                     <div class="divider"></div>
-                    <span style="font-weight: 600; font-size: 14px; cursor: pointer;">English</span>
+                    <select id="languageSelector" aria-label="Select language" style="font-weight: 600; font-size: 14px; cursor: pointer; border: 0; background: transparent; color: inherit; font-family: inherit;">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="mr">मराठी</option>
+                    </select>
                     <i data-lucide="bell" size="20" style="cursor: pointer; color: var(--text-secondary);"></i>
                 </div>
             </header>
@@ -529,15 +534,15 @@
                 <!-- HERO SECTION -->
                 <section class="hero-card">
                     <div class="hero-content">
-                        <span class="badge-pill">National Health Gateway</span>
-                        <h2 class="hero-title">Connecting<br>Communities to<br><span>Accessible Healthcare</span></h2>
-                        <p class="hero-desc">
+                        <span class="badge-pill" data-i18n="nationalHealthGateway">National Health Gateway</span>
+                        <h2 class="hero-title" data-i18n="heroTitle">Connecting<br>Communities to<br><span>Accessible Healthcare</span></h2>
+                        <p class="hero-desc" data-i18n="heroDescription">
                             AarogyaConnect is a centralized digital healthcare platform designed to bridge the gap between rural patients, doctors, and specialists through technology.
                         </p>
                         <!-- Request 3: Button Functionality (Anchor Links) -->
                         <div class="btn-group">
-                            <a href="#ecosystem" class="btn-teal">Explore Healthcare Services <i data-lucide="arrow-right" size="18"></i></a>
-                            <a href="#portals" class="btn-outline-dark">Choose Your Portal</a>
+                            <a href="#ecosystem" class="btn-teal" data-i18n="exploreServices">Explore Healthcare Services <i data-lucide="arrow-right" size="18"></i></a>
+                            <a href="#portals" class="btn-outline-dark" data-i18n="choosePortal">Choose Your Portal</a>
                         </div>
                     </div>
                     
@@ -557,8 +562,8 @@
                 <!-- Request 3 Target: ECOSYSTEM SECTION -->
                 <section id="ecosystem">
                     <div class="section-header">
-                        <h2>Professional Healthcare Ecosystem</h2>
-                        <p style="color: var(--text-secondary);">Advanced digital infrastructure optimized for rural healthcare delivery.</p>
+                        <h2 data-i18n="ecosystemTitle">Professional Healthcare Ecosystem</h2>
+                        <p style="color: var(--text-secondary);" data-i18n="ecosystemDescription">Advanced digital infrastructure optimized for rural healthcare delivery.</p>
                     </div>
 
                     <div class="services-grid">
@@ -616,27 +621,27 @@
                     <div class="portal-grid">
                         <div class="portal-card featured">
                             <div class="portal-icon"><i data-lucide="shield-check" size="32" color="#0F766E"></i></div>
-                            <h3>System Admin Portal</h3>
-                            <p>Monitor network health, oversee security controls, and manage policy compliance across the platform.</p>
-                            <a href="admin-login.html" class="btn-login system">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3 data-i18n="systemAdminPortal">System Admin Portal</h3>
+                            <p data-i18n="systemAdminDescription">Monitor network health, oversee security controls, and manage policy compliance across the platform.</p>
+                            <a href="admin-login.html" class="btn-login system" data-i18n="loginToPortal">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="user" size="32" color="#0F766E"></i></div>
-                            <h3>Patient Portal</h3>
-                            <p>Access healthcare services, book appointments, and view records.</p>
-                            <a href="patient-login.html" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3 data-i18n="patientPortal">Patient Portal</h3>
+                            <p data-i18n="patientDescription">Access healthcare services, book appointments, and view records.</p>
+                            <a href="patient-login.html" class="btn-login" data-i18n="loginToPortal">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="stethoscope" size="32" color="#0F766E"></i></div>
-                            <h3>Doctor Portal</h3>
-                            <p>Manage consultations, diagnostics, and referrals efficiently.</p>
-                            <a href="doctor-login.html" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3 data-i18n="doctorPortal">Doctor Portal</h3>
+                            <p data-i18n="doctorDescription">Manage consultations, diagnostics, and referrals efficiently.</p>
+                            <a href="doctor-login.html" class="btn-login" data-i18n="loginToPortal">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="building-2" size="32" color="#0F766E"></i></div>
-                            <h3>Hospital Admin Portal</h3>
-                            <p>Administrative oversight of hospitals, staffing, and operational performance.</p>
-                            <a href="/hospital%20admin.html" class="btn-login">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
+                            <h3 data-i18n="hospitalAdminPortal">Hospital Admin Portal</h3>
+                            <p data-i18n="hospitalAdminDescription">Administrative oversight of hospitals, staffing, and operational performance.</p>
+                            <a href="/hospital-admin/login/" class="btn-login" data-i18n="loginToPortal">Login to Portal <i data-lucide="arrow-right" size="16"></i></a>
                         </div>
                         <div class="portal-card">
                             <div class="portal-icon"><i data-lucide="users" size="32" color="#0F766E"></i></div>
@@ -652,6 +657,54 @@
     </div>
 
     <script>
+        const translations = {
+            en: {
+                hospitalAdminPortal: 'Hospital Admin Portal', nationalHealthGateway: 'National Health Gateway',
+                heroTitle: 'Connecting<br>Communities to<br><span>Accessible Healthcare</span>',
+                heroDescription: 'AarogyaConnect is a centralized digital healthcare platform designed to bridge the gap between rural patients, doctors, and specialists through technology.',
+                exploreServices: 'Explore Healthcare Services', choosePortal: 'Choose Your Portal',
+                ecosystemTitle: 'Professional Healthcare Ecosystem', ecosystemDescription: 'Advanced digital infrastructure optimized for rural healthcare delivery.',
+                systemAdminPortal: 'System Admin Portal', systemAdminDescription: 'Monitor network health, oversee security controls, and manage policy compliance across the platform.',
+                patientPortal: 'Patient Portal', patientDescription: 'Access healthcare services, book appointments, and view records.',
+                doctorPortal: 'Doctor Portal', doctorDescription: 'Manage consultations, diagnostics, and referrals efficiently.',
+                hospitalAdminDescription: 'Administrative oversight of hospitals, staffing, and operational performance.', loginToPortal: 'Login to Portal'
+            },
+            hi: {
+                hospitalAdminPortal: 'अस्पताल प्रशासक पोर्टल', nationalHealthGateway: 'राष्ट्रीय स्वास्थ्य गेटवे',
+                heroTitle: 'समुदायों को<br>सुलभ स्वास्थ्य सेवा से<br><span>जोड़ना</span>',
+                heroDescription: 'आरोग्यकनेक्ट एक केंद्रीकृत डिजिटल स्वास्थ्य मंच है जो तकनीक के माध्यम से ग्रामीण मरीजों, डॉक्टरों और विशेषज्ञों के बीच की दूरी कम करता है।',
+                exploreServices: 'स्वास्थ्य सेवाएं देखें', choosePortal: 'अपना पोर्टल चुनें', ecosystemTitle: 'व्यावसायिक स्वास्थ्य तंत्र', ecosystemDescription: 'ग्रामीण स्वास्थ्य सेवा के लिए अनुकूलित उन्नत डिजिटल ढांचा।',
+                systemAdminPortal: 'सिस्टम एडमिन पोर्टल', systemAdminDescription: 'नेटवर्क स्वास्थ्य और सुरक्षा नियंत्रणों की निगरानी करें।', patientPortal: 'मरीज पोर्टल', patientDescription: 'स्वास्थ्य सेवाओं, अपॉइंटमेंट और रिकॉर्ड तक पहुंचें।', doctorPortal: 'डॉक्टर पोर्टल', doctorDescription: 'परामर्श, निदान और रेफरल प्रबंधित करें।', hospitalAdminDescription: 'अस्पताल, कर्मचारियों और संचालन की निगरानी करें।', loginToPortal: 'पोर्टल में लॉगिन करें'
+            },
+            te: {
+                hospitalAdminPortal: 'ఆసుపత్రి నిర్వాహక పోర్టల్', nationalHealthGateway: 'జాతీయ ఆరోగ్య గేట్‌వే',
+                heroTitle: 'సముదాయాలను<br>అందుబాటులో ఉన్న ఆరోగ్య సేవలతో<br><span>అనుసంధానించడం</span>',
+                heroDescription: 'ఆరోగ్యకనెక్ట్ గ్రామీణ రోగులు, వైద్యులు మరియు నిపుణులను సాంకేతికత ద్వారా అనుసంధానించే కేంద్రీకృత డిజిటల్ ఆరోగ్య వేదిక.',
+                exploreServices: 'ఆరోగ్య సేవలను చూడండి', choosePortal: 'మీ పోర్టల్‌ను ఎంచుకోండి', ecosystemTitle: 'వృత్తిపరమైన ఆరోగ్య వ్యవస్థ', ecosystemDescription: 'గ్రామీణ ఆరోగ్య సేవల కోసం రూపొందించిన ఆధునిక డిజిటల్ మౌలిక వసతులు.',
+                systemAdminPortal: 'సిస్టమ్ అడ్మిన్ పోర్టల్', systemAdminDescription: 'నెట్‌వర్క్ ఆరోగ్యం మరియు భద్రతా నియంత్రణలను పర్యవేక్షించండి.', patientPortal: 'రోగి పోర్టల్', patientDescription: 'ఆరోగ్య సేవలు, అపాయింట్‌మెంట్లు మరియు రికార్డులను చూడండి.', doctorPortal: 'వైద్యుల పోర్టల్', doctorDescription: 'సంప్రదింపులు, నిర్ధారణలు మరియు రిఫరల్స్‌ను నిర్వహించండి.', hospitalAdminDescription: 'ఆసుపత్రులు, సిబ్బంది మరియు కార్యకలాపాలను పర్యవేక్షించండి.', loginToPortal: 'పోర్టల్‌లోకి లాగిన్ అవ్వండి'
+            },
+            mr: {
+                hospitalAdminPortal: 'रुग्णालय प्रशासक पोर्टल', nationalHealthGateway: 'राष्ट्रीय आरोग्य गेटवे',
+                heroTitle: 'समुदायांना<br>सुलभ आरोग्य सेवेशी<br><span>जोडणे</span>',
+                heroDescription: 'आरोग्यकनेक्ट हे तंत्रज्ञानाद्वारे ग्रामीण रुग्ण, डॉक्टर आणि तज्ज्ञांना जोडणारे केंद्रीकृत डिजिटल आरोग्य व्यासपीठ आहे.',
+                exploreServices: 'आरोग्य सेवा पहा', choosePortal: 'तुमचे पोर्टल निवडा', ecosystemTitle: 'व्यावसायिक आरोग्य परिसंस्था', ecosystemDescription: 'ग्रामीण आरोग्य सेवेसाठी अनुकूलित आधुनिक डिजिटल पायाभूत सुविधा.',
+                systemAdminPortal: 'सिस्टम प्रशासक पोर्टल', systemAdminDescription: 'नेटवर्क आरोग्य आणि सुरक्षा नियंत्रणांचे निरीक्षण करा.', patientPortal: 'रुग्ण पोर्टल', patientDescription: 'आरोग्य सेवा, अपॉइंटमेंट आणि नोंदी पहा.', doctorPortal: 'डॉक्टर पोर्टल', doctorDescription: 'सल्लामसलत, निदान आणि रेफरल व्यवस्थापित करा.', hospitalAdminDescription: 'रुग्णालये, कर्मचारी आणि कामकाजाचे निरीक्षण करा.', loginToPortal: 'पोर्टलमध्ये लॉगिन करा'
+            }
+        };
+
+        function updateLanguage(language) {
+            const dictionary = translations[language] || translations.en;
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const value = dictionary[element.dataset.i18n];
+                if (value) element.innerHTML = value;
+            });
+            document.documentElement.lang = language;
+            localStorage.setItem('selectedLanguage', language);
+            document.getElementById('languageSelector').value = language;
+        }
+
+        document.getElementById('languageSelector').addEventListener('change', (event) => updateLanguage(event.target.value));
+        updateLanguage(localStorage.getItem('selectedLanguage') || 'en');
         lucide.createIcons();
 
         document.querySelectorAll('.btn-login').forEach((link) => {

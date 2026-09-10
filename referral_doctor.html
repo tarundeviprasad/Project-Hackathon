@@ -6,7 +6,7 @@
     <title>Referrals | AarogyaConnect Doctor Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-indigo: #1E2A5A;
@@ -28,7 +28,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Sans Telugu', 'Noto Sans', sans-serif;
         }
 
         body {
@@ -439,6 +439,11 @@
 
         .followup-card {
             grid-template-columns: 1.05fr 1.3fr 1.3fr 0.8fr 1fr auto;
+        }
+
+        .followup-card .action-group {
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .tab-panel {
@@ -1021,9 +1026,6 @@
             <h1>Referrals</h1>
             <p>Manage incoming clinical evaluations, track referrals, and coordinate follow-ups.</p>
         </div>
-        <button class="btn-primary" id="sendReferralButton" type="button">
-            <span>+</span> Send Referral
-        </button>
         <div style="display:flex; gap:10px; align-items:center;">
             <a class="btn-primary" href="/doctor-dashboard.html">Dashboard</a>
             <button class="btn-primary" id="sendReferralButton" type="button">
@@ -1242,9 +1244,6 @@
             <div class="referral-card followup-card">
                 <div class="patient-info">
                     <span class="label">Patient</span>
-            <div class="referral-card">
-                <div class="patient-info">
-                    <span class="label">Patient Information</span>
                     <span class="name">Meera Reddy</span>
                     <span class="meta">P-10318 &bull; 39 yrs &bull; Female</span>
                 </div>
@@ -1269,22 +1268,6 @@
                 <div class="action-group">
                     <button class="btn-primary view-details" type="button">View Details</button>
                     <button class="mark-completed" type="button">Mark Completed</button>
-                    <span class="label">Referral Contact</span>
-                    <span class="name">Dr. Rohan Kapoor</span>
-                    <span class="meta">Cardiology</span>
-                </div>
-                <div class="reason-info">
-                    <span class="label">Next Action</span>
-                    <p class="reason">Review consultation report</p>
-                    <p class="desc">Confirm the recommended treatment plan.</p>
-                </div>
-                <div class="date-info">
-                    <span class="label">Due On</span>
-                    <div>Sep 8, 2026</div>
-                    <div class="time">In 2 days</div>
-                </div>
-                <div class="action-group">
-                    <button class="btn-primary view-details" type="button">View Details</button>
                 </div>
             </div>
 
@@ -1370,6 +1353,16 @@
                 <label for="referralIssue">Issue
                     <textarea id="referralIssue" name="referralIssue" placeholder="Type the patient's issue" required></textarea>
                 </label>
+                <label for="receivingDoctor">Receiving Doctor
+                    <select id="receivingDoctor" name="receivingDoctor">
+                        <option value="">Select a receiving doctor</option>
+                    </select>
+                </label>
+                <label for="receivingFacility">Receiving Hospital
+                    <select id="receivingFacility" name="receivingFacility">
+                        <option value="">Select a receiving hospital</option>
+                    </select>
+                </label>
                 <div class="form-actions">
                     <button class="btn-decline" id="cancelSendReferral" type="button">Cancel</button>
                     <button class="btn-accept" type="submit">Submit</button>
@@ -1401,20 +1394,19 @@
             }
         });
 
-        sendReferralForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            closeSendReferralModal();
-            sendReferralForm.reset();
-            window.alert('Okay, permission requested.');
         sendReferralForm.addEventListener('submit', async function (event) {
             event.preventDefault();
+            const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+            const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
             const response = await fetch('/api/v1/referrals', {
                 method: 'POST',
                 credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
                 body: JSON.stringify({
                     patient_id: document.getElementById('patientId').value.trim(),
-                    reason: document.getElementById('referralIssue').value.trim()
+                    reason: document.getElementById('referralIssue').value.trim(),
+                    receiving_doctor_id: document.getElementById('receivingDoctor').value || null,
+                    receiving_facility_id: document.getElementById('receivingFacility').value || null
                 })
             });
             if (!response.ok) {
@@ -1531,6 +1523,14 @@
             panel.querySelectorAll('[data-referral-id] .btn-decline').forEach(button => {
                 button.addEventListener('click', () => updateReferral(button.closest('[data-referral-id]').dataset.referralId, 'Rejected'));
             });
+
+            ['sent-panel', 'followups-panel'].forEach(panelId => {
+                const target = document.getElementById(panelId);
+                target.querySelectorAll('.referral-card').forEach(card => card.remove());
+                if (!referrals.length) {
+                    target.insertAdjacentHTML('beforeend', '<p>No referrals available.</p>');
+                }
+            });
         }
 
         async function updateReferral(id, status) {
@@ -1548,11 +1548,38 @@
         }
 
         async function loadDatabaseReferrals() {
+            document.querySelectorAll('#incoming-panel .referral-card, #sent-panel .referral-card, #followups-panel .referral-card').forEach(card => card.remove());
+            document.querySelectorAll('#incoming-panel, #sent-panel, #followups-panel').forEach(panel => {
+                if (!panel.querySelector('.referral-card')) panel.insertAdjacentHTML('beforeend', '<p class="database-empty-state">Loading referrals...</p>');
+            });
             const response = await fetch('/api/v1/referrals', { credentials: 'same-origin' });
-            if (response.ok) renderDatabaseReferrals(await response.json());
+            if (response.ok) {
+                document.querySelectorAll('.database-empty-state').forEach(item => item.remove());
+                renderDatabaseReferrals(await response.json());
+            } else {
+                document.querySelectorAll('.database-empty-state').forEach(item => item.textContent = 'No referrals available.');
+            }
+        }
+
+        async function loadReferralTargets() {
+            const [doctorsResponse, facilitiesResponse] = await Promise.all([
+                fetch('/api/v1/doctors', { credentials: 'same-origin' }),
+                fetch('/api/v1/facilities', { credentials: 'same-origin' })
+            ]);
+            if (doctorsResponse.ok) {
+                const doctors = await doctorsResponse.json();
+                document.getElementById('receivingDoctor').insertAdjacentHTML('beforeend', doctors.map(doctor =>
+                    `<option value="${doctor.user}">${doctor.name} - ${doctor.specialty}</option>`).join(''));
+            }
+            if (facilitiesResponse.ok) {
+                const facilities = await facilitiesResponse.json();
+                document.getElementById('receivingFacility').insertAdjacentHTML('beforeend', facilities.map(facility =>
+                    `<option value="${facility.id}">${facility.name}</option>`).join(''));
+            }
         }
 
         loadDatabaseReferrals().catch(() => {});
+        loadReferralTargets().catch(() => {});
     </script>
 
 </body>
