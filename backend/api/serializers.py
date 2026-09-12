@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import (
     Patient, Facility, Appointment, HealthTimelineRecord, MedicineStock,
     SOSAlert, Consultation, Referral, FollowUp, DoctorProfile,
+    DigitalTriageAssessment,
 )
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -24,7 +25,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         model = Appointment
         fields = (
             'id', 'patient', 'doctor', 'doctor_name', 'facility', 'appointment_time',
-            'queue_number', 'patients_ahead', 'status', 'facility_name',
+            'reason', 'queue_number', 'patients_ahead', 'status', 'facility_name',
             'patient_name', 'patient_gender', 'patient_phone',
         )
 
@@ -75,6 +76,20 @@ class FollowUpSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DigitalTriageAssessmentSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer(read_only=True)
+    patient_id = serializers.CharField(source='patient.patient_id', read_only=True)
+    patient_name = serializers.CharField(source='patient.full_name', read_only=True)
+
+    class Meta:
+        model = DigitalTriageAssessment
+        fields = (
+            'id', 'patient', 'patient_id', 'patient_name', 'main_symptom', 'duration',
+            'additional_symptoms', 'follow_up_answers', 'priority', 'recommendation',
+            'status', 'source', 'created_at', 'updated_at'
+        )
+
+
 class DoctorProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     name = serializers.SerializerMethodField()
@@ -85,5 +100,11 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'username', 'name', 'specialty', 'facility', 'facility_name', 'experience_years', 'rating', 'consultation_fee', 'bio')
 
     def get_name(self, obj):
-        full_name = obj.user.get_full_name().strip()
-        return full_name or obj.user.username
+        full_name = (obj.user.get_full_name() or '').strip()
+        if full_name:
+            return full_name
+        first_name = (obj.user.first_name or '').strip()
+        last_name = (obj.user.last_name or '').strip()
+        if first_name or last_name:
+            return ' '.join(part for part in [first_name, last_name] if part).strip()
+        return obj.user.username

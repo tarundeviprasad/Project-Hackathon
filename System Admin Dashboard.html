@@ -1216,19 +1216,44 @@
         }
 
         async function loadHospitalAdmins() {
-            const response = await fetch('/api/v1/admin/hospital-admins', { credentials: 'same-origin' });
-            if (!response.ok) return;
-            const admins = await response.json();
-            const rows = admins.map(admin => `<tr>
-                <td><div class="hospital-cell">🏥 ${admin.hospital_name}</div></td>
-                <td>${admin.address || 'Not provided'}</td>
-                <td>—</td>
-                <td>${admin.username}</td>
-                <td><span class="badge badge-success">${admin.is_active ? 'Active' : 'Inactive'}</span></td>
-                <td>${new Date(admin.created_at).toLocaleDateString()}</td>
+            const [adminsResponse, facilitiesResponse, doctorsResponse] = await Promise.all([
+                fetch('/api/v1/admin/hospital-admins', { credentials: 'same-origin' }),
+                fetch('/api/v1/facilities', { credentials: 'same-origin' }),
+                fetch('/api/v1/doctors', { credentials: 'same-origin' })
+            ]);
+            if (!adminsResponse.ok || !facilitiesResponse.ok || !doctorsResponse.ok) return;
+            const admins = await adminsResponse.json();
+            const facilities = await facilitiesResponse.json();
+            const doctors = await doctorsResponse.json();
+            const hospitalFacilities = facilities.filter(facility => facility.facility_type === 'Hospital');
+            const values = document.querySelectorAll('.stats-grid .stat-value');
+            values[0].textContent = facilities.length;
+            values[1].textContent = doctors.length;
+            values[2].textContent = admins.length;
+            values[3].textContent = hospitalFacilities.length;
+            const hospitalOptions = hospitalFacilities.map(facility => `<option value="${facility.name}">${facility.name}</option>`).join('');
+            document.getElementById('hospSelect').innerHTML = '<option value="">Choose a hospital</option>' + hospitalOptions;
+            const doctorsByFacility = doctors.reduce((counts, doctor) => {
+                counts[doctor.facility] = (counts[doctor.facility] || 0) + 1;
+                return counts;
+            }, {});
+            const adminsByFacility = admins.reduce((lookup, admin) => {
+                lookup[admin.hospital_name] = admin;
+                return lookup;
+            }, {});
+            const rows = hospitalFacilities.map(facility => {
+                const admin = adminsByFacility[facility.name];
+                return `<tr>
+                <td><div class="hospital-cell">🏥 ${facility.name}</div></td>
+                <td>${facility.phone || 'Hyderabad'}</td>
+                <td>${doctorsByFacility[facility.id] || 0} Doctors</td>
+                <td>${admin ? admin.username : 'Not assigned'}</td>
+                <td><span class="badge badge-success">${admin && admin.is_active ? 'Active' : 'Available'}</span></td>
+                <td>${admin ? new Date(admin.created_at).toLocaleDateString() : 'Demo network'}</td>
                 <td><div class="action-btns"><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View</button></div></td>
-            </tr>`).join('');
-            if (rows) document.getElementById('hospitalTableBody').insertAdjacentHTML('afterbegin', rows);
+            </tr>`;
+            }).join('');
+            document.getElementById('hospitalTableBody').innerHTML = rows || '<tr><td colspan="7">No hospitals found.</td></tr>';
         }
 
         const translations = {
@@ -1259,5 +1284,6 @@
             }
         });
     </script>
+    <script src="/language.js"></script>
 </body>
 </html>

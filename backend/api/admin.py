@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AuditLog, Consultation, DoctorProfile, FollowUp, Referral
+from .models import AuditLog, Consultation, DoctorProfile, FollowUp, Referral, DigitalTriageAssessment
 
 
 @admin.register(AuditLog)
@@ -19,3 +19,4 @@ admin.site.register(DoctorProfile)
 admin.site.register(Consultation)
 admin.site.register(Referral)
 admin.site.register(FollowUp)
+admin.site.register(DigitalTriageAssessment)

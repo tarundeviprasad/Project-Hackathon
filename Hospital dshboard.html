@@ -716,7 +716,40 @@
                 byDoctor.set(key, current);
             });
             appointmentData = [...byDoctor.values()];
+                            bedData = data.beds.map(item => ({ name: item.name, total: item.total, occupied: item.occupied }));
+              staffData = data.staff.map(member => ({ name: member.name, id: member.staff_id, role: member.role, dept: member.department, status: member.status, contact: member.contact }));
+              resources = data.equipment.map(item => ({ name: item.name, total: item.quantity, occupied: 0, type: item.category }));
+              inventory = data.medicines.map(item => ({ name: item.name, id: item.medicine_id, category: item.category, stock: item.quantity, unit: item.unit, min: item.reorder_level, expiry: item.expiry_date || '' }));
         }
+
+          async function csrfToken() {
+              let token = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+              if (!token) {
+                  const response = await fetch('/auth/csrf/', { credentials: 'same-origin' });
+                  const data = await response.json();
+                  token = data.csrfToken || '';
+              }
+              return token;
+          }
+
+          async function submitHospitalForm(formId, endpoint, payload, label) {
+              console.log(`${label} BUTTON CLICKED`);
+              console.log('FORM DATA:', payload);
+              console.log('REQUEST SENT TO:', endpoint);
+              const response = await fetch(endpoint, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': await csrfToken() }, body: JSON.stringify(payload) });
+              const body = await response.json().catch(() => ({}));
+              console.log('SERVER RESPONSE:', response.status, body);
+              if (!response.ok) throw new Error(body.error || `Request failed (${response.status})`);
+              console.log('RECORD SAVED:', body.id);
+              closeModals();
+              $(formId).reset();
+              await loadHospitalData();
+              nav(formId === 'staffForm' ? 'staff' : formId === 'resForm' ? 'beds' : 'inventory');
+          }
+
+          $('staffForm').addEventListener('submit', event => { event.preventDefault(); submitHospitalForm('staffForm', '/api/v1/hospital/me/staff', { name: $('sName').value, staff_id: $('sId').value, role: $('sRole').value, department: $('sDept').value, status: $('sStatus').value, contact: $('sContact').value }, 'SAVE MEMBER').catch(error => console.error('SAVE MEMBER FAILED:', error)); });
+          $('resForm').addEventListener('submit', event => { event.preventDefault(); submitHospitalForm('resForm', '/api/v1/hospital/me/equipment', { name: $('rName').value, quantity: $('rTotal').value, category: $('rCat').value }, 'ADD TO INVENTORY').catch(error => console.error('ADD TO INVENTORY FAILED:', error)); });
+          $('medForm').addEventListener('submit', event => { event.preventDefault(); submitHospitalForm('medForm', '/api/v1/hospital/me/medicines', { name: $('mName').value, medicine_id: $('mId').value, category: $('mCat').value, quantity: $('mStock').value, unit: $('mUnit').value, reorder_level: $('mMin').value, expiry_date: $('mExpiry').value }, 'ADD MEDICINE').catch(error => console.error('ADD MEDICINE FAILED:', error)); });
 
         // --- INITIALIZATION ---
         window.onload = async () => {
@@ -730,5 +763,6 @@
             }
         };
     </script>
+    <script src="/language.js"></script>
 </body>
 </html>

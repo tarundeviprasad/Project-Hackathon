@@ -9,11 +9,18 @@ from django.shortcuts import redirect
 ROOT_HTML_DIR = Path(__file__).resolve().parent.parent
 
 
-@login_required
+@login_required(login_url="/patient-login.html")
 def patient_dashboard(request):
     if request.user.role != "PATIENT":
         return HttpResponseForbidden("Access denied")
     return FileResponse((ROOT_HTML_DIR / "patient_portal.html").open("rb"))
+
+
+@login_required(login_url="/patient-login.html")
+def digital_triage_page(request):
+    if request.user.role != "PATIENT":
+        return HttpResponseForbidden("Access denied")
+    return FileResponse((ROOT_HTML_DIR / "digitaltriage.html").open("rb"))
 
 
 @login_required(login_url="/doctor-login.html")

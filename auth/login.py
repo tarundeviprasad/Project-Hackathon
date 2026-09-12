@@ -12,6 +12,40 @@ from pathlib import Path
 from django.middleware.csrf import get_token
 from .models import User
 from .security import clear_login_failures, login_is_rate_limited, record_login_failure
+from api.models import Patient
+from datetime import datetime
+import random
+
+
+def ensure_patient_profile_for_user(user, request=None):
+    if getattr(user, "role", None) != "PATIENT":
+        return getattr(user, "patient_profile", None)
+
+    patient = getattr(user, "patient_profile", None)
+    if patient:
+        return patient
+
+    full_name = (user.get_full_name() or user.username or "Patient").strip() or "Patient"
+    patient_id = None
+    while patient_id is None or Patient.objects.filter(patient_id=patient_id).exists():
+        patient_id = f"AC-{datetime.now().year}-{random.randint(1000, 9999)}"
+
+    return Patient.objects.create(
+        user=user,
+        patient_id=patient_id,
+        full_name=full_name,
+        dob=None,
+        gender='None',
+        phone='',
+        email=user.email or '',
+        address='',
+        village='',
+        district='',
+        blood_group='Not Added',
+        allergies='No allergies recorded',
+        active_conditions='No active conditions',
+        preferred_language='en',
+    )
 
 
 def authenticate_by_identifier(request, identifier, password):
@@ -55,6 +89,8 @@ def _role_login(request, role, redirect_url):
 
     clear_login_failures(request, identifier)
     login(request, user)
+    if user.role == "PATIENT":
+        ensure_patient_profile_for_user(user)
     from api.audit import record_audit_event
     record_audit_event(request, 'LOGIN_SUCCESS', user=user)
     destination = redirect_url.get(user.role, redirect_url) if isinstance(redirect_url, dict) else redirect_url

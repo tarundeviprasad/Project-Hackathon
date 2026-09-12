@@ -480,7 +480,23 @@
 
     <script>
         /* --- CENTRALIZED STATE --- */
-        const state = { patients: [], appointments: [], referrals: [], notifs: [], specialists: [] };
+        const state = { patients: [], appointments: [], referrals: [], notifs: [], specialists: [], inventory: [], labs: [], asha: [], analytics: [], doctors: [] };
+
+        function getDisplayDate(dateValue) {
+            if (!dateValue) return 'Not available';
+            const parsed = new Date(dateValue);
+            if (Number.isNaN(parsed.getTime())) return 'Not available';
+            return parsed.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function buildPatientAge(dobValue) {
+            if (!dobValue) return '—';
+            const dob = new Date(dobValue);
+            if (Number.isNaN(dob.getTime())) return '—';
+            const diff = Date.now() - dob.getTime();
+            const ageInYears = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+            return ageInYears > 0 ? `${ageInYears}` : '—';
+        }
 
         /* --- CORE FUNCTIONS --- */
         async function loadPhcData() {
@@ -493,43 +509,66 @@
                 throw new Error(`PHC dashboard API failed (${response.status}).`);
             }
             const data = await response.json();
-            document.querySelector('.brand span').textContent = data.phc.name;
-            document.getElementById('phcUserName').textContent = data.phc.user_name;
-            document.getElementById('phcUserAvatar').textContent = data.phc.user_name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('') || '?';
-            document.querySelector('.title-group h2').textContent = `Welcome back, ${data.phc.name}`;
-            document.querySelector('.title-group p').innerHTML = `${data.phc.centre_id} | <span id="currentDate"></span>`;
-            state.patients = data.patients.map(patient => ({
-                id: patient.patient_id,
-                name: patient.full_name,
-                gender: patient.gender,
-                phone: patient.phone,
+            const payload = data || {};
+            const phc = payload.phc || {};
+            const patientRecords = Array.isArray(payload.patients) ? payload.patients : [];
+            const appointmentRecords = Array.isArray(payload.appointments) ? payload.appointments : [];
+            const referralRecords = Array.isArray(payload.referrals) ? payload.referrals : [];
+
+            document.querySelector('.brand span').textContent = phc.name || 'PHC Centre';
+            document.getElementById('phcUserName').textContent = phc.user_name || 'PHC User';
+            const initials = (phc.user_name || 'PHC User').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('') || 'PH';
+            document.getElementById('phcUserAvatar').textContent = initials;
+            document.querySelector('.title-group h2').textContent = `Welcome back, ${phc.name || 'PHC Centre'}`;
+            document.querySelector('.title-group p').innerHTML = `${phc.centre_id || 'PHC-UNASSIGNED'} | <span id="currentDate"></span>`;
+
+            state.patients = patientRecords.map(patient => ({
+                id: patient.patient_id || patient.id || `PAT-${Math.random().toString(16).slice(2, 8)}`,
+                patientPk: patient.id || patient.pk || null,
+                name: patient.full_name || patient.name || 'Unknown patient',
+                age: buildPatientAge(patient.dob),
+                gender: patient.gender || 'Not set',
+                phone: patient.phone || '—',
                 priority: 'Routine',
-                lastVisit: patient.created_at ? patient.created_at.slice(0, 10) : 'Not available',
-                history: patient.active_conditions || 'Not recorded',
+                lastVisit: getDisplayDate(patient.created_at),
+                history: patient.active_conditions || patient.allergies || 'Not recorded',
                 timeline: []
             }));
-            state.appointments = data.appointments.map(appointment => ({
+
+            state.appointments = appointmentRecords.map(appointment => ({
                 id: appointment.id,
-                patientId: appointment.patient,
-                time: new Date(appointment.appointment_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                token: appointment.queue_number,
-                status: appointment.status === 'Scheduled' ? 'Waiting' : appointment.status,
+                patientId: appointment.patient_id || appointment.patient || appointment.patient_name || 'unknown',
+                patientName: appointment.patient_name || state.patients.find(p => String(p.patientPk ?? p.id) === String(appointment.patient))?.name || 'Unknown patient',
+                time: appointment.appointment_time ? new Date(appointment.appointment_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—',
+                token: appointment.queue_number || 'A-00',
+                status: appointment.status === 'Scheduled' ? 'Waiting' : (appointment.status || 'Waiting'),
                 priority: 'Routine'
             }));
-            state.referrals = data.referrals.map(referral => ({
+
+            state.referrals = referralRecords.map(referral => ({
                 id: referral.id,
-                patientId: referral.patient,
-                patientName: referral.patient_name,
+                patientId: referral.patient_id || referral.patient || referral.patient_name || 'unknown',
+                patientName: referral.patient_name || state.patients.find(p => String(p.patientPk ?? p.id) === String(referral.patient))?.name || 'Unknown patient',
                 facility: referral.receiving_facility_name || 'Not assigned',
-                specialty: referral.receiving_doctor_name || 'Doctor referral',
+                specialty: referral.receiving_doctor_name || referral.reason || 'Doctor referral',
                 urgency: 'Routine',
-                status: referral.status,
+                status: referral.status || 'Pending',
                 progress: referral.status === 'Completed' ? 100 : referral.status === 'Accepted' ? 60 : 10
             }));
-            document.getElementById('stat-total').textContent = data.stats.patients;
-            document.getElementById('stat-appts').textContent = data.stats.appointments;
-            document.getElementById('stat-waiting').textContent = data.stats.waiting;
-            document.getElementById('stat-stock').textContent = '0';
+
+            state.notifs = Array.isArray(payload.notifications) ? payload.notifications : [];
+            state.doctors = Array.isArray(payload.staff) ? payload.staff : [];
+            state.inventory = Array.isArray(payload.inventory) ? payload.inventory : [];
+            state.labs = Array.isArray(payload.labs) ? payload.labs : [];
+            state.asha = Array.isArray(payload.asha) ? payload.asha : [];
+            state.analytics = Array.isArray(payload.analytics) ? payload.analytics : [];
+
+            const stats = payload.stats || {};
+            document.getElementById('stat-total').textContent = Number(stats.patients || state.patients.length || 0);
+            document.getElementById('stat-appts').textContent = Number(stats.appointments || state.appointments.length || 0);
+            document.getElementById('stat-waiting').textContent = Number(stats.waiting || 0);
+            document.getElementById('stat-stock').textContent = Number(state.inventory.length || 0);
+
             const [facilitiesResponse, doctorsResponse] = await Promise.all([
                 fetch('/api/v1/facilities', { credentials: 'same-origin' }),
                 fetch('/api/v1/doctors', { credentials: 'same-origin' })
@@ -589,8 +628,15 @@
         function renderDashboardQueue() {
             const body = document.getElementById('dashboard-queue-body');
             body.innerHTML = '';
-            state.appointments.filter(a => a.status === 'Waiting' || a.status === 'In-Consult').forEach(appt => {
-                const p = state.patients.find(x => x.id === appt.patientId);
+            const queueItems = state.appointments.filter(a => a.status === 'Waiting' || a.status === 'In-Consult');
+
+            if (!queueItems.length) {
+                body.innerHTML = '<tr><td colspan="6" style="padding:1rem; color:var(--text-secondary);">No patients are currently in the queue.</td></tr>';
+                return;
+            }
+
+            queueItems.forEach(appt => {
+                const p = state.patients.find(x => String(x.id) === String(appt.patientId) || x.name === appt.patientName) || { id: appt.patientId || 'Unknown', name: appt.patientName || 'Unknown patient', age: '—', gender: 'Not set', phone: '—', history: 'Not recorded' };
                 const row = document.createElement('tr');
                 row.onclick = () => openProfile(p.id);
                 row.innerHTML = `
@@ -628,16 +674,22 @@
             const body = document.getElementById('patients-list-body');
             body.innerHTML = '';
             const list = filtered || state.patients;
+
+            if (!list.length) {
+                body.innerHTML = '<tr><td colspan="7" style="padding:1rem; color:var(--text-secondary);">No patient records are available for this PHC yet.</td></tr>';
+                return;
+            }
+
             list.forEach(p => {
                 const row = document.createElement('tr');
                 row.onclick = () => openProfile(p.id);
                 row.innerHTML = `
                     <td>${p.id}</td>
                     <td style="font-weight:600">${p.name}</td>
-                    <td>${p.age} / ${p.gender}</td>
-                    <td><span class="badge-status bg-${p.priority.toLowerCase()}">${p.priority}</span></td>
+                    <td>${p.age || '—'} / ${p.gender || 'Not set'}</td>
+                    <td><span class="badge-status bg-${(p.priority || 'routine').toLowerCase()}">${p.priority || 'Routine'}</span></td>
                     <td>${p.lastVisit}</td>
-                    <td><span style="font-size:0.8rem">12 Dec 2023</span></td>
+                    <td><span style="font-size:0.8rem">${p.history || 'No follow-up info'}</span></td>
                     <td><button class="btn btn-outline" style="padding:4px 10px; font-size:0.7rem;">View</button></td>
                 `;
                 body.appendChild(row);
@@ -730,8 +782,14 @@
         function renderReferrals() {
             const body = document.getElementById('referral-list-body');
             body.innerHTML = '';
+
+            if (!state.referrals.length) {
+                body.innerHTML = '<tr><td colspan="7" style="padding:1rem; color:var(--text-secondary);">No referral records have been created yet.</td></tr>';
+                return;
+            }
+
             state.referrals.forEach(r => {
-                const p = state.patients.find(x => x.id === r.patientId);
+                const p = state.patients.find(x => String(x.id) === String(r.patientId) || x.name === r.patientName) || { name: r.patientName || 'Unknown patient' };
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td style="font-weight:600">${r.id}</td>
@@ -806,27 +864,59 @@
         /* --- DATA TABLES (OTHER SECTIONS) --- */
         function renderInventory() {
             const cont = document.getElementById('inventory-content');
-            cont.innerHTML = '<p>No inventory records available.</p>';
+            if (!state.inventory.length) {
+                cont.innerHTML = '<p>No inventory records available.</p>';
+                return;
+            }
+            cont.innerHTML = '<table><thead><tr><th>Medicine</th><th>Dosage</th><th>Availability</th><th>Stock</th></tr></thead><tbody>' +
+                state.inventory.map(item => `<tr><td>${item.name || 'Medicine'}</td><td>${item.dosage || 'N/A'}</td><td>${item.is_available ? 'Available' : 'Low stock'}</td><td>${item.quantity ?? 0}</td></tr>`).join('') +
+                '</tbody></table>';
         }
 
         function renderASHA() {
-            document.getElementById('asha-content').innerHTML = '<p>No ASHA tasks available.</p>';
+            const cont = document.getElementById('asha-content');
+            if (!state.asha.length) {
+                cont.innerHTML = '<p>No ASHA tasks available.</p>';
+                return;
+            }
+            cont.innerHTML = '<table><thead><tr><th>ASHA</th><th>Task</th><th>Status</th></tr></thead><tbody>' +
+                state.asha.map(item => `<tr><td>${item.name || 'ASHA'}</td><td>${item.task || 'Follow-up'}</td><td>${item.status || 'Pending'}</td></tr>`).join('') +
+                '</tbody></table>';
         }
 
         function renderLabs() {
-            document.getElementById('labs-content').innerHTML = '<p>No lab requests available.</p>';
+            const cont = document.getElementById('labs-content');
+            if (!state.labs.length) {
+                cont.innerHTML = '<p>No lab requests available.</p>';
+                return;
+            }
+            cont.innerHTML = '<table><thead><tr><th>Patient</th><th>Test</th><th>Status</th></tr></thead><tbody>' +
+                state.labs.map(item => `<tr><td>${item.patient_name || 'Unknown patient'}</td><td>${item.test_name || 'Lab request'}</td><td>${item.status || 'Pending'}</td></tr>`).join('') +
+                '</tbody></table>';
         }
 
         function renderAppointments() {
-            document.getElementById('appointments-content').innerHTML = '<table><thead><tr><th>Patient</th><th>Time</th><th>Token</th><th>Status</th></tr></thead><tbody>' + 
+            const cont = document.getElementById('appointments-content');
+            if (!state.appointments.length) {
+                cont.innerHTML = '<p>No appointments scheduled for this PHC.</p>';
+                return;
+            }
+            cont.innerHTML = '<table><thead><tr><th>Patient</th><th>Time</th><th>Token</th><th>Status</th></tr></thead><tbody>' + 
                 state.appointments.map(a => {
-                    const p = state.patients.find(x => x.id === a.patientId);
+                    const p = state.patients.find(x => String(x.id) === String(a.patientId) || x.name === a.patientName) || { name: a.patientName || 'Unknown patient' };
                     return `<tr><td>${p.name}</td><td>${a.time}</td><td>${a.token}</td><td>${a.status}</td></tr>`;
                 }).join('') + '</tbody></table>';
         }
 
         function renderAnalytics() {
-            document.getElementById('analytics-content').innerHTML = '<p>No analytics data available.</p>';
+            const cont = document.getElementById('analytics-content');
+            if (!state.analytics.length) {
+                cont.innerHTML = '<p>No analytics data available yet.</p>';
+                return;
+            }
+            cont.innerHTML = '<table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>' +
+                state.analytics.map(item => `<tr><td>${item.label || 'Metric'}</td><td>${item.value ?? 0}</td></tr>`).join('') +
+                '</tbody></table>';
         }
 
         /* --- UTILS --- */
@@ -900,5 +990,6 @@
             document.getElementById('appContent').innerHTML = '<section class="view active"><div class="card" style="padding:2rem; color:var(--danger);">Unable to load PHC data. Please try again without signing out.</div></section>';
         });
     </script>
+    <script src="/language.js"></script>
 </body>
 </html>

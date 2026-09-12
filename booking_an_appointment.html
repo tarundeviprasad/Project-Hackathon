@@ -353,16 +353,21 @@
             display: none;
             place-items: center;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .modal-card {
             background: var(--pure-white);
             width: 100%;
             max-width: 600px;
+            max-height: 90vh;
             padding: 40px;
             border-radius: 32px;
             position: relative;
             animation: modalPop 0.4s var(--transition);
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 0 24px 60px rgba(23, 32, 51, 0.18);
         }
 
         @keyframes modalPop {
@@ -588,7 +593,7 @@
             <i data-lucide="x" class="close-modal" onclick="closeModal()"></i>
             <div id="modalContent">
                 <!-- Step 1: Selection -->
-                <div class="booking-step" id="step1">
+                <form id="step1" class="booking-step" novalidate>
                     <h2 data-i18n="bookTitleModal">Book Appointment</h2>
                     <p data-i18n="bookDescModal">Choose a preferred date and time for your consultation.</p>
                     
@@ -597,55 +602,56 @@
                     </div>
 
                     <h4 data-i18n="selDate">Select Date</h4>
-                    <div class="date-picker">
-                        <div class="date-item active">
+                    <div class="date-picker" id="datePicker">
+                        <div class="date-item active" data-date="">
                             <span class="day">Mon</span>
                             <span class="num">31</span>
                         </div>
-                        <div class="date-item">
+                        <div class="date-item" data-date="">
                             <span class="day">Tue</span>
                             <span class="num">01</span>
                         </div>
-                        <div class="date-item">
+                        <div class="date-item" data-date="">
                             <span class="day">Wed</span>
                             <span class="num">02</span>
                         </div>
-                        <div class="date-item">
+                        <div class="date-item" data-date="">
                             <span class="day">Thu</span>
                             <span class="num">03</span>
                         </div>
-                        <div class="date-item">
+                        <div class="date-item" data-date="">
                             <span class="day">Fri</span>
                             <span class="num">04</span>
                         </div>
                     </div>
 
                     <h4 data-i18n="selTime">Select Time</h4>
-                    <div class="time-grid">
-                        <div class="time-item">09:00 AM</div>
-                        <div class="time-item active">09:30 AM</div>
-                        <div class="time-item disabled">10:00 AM</div>
-                        <div class="time-item">11:30 AM</div>
-                        <div class="time-item">02:00 PM</div>
-                        <div class="time-item">04:30 PM</div>
+                    <div class="time-grid" id="timePicker">
+                        <div class="time-item" data-time="09:00 AM">09:00 AM</div>
+                        <div class="time-item active" data-time="09:30 AM">09:30 AM</div>
+                        <div class="time-item disabled" data-time="10:00 AM">10:00 AM</div>
+                        <div class="time-item" data-time="11:30 AM">11:30 AM</div>
+                        <div class="time-item" data-time="02:00 PM">02:00 PM</div>
+                        <div class="time-item" data-time="04:30 PM">04:30 PM</div>
                     </div>
 
                     <h4 data-i18n="labelReason">Reason for Visit</h4>
-                    <textarea placeholder="Briefly describe symptoms..." style="width: 100%; height: 80px; padding: 12px; border-radius: 12px; border: 1px solid var(--soft-border); margin-bottom: 24px; outline: none;"></textarea>
+                    <textarea id="reasonInput" name="reason" placeholder="Briefly describe symptoms..." style="width: 100%; height: 80px; padding: 12px; border-radius: 12px; border: 1px solid var(--soft-border); margin-bottom: 16px; outline: none; resize: vertical;"></textarea>
+                    <div id="bookingError" style="display: none; margin-bottom: 16px; color: #B91C1C; background: #FEF2F2; border: 1px solid #fecaca; border-radius: 10px; padding: 10px 12px; font-size: 0.85rem; font-weight: 600;"></div>
 
                     <div style="display: flex; gap: 12px;">
-                        <button class="btn btn-primary" style="flex: 1;" onclick="confirmBooking()" data-i18n="btnConfirm">Confirm Appointment</button>
-                        <button class="btn btn-outline" style="flex: 1;" onclick="closeModal()" data-i18n="btnCancel">Cancel</button>
+                        <button type="submit" id="bookAppointmentBtn" class="btn btn-primary" style="flex: 1;" data-i18n="btnConfirm">Book Appointment</button>
+                        <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeModal()" data-i18n="btnCancel">Cancel</button>
                     </div>
-                </div>
+                </form>
 
                 <!-- Step 2: Success -->
                 <div class="booking-step" id="step2" style="display: none; text-align: center;">
                     <div style="width: 64px; height: 64px; background: var(--soft-aqua); color: var(--rich-teal); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px;">
                         <i data-lucide="check" size="32"></i>
                     </div>
-                    <h2 data-i18n="confTitle">Appointment Confirmed</h2>
-                    <p data-i18n="confDesc">Your appointment has been successfully booked.</p>
+                    <h2>Appointment booked successfully!</h2>
+                    <p>Thank you. Your booking has been confirmed.</p>
                     
                     <div id="confSummary" style="background: var(--soft-ivory); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 24px; border: 1px solid var(--soft-border);">
                         <!-- Injected -->
@@ -851,10 +857,64 @@
             renderDoctors(filteredDoctors);
         }
 
+        function configureDateOptions() {
+            const today = new Date();
+            const dateItems = document.querySelectorAll('.date-item');
+            dateItems.forEach((item, index) => {
+                const d = new Date(today);
+                d.setDate(today.getDate() + index + 1);
+                const day = d.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayNum = d.getDate().toString().padStart(2, '0');
+                item.dataset.date = d.toISOString().slice(0, 10);
+                item.querySelector('.day').textContent = day;
+                item.querySelector('.num').textContent = dayNum;
+                if (index === 0) item.classList.add('active');
+            });
+        }
+
+        function getSelectedDateValue() {
+            return document.querySelector('.date-item.active')?.dataset.date || null;
+        }
+
+        function getSelectedTimeValue() {
+            return document.querySelector('.time-item.active')?.dataset.time || null;
+        }
+
+        function parseAppointmentDate(dateValue, timeValue) {
+            if (!dateValue || !timeValue) return null;
+            const match = timeValue.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (!match) return null;
+            let hour = Number(match[1]);
+            const minute = Number(match[2]);
+            const meridiem = match[3].toUpperCase();
+            if (meridiem === 'PM' && hour < 12) hour += 12;
+            if (meridiem === 'AM' && hour === 12) hour = 0;
+            const parsed = new Date(`${dateValue}T00:00:00`);
+            parsed.setHours(hour, minute, 0, 0);
+            return parsed;
+        }
+
+        function showBookingError(message) {
+            const errorBox = document.getElementById('bookingError');
+            errorBox.textContent = message;
+            errorBox.style.display = 'block';
+        }
+
+        function hideBookingError() {
+            const errorBox = document.getElementById('bookingError');
+            errorBox.textContent = '';
+            errorBox.style.display = 'none';
+        }
+
         function openBooking(id) {
             selectedDocId = id;
             const doc = doctors.find(d => d.id === id);
             const info = document.getElementById('modalDocInfo');
+            const bookingForm = document.getElementById('step1') || document.getElementById('appointmentForm');
+            const successStep = document.getElementById('step2');
+
+            if (!doc || !info) return;
+
             info.innerHTML = `
                 <div style="width: 48px; height: 48px; border-radius: 50%; background: white; color: var(--rich-teal); display: grid; place-items: center; font-weight: 800;">${doc.initial}</div>
                 <div>
@@ -862,64 +922,118 @@
                     <p style="font-size: 0.8rem; color: var(--rich-teal); font-weight: 700;">${doc.spec} • ${doc.hosp}</p>
                 </div>
             `;
-            document.getElementById('step1').style.display = "block";
-            document.getElementById('step2').style.display = "none";
-            document.getElementById('bookingModal').style.display = "grid";
+            hideBookingError();
+            document.getElementById('reasonInput').value = '';
+            if (bookingForm) bookingForm.style.display = 'block';
+            if (successStep) successStep.style.display = 'none';
+            document.getElementById('bookingModal').style.display = 'grid';
         }
 
         async function confirmBooking() {
             const doc = doctors.find(d => d.id === selectedDocId);
             const summary = document.getElementById('confSummary');
-            const selectedTime = document.querySelector('.time-item.active')?.textContent.trim() || '09:30 AM';
-            const timeParts = selectedTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
-            const appointmentDate = new Date();
-            appointmentDate.setDate(appointmentDate.getDate() + 1);
-            if (timeParts) {
-                let hour = Number(timeParts[1]) % 12;
-                if (timeParts[3].toUpperCase() === 'PM') hour += 12;
-                appointmentDate.setHours(hour, Number(timeParts[2]), 0, 0);
-            }
+            const reason = document.getElementById('reasonInput').value.trim();
+            const selectedDate = getSelectedDateValue();
+            const selectedTime = getSelectedTimeValue();
+            const bookButton = document.getElementById('bookAppointmentBtn');
 
-            const response = await fetch('/api/v1/appointments', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    doctor_id: doc.user,
-                    doctor_name: doc.name,
-                    appointment_time: appointmentDate.toISOString(),
-                    queue_number: 'A-17',
-                    patients_ahead: 0
-                })
-            });
-            if (!response.ok) {
-                alert(response.status === 401 || response.status === 403
-                    ? 'Please log in as a patient before booking.'
-                    : 'Unable to save this appointment. Please try again.');
+            hideBookingError();
+
+            if (!doc) {
+                showBookingError('Please select a doctor before booking.');
                 return;
             }
-            const appointment = await response.json();
-            summary.innerHTML = `
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Doctor</span>
-                    <span style="font-weight: 700; color: var(--deep-indigo);">${doc.name}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Hospital</span>
-                    <span style="font-weight: 700; color: var(--deep-indigo);">${doc.hosp}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Date & Time</span>
-                    <span style="font-weight: 700; color: var(--deep-indigo);">31 Aug, 9:30 AM</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px dashed var(--soft-border);">
-                    <span style="font-size: 0.85rem; color: var(--slate-gray);">Booking ID</span>
-                    <span style="font-weight: 800; color: var(--rich-teal);">${appointment.id}</span>
-                </div>
-            `;
+            if (!selectedDate) {
+                showBookingError('Please select a date for the appointment.');
+                return;
+            }
+            if (!selectedTime) {
+                showBookingError('Please select a time for the appointment.');
+                return;
+            }
+            if (!reason) {
+                showBookingError('Please enter a reason for your visit.');
+                return;
+            }
 
-            document.getElementById('step1').style.display = "none";
-            document.getElementById('step2').style.display = "block";
+            const appointmentDate = parseAppointmentDate(selectedDate, selectedTime);
+            if (!appointmentDate) {
+                showBookingError('The selected appointment time is invalid. Please choose a different time.');
+                return;
+            }
+
+            bookButton.disabled = true;
+            bookButton.textContent = 'Booking...';
+
+            try {
+                const response = await fetch('/api/v1/appointments', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''
+                    },
+                    body: JSON.stringify({
+                        doctor_id: doc.user,
+                        doctor_name: doc.name,
+                        appointment_time: appointmentDate.toISOString(),
+                        reason: reason,
+                        queue_number: 'A-17',
+                        patients_ahead: 0
+                    })
+                });
+
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    const message = payload.error || 'Unable to book appointment. Please try again.';
+                    showBookingError(message);
+                    return;
+                }
+
+                const appointment = payload;
+                const appointmentDateText = new Date(appointment.appointment_time).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                const appointmentTimeText = new Date(appointment.appointment_time).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                summary.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-size: 0.85rem; color: var(--slate-gray);">Doctor</span>
+                        <span style="font-weight: 700; color: var(--deep-indigo);">${doc.name}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-size: 0.85rem; color: var(--slate-gray);">Date</span>
+                        <span style="font-weight: 700; color: var(--deep-indigo);">${appointmentDateText}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-size: 0.85rem; color: var(--slate-gray);">Time</span>
+                        <span style="font-weight: 700; color: var(--deep-indigo);">${appointmentTimeText}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-size: 0.85rem; color: var(--slate-gray);">Reason for Visit</span>
+                        <span style="font-weight: 700; color: var(--deep-indigo); text-align: right; max-width: 55%;">${appointment.reason || reason}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px dashed var(--soft-border);">
+                        <span style="font-size: 0.85rem; color: var(--slate-gray);">Status</span>
+                        <span style="font-weight: 800; color: var(--rich-teal);">${appointment.status || 'Scheduled'}</span>
+                    </div>
+                `;
+
+                const bookingForm = document.getElementById('step1') || document.getElementById('appointmentForm');
+                const successStep = document.getElementById('step2');
+                if (bookingForm) bookingForm.style.display = 'none';
+                if (successStep) successStep.style.display = 'block';
+            } catch (error) {
+                showBookingError('Unable to book appointment. Please try again.');
+            } finally {
+                bookButton.disabled = false;
+                bookButton.textContent = 'Book Appointment';
+            }
         }
 
         function closeModal() {
@@ -992,6 +1106,7 @@
                     prev: false
                 }));
             }
+            configureDateOptions();
             renderPrevDoctors();
             renderDoctors(doctors);
             changeLanguage(currentLang);
@@ -1013,6 +1128,13 @@
                 timeItem.classList.add('active');
             }
         });
+
+        const bookingStepForm = document.getElementById('step1') || document.getElementById('appointmentForm');
+        bookingStepForm?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            confirmBooking();
+        });
     </script>
+    <script src="/language.js"></script>
 </body>
 </html>

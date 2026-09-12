@@ -52,6 +52,57 @@ class HealthcareSecurityTests(TestCase):
 		response = self.client.get(f'/api/v1/patient/{self.patient.patient_id}/records')
 		self.assertEqual(response.status_code, 200)
 
+	def test_patient_can_submit_digital_triage_assessment(self):
+		self.client.force_authenticate(self.patient_user)
+		response = self.client.post('/api/v1/patient/me/triage', {
+			'main_symptom': 'chest pain',
+			'duration': '1–2 days',
+			'additional_symptoms': ['dizziness', 'shortness of breath'],
+			'follow_up_answers': ['palpitations', 'worse with activity'],
+		}, format='json')
+		self.assertEqual(response.status_code, 201)
+		self.assertEqual(response.data['priority'], 'EMERGENCY')
+		self.assertEqual(response.data['patient']['patient_id'], self.patient.patient_id)
+		self.assertTrue(response.data['id'])
+
+	def test_logged_in_patient_without_profile_can_book_appointment_using_authenticated_user(self):
+		legacy_patient = User.objects.create_user(
+			username='legacy-patient',
+			email='legacy.patient@example.com',
+			password='StrongPass123!',
+			role='PATIENT',
+		)
+		self.client.force_authenticate(legacy_patient)
+		response = self.client.post('/api/v1/appointments', {
+			'doctor_id': self.doctor.id,
+			'doctor_name': 'doctor-one',
+			'appointment_time': '2026-09-15T10:30:00Z',
+			'reason': 'headache',
+		}, format='json')
+		self.assertEqual(response.status_code, 201)
+		patient = Patient.objects.get(user=legacy_patient)
+		self.assertEqual(response.data['patient'], patient.id)
+		self.assertTrue(Appointment.objects.filter(patient__user=legacy_patient).exists())
+		self.assertEqual(patient.patient_id, Patient.objects.get(pk=response.data['patient']).patient_id)
+
+	def test_doctor_api_uses_real_name_from_database_for_doctor_and_phc_facility(self):
+		facility = Facility.objects.create(name='AarogyaConnect Primary Facility', facility_type='PHC')
+		doctor = User.objects.create_user(
+			username='rajesh.kumar',
+			email='rajesh.kumar@example.com',
+			password='StrongPass123!',
+			first_name='Rajesh',
+			last_name='Kumar',
+			role='DOCTOR',
+		)
+		DoctorProfile.objects.create(user=doctor, facility=facility, specialty='General Physician', experience_years=8)
+		response = self.client.get('/api/v1/doctors')
+		self.assertEqual(response.status_code, 200)
+		payload = next(item for item in response.data if item['user'] == doctor.id)
+		self.assertEqual(payload['name'], 'Rajesh Kumar')
+		self.assertEqual(payload['facility_name'], 'AarogyaConnect Primary Facility')
+		self.assertEqual(payload['specialty'], 'General Physician')
+
 	def test_patient_search_only_returns_matching_owned_patient(self):
 		self.client.force_authenticate(self.patient_user)
 		response = self.client.get('/api/v1/patients?search=Patient%20One')
@@ -115,6 +166,15 @@ class HealthcareSecurityTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.data['stats']['appointments'], 0)
 		self.assertEqual(response.data['appointments'], [])
+
+	def test_phc_dashboard_without_profile_returns_empty_safe_payload(self):
+		phc = User.objects.create_user(username='phc-no-profile', password='StrongPass123!', role='PHC', first_name='PHC Worker')
+		self.client.force_login(phc)
+		response = self.client.get('/api/v1/phc/me/dashboard')
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.data['stats']['patients'], 0)
+		self.assertEqual(response.data['patients'], [])
+		self.assertEqual(response.data['phc']['name'], 'PHC Centre')
 
 	def test_phc_referral_is_visible_to_assigned_doctor_and_status_is_shared(self):
 		phc = User.objects.create_user(username='phc-referrals', password='StrongPass123!', role='PHC')
@@ -325,6 +385,26 @@ class HealthcareSecurityTests(TestCase):
 		response = self.client.get('/patient_portal.html')
 		self.assertEqual(response.status_code, 200)
 
+	def test_patient_dashboard_nav_has_correct_modules_and_no_referrals(self):
+		self.client.force_login(self.patient_user)
+		response = self.client.get('/patient_portal.html')
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Appointments')
+		self.assertContains(response, 'Health Records')
+		self.assertContains(response, 'Medicines')
+		self.assertContains(response, 'Digital Triage')
+		self.assertNotContains(response, 'Referrals')
+		self.assertContains(response, '/booking_an_appointment.html')
+		self.assertContains(response, '/digital_health_record.html')
+		self.assertContains(response, '/teleconsultation.html')
+		self.assertContains(response, 'http://127.0.0.1:8001/')
+
+	def test_patient_teleconsultation_page_is_served(self):
+		self.client.force_login(self.patient_user)
+		response = self.client.get('/teleconsultation.html')
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Teleconsultation')
+
 	def test_patient_can_create_and_read_appointment(self):
 		self.client.force_authenticate(self.patient_user)
 		response = self.client.post('/api/v1/appointments', {
@@ -335,6 +415,22 @@ class HealthcareSecurityTests(TestCase):
 		self.assertEqual(response.status_code, 201)
 		self.assertTrue(Appointment.objects.filter(patient=self.patient, doctor=self.doctor).exists())
 		self.assertEqual(self.client.get('/api/v1/appointments').status_code, 200)
+
+	def test_patient_can_book_appointment_with_reason_and_duplicate_check(self):
+		self.client.force_authenticate(self.patient_user)
+		payload = {
+			'doctor_id': self.doctor.id,
+			'appointment_time': '2026-09-10T10:30:00Z',
+			'reason': 'Follow-up for recurring fever',
+		}
+		response = self.client.post('/api/v1/appointments', payload, format='json')
+		self.assertEqual(response.status_code, 201)
+		self.assertEqual(response.data['reason'], 'Follow-up for recurring fever')
+		self.assertTrue(Appointment.objects.filter(patient=self.patient, doctor=self.doctor, reason='Follow-up for recurring fever').exists())
+
+		duplicate = self.client.post('/api/v1/appointments', payload, format='json')
+		self.assertEqual(duplicate.status_code, 409)
+		self.assertIn('already exists', str(duplicate.data['error']).lower())
 
 	def test_doctor_can_create_consultation_and_followup(self):
 		self.client.force_authenticate(self.doctor)

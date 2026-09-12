@@ -153,6 +153,48 @@ class HospitalAdminProfile(models.Model):
         return f'{self.admin_name} - {self.facility.name}'
 
 
+class HospitalStaff(models.Model):
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='staff_members')
+    name = models.CharField(max_length=200)
+    staff_id = models.CharField(max_length=50)
+    role = models.CharField(max_length=50)
+    department = models.CharField(max_length=120)
+    status = models.CharField(max_length=30, default='Active')
+    contact = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['facility', 'staff_id'], name='unique_hospital_staff_id'),
+        ]
+
+    def __str__(self):
+        return f'{self.staff_id} - {self.name}'
+
+
+class Equipment(models.Model):
+    CATEGORY_CHOICES = [('basic', 'Basic Resource'), ('advanced', 'Advanced Equipment')]
+
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='equipment')
+    name = models.CharField(max_length=200)
+    quantity = models.PositiveIntegerField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='basic')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.name} ({self.quantity})'
+
+
+class BedResource(models.Model):
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='bed_resources')
+    name = models.CharField(max_length=120)
+    total = models.PositiveIntegerField()
+    occupied = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.name} ({self.occupied}/{self.total})'
+
+
 class Appointment(models.Model):
     STATUS_CHOICES = [
         ('Scheduled', 'Scheduled'),
@@ -171,6 +213,7 @@ class Appointment(models.Model):
     doctor_name = models.CharField(max_length=150)
     facility = models.ForeignKey(Facility, on_delete=models.SET_NULL, null=True)
     appointment_time = models.DateTimeField()
+    reason = models.TextField(blank=True, default='')
     queue_number = models.CharField(max_length=20, default='A-17')
     patients_ahead = models.IntegerField(default=4)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Scheduled')
@@ -303,6 +346,37 @@ class FollowUp(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class DigitalTriageAssessment(models.Model):
+    PRIORITY_CHOICES = [
+        ('EMERGENCY', 'Emergency'),
+        ('MEDIUM', 'Medium'),
+        ('LOW', 'Low'),
+    ]
+    STATUS_CHOICES = [
+        ('NEW', 'New'),
+        ('REVIEWED', 'Reviewed'),
+        ('RESOLVED', 'Resolved'),
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='digital_triage_assessments')
+    main_symptom = models.CharField(max_length=200)
+    duration = models.CharField(max_length=80, blank=True, default='')
+    additional_symptoms = models.JSONField(default=list, blank=True)
+    follow_up_answers = models.JSONField(default=list, blank=True)
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='LOW')
+    recommendation = models.TextField(blank=True, default='')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='NEW')
+    source = models.CharField(max_length=50, default='patient_portal')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.patient.patient_id} - {self.priority} - {self.main_symptom}'
+
+
 class HealthTimelineRecord(models.Model):
     RECORD_TYPES = [
         ('CONSULTATION', 'PHC / Specialist Consultation'),
@@ -345,10 +419,15 @@ class HealthTimelineRecord(models.Model):
 
 class MedicineStock(models.Model):
     name = models.CharField(max_length=200)
+    medicine_id = models.CharField(max_length=50, default='')
+    category = models.CharField(max_length=80, default='')
+    unit = models.CharField(max_length=40, default='Tablets')
     dosage = models.CharField(max_length=50, default='500mg')
     facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='medicines')
     is_available = models.BooleanField(default=True)
     quantity = models.IntegerField(default=100)
+    reorder_level = models.PositiveIntegerField(default=1)
+    expiry_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} {self.dosage}"

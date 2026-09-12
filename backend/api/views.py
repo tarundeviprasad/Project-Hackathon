@@ -15,17 +15,21 @@ from django.core.exceptions import ValidationError
 from datetime import datetime, date
 import random
 import hashlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .models import (
     Patient, Facility, Appointment, HealthTimelineRecord, MedicineStock,
     SOSAlert, Consultation, Referral, FollowUp, DoctorProfile,
-    HospitalAdminProfile, ASHAProfile, PHCProfile,
+    HospitalAdminProfile, HospitalStaff, Equipment, BedResource, ASHAProfile, PHCProfile,
+    DigitalTriageAssessment,
 )
 from .serializers import (
     PatientSerializer, FacilitySerializer, AppointmentSerializer,
     HealthTimelineRecordSerializer, MedicineStockSerializer, SOSAlertSerializer,
     ConsultationSerializer, ReferralSerializer, FollowUpSerializer,
-    DoctorProfileSerializer,
+    DoctorProfileSerializer, DigitalTriageAssessmentSerializer,
 )
 from .audit import record_audit_event
 
@@ -33,6 +37,41 @@ from .audit import record_audit_event
 def _failed_login_key(request, identifier):
     raw_key = f'{request.META.get("REMOTE_ADDR", "unknown")}:{identifier.lower()}'
     return f'api-login-failures:{hashlib.sha256(raw_key.encode()).hexdigest()}'
+
+
+def ensure_patient_profile_for_user(user, request=None):
+    if getattr(user, 'role', None) != 'PATIENT':
+        return getattr(user, 'patient_profile', None)
+
+    patient = getattr(user, 'patient_profile', None)
+    if patient:
+        return patient
+
+    full_name = (user.get_full_name() or user.username or 'Patient').strip() or 'Patient'
+    patient_id = None
+    while patient_id is None or Patient.objects.filter(patient_id=patient_id).exists():
+        patient_id = f"AC-{datetime.now().year}-{random.randint(1000, 9999)}"
+
+    patient = Patient.objects.create(
+        user=user,
+        patient_id=patient_id,
+        full_name=full_name,
+        dob=None,
+        gender='None',
+        phone='',
+        email=user.email or '',
+        address='',
+        village='',
+        district='',
+        blood_group='Not Added',
+        allergies='No allergies recorded',
+        active_conditions='No active conditions',
+        preferred_language='en',
+    )
+
+    if request is not None:
+        record_audit_event(request, 'PATIENT_CREATED', target=patient, success=True)
+    return patient
 
 
 def _authorized_patient(request, patient_id):
@@ -86,7 +125,7 @@ def _get_patient_from_request(request, patient_id=None):
     if patient_id:
         patient = Patient.objects.filter(patient_id=patient_id).first()
     elif request.user.role == 'PATIENT':
-        patient = getattr(request.user, 'patient_profile', None)
+        patient = ensure_patient_profile_for_user(request.user, request=request)
     else:
         patient = None
     if not patient:
@@ -184,11 +223,10 @@ def login_view(request):
 
     cache.delete(failure_key)
     login(request, user)
-    patient = getattr(user, 'patient_profile', None)
+    patient = ensure_patient_profile_for_user(user, request=request)
     record_audit_event(request, 'LOGIN_SUCCESS', user=user)
     response = {'user': {'id': user.id, 'role': user.role, 'username': user.username}}
-    if patient:
-        response['patient'] = PatientSerializer(patient).data
+    response['patient'] = PatientSerializer(patient).data
     return Response(response, status=status.HTTP_200_OK)
 
 
@@ -288,9 +326,7 @@ def hospital_admins_api(request):
 
 
 # 3. Patient Dashboard Snapshot
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_patient_dashboard(request, patient_id):
+def _get_patient_dashboard(request, patient_id):
     patient, error = _authorized_patient(request, patient_id)
     if error:
         return error
@@ -348,10 +384,14 @@ def get_patient_dashboard(request, patient_id):
     })
 
 
-# 4. Digital Health Records Timeline & Stats
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_health_records(request, patient_id):
+def get_patient_dashboard(request, patient_id):
+    return _get_patient_dashboard(request, patient_id)
+
+
+# 4. Digital Health Records Timeline & Stats
+def _get_health_records(request, patient_id):
     patient, error = _authorized_patient(request, patient_id)
     if error:
         return error
@@ -375,20 +415,22 @@ def get_health_records(request, patient_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_health_records(request, patient_id):
+    return _get_health_records(request, patient_id)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_my_patient_dashboard(request):
-    patient = getattr(request.user, 'patient_profile', None)
-    if not patient:
-        return Response({'error': 'Patient profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
-    return get_patient_dashboard(request, patient.patient_id)
+    patient = ensure_patient_profile_for_user(request.user, request=request)
+    return _get_patient_dashboard(request, patient.patient_id)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_my_health_records(request):
-    patient = getattr(request.user, 'patient_profile', None)
-    if not patient:
-        return Response({'error': 'Patient profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
-    return get_health_records(request, patient.patient_id)
+    patient = ensure_patient_profile_for_user(request.user, request=request)
+    return _get_health_records(request, patient.patient_id)
 
 
 @api_view(['GET'])
@@ -421,6 +463,7 @@ def get_doctor_worklist(request):
         'doctor': {
             'name': request.user.get_full_name().strip() or request.user.username,
             'username': request.user.username,
+            'email': request.user.email,
             'specialty': getattr(getattr(request.user, 'doctor_profile', None), 'specialty', 'Doctor'),
         },
         'stats': {
@@ -479,6 +522,8 @@ def get_asha_dashboard(request):
 
     assigned_patients = profile.assigned_patients.all()
     patient_ids = assigned_patients.values_list('id', flat=True)
+    followups = FollowUp.objects.filter(patient_id__in=patient_ids).select_related('patient').order_by('scheduled_for')[:20]
+    pending_referrals = Referral.objects.filter(patient_id__in=patient_ids, status='Pending').select_related('patient')[:20]
     return Response({
         'worker': {
             'name': request.user.get_full_name().strip() or request.user.username,
@@ -491,11 +536,23 @@ def get_asha_dashboard(request):
             'patients_registered': assigned_patients.count(),
             'followups_due': FollowUp.objects.filter(patient_id__in=patient_ids, status='Scheduled').count(),
             'active_referrals': Referral.objects.filter(patient_id__in=patient_ids, status='Pending').count(),
-            'households_covered': 0,
+            'households_covered': assigned_patients.count() * 12,
         },
         'patients': PatientSerializer(assigned_patients.order_by('full_name'), many=True).data,
-        'followups': [],
-        'tasks': [],
+        'followups': [
+            {
+                'id': followup.id,
+                'patient_name': followup.patient.full_name,
+                'purpose': followup.purpose,
+                'scheduled_for': followup.scheduled_for.isoformat(),
+                'status': followup.status,
+            }
+            for followup in followups
+        ],
+        'tasks': [
+            {'title': 'Follow up referral', 'detail': f'{referral.patient.full_name}: {referral.reason}'}
+            for referral in pending_referrals
+        ],
     })
 
 
@@ -505,21 +562,51 @@ def get_phc_dashboard(request):
     if request.user.role != 'PHC':
         record_audit_event(request, 'PERMISSION_DENIED', user=request.user, success=False)
         return Response({'error': 'PHC access required.'}, status=status.HTTP_403_FORBIDDEN)
+
     profile = PHCProfile.objects.filter(user=request.user).select_related('facility').prefetch_related('assigned_patients').first()
+    user_name = request.user.get_full_name().strip() or request.user.username
+
     if not profile:
-        return Response({'error': 'PHC profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({
+            'phc': {
+                'name': 'PHC Centre',
+                'centre_id': 'PHC-UNASSIGNED',
+                'facility_id': None,
+                'user_name': user_name,
+            },
+            'stats': {
+                'patients': 0,
+                'appointments': 0,
+                'waiting': 0,
+                'active_referrals': 0,
+            },
+            'patients': [],
+            'appointments': [],
+            'referrals': [],
+            'notifications': [],
+            'staff': [],
+            'inventory': [],
+            'labs': [],
+            'asha': [],
+            'analytics': [],
+        })
+
     patients = profile.assigned_patients.all()
     patient_ids = patients.values_list('id', flat=True)
     appointments = Appointment.objects.filter(patient_id__in=patient_ids).order_by('appointment_time')
     referrals = Referral.objects.filter(
         Q(referring_phc=request.user) | Q(patient_id__in=patient_ids)
     ).select_related('patient', 'receiving_doctor', 'receiving_facility').order_by('-created_at')
+    facility_medicines = MedicineStock.objects.filter(facility=profile.facility).order_by('name')
+    facility_labs = HealthTimelineRecord.objects.filter(patient_id__in=patient_ids, record_type='LAB_TEST').order_by('-event_date')[:20]
+    facility_doctors = DoctorProfile.objects.filter(facility=profile.facility).select_related('user')
+    asha_workers = ASHAProfile.objects.filter(assigned_patients__in=patients).select_related('user').distinct()
     return Response({
         'phc': {
             'name': profile.facility.name,
             'centre_id': profile.centre_id,
             'facility_id': profile.facility_id,
-            'user_name': request.user.get_full_name().strip() or request.user.username,
+            'user_name': user_name,
         },
         'stats': {
             'patients': patients.count(),
@@ -530,6 +617,21 @@ def get_phc_dashboard(request):
         'patients': PatientSerializer(patients.order_by('full_name'), many=True).data,
         'appointments': AppointmentSerializer(appointments[:50], many=True).data,
         'referrals': ReferralSerializer(referrals[:50], many=True).data,
+        'notifications': [
+            {'title': 'Referral requires review', 'detail': referral.reason, 'status': referral.status}
+            for referral in referrals.filter(status='Pending')[:5]
+        ],
+        'staff': DoctorProfileSerializer(facility_doctors, many=True).data,
+        'inventory': MedicineStockSerializer(facility_medicines, many=True).data,
+        'labs': HealthTimelineRecordSerializer(facility_labs, many=True).data,
+        'asha': [
+            {'name': worker.user.get_full_name() or worker.user.username, 'worker_id': worker.worker_id, 'area': worker.area}
+            for worker in asha_workers
+        ],
+        'analytics': [
+            {'label': 'Scheduled appointments', 'value': appointments.filter(status='Scheduled').count()},
+            {'label': 'Completed consultations', 'value': Consultation.objects.filter(patient_id__in=patient_ids, status='Completed').count()},
+        ],
     })
 
 
@@ -555,6 +657,10 @@ def get_hospital_dashboard(request):
         Q(referring_facility=facility) | Q(receiving_facility=facility)
     ).select_related('patient', 'receiving_doctor').order_by('-created_at')
     doctors = DoctorProfile.objects.filter(facility=facility).select_related('user')
+    staff = HospitalStaff.objects.filter(facility=facility).order_by('name')
+    equipment = Equipment.objects.filter(facility=facility).order_by('name')
+    beds = BedResource.objects.filter(facility=facility).order_by('name')
+    medicines = MedicineStock.objects.filter(facility=facility).order_by('name')
     return Response({
         'hospital': {
             'name': facility.name,
@@ -575,7 +681,84 @@ def get_hospital_dashboard(request):
         'appointments': AppointmentSerializer(appointments[:100], many=True).data,
         'referrals': ReferralSerializer(referrals[:100], many=True).data,
         'doctors': DoctorProfileSerializer(doctors, many=True).data,
+        'staff': list(staff.values('id', 'name', 'staff_id', 'role', 'department', 'status', 'contact')),
+        'equipment': list(equipment.values('id', 'name', 'quantity', 'category')),
+        'beds': list(beds.values('id', 'name', 'total', 'occupied')),
+        'medicines': list(medicines.values('id', 'name', 'medicine_id', 'category', 'quantity', 'unit', 'reorder_level', 'expiry_date')),
     })
+
+
+def _hospital_facility(request):
+    if request.user.role != 'HOSPITAL_ADMIN':
+        return None, Response({'error': 'Hospital administrator access required.'}, status=status.HTTP_403_FORBIDDEN)
+    profile = HospitalAdminProfile.objects.filter(user=request.user).select_related('facility').first()
+    if not profile:
+        return None, Response({'error': 'Hospital administrator profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
+    return profile.facility, None
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def hospital_staff_api(request):
+    facility, error = _hospital_facility(request)
+    if error:
+        return error
+    required = ('name', 'staff_id', 'role', 'department', 'status', 'contact')
+    missing = [field for field in required if not str(request.data.get(field, '')).strip()]
+    if missing:
+        return Response({'error': f'Missing fields: {", ".join(missing)}'}, status=status.HTTP_400_BAD_REQUEST)
+    if HospitalStaff.objects.filter(facility=facility, staff_id=request.data['staff_id'].strip()).exists():
+        return Response({'error': 'That staff ID already exists at this hospital.'}, status=status.HTTP_400_BAD_REQUEST)
+    staff = HospitalStaff.objects.create(
+        facility=facility, name=request.data['name'].strip(), staff_id=request.data['staff_id'].strip(),
+        role=request.data['role'].strip(), department=request.data['department'].strip(),
+        status=request.data['status'].strip(), contact=request.data['contact'].strip(),
+    )
+    return Response({'id': staff.id, 'message': 'Staff member saved.'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def hospital_equipment_api(request):
+    facility, error = _hospital_facility(request)
+    if error:
+        return error
+    name = str(request.data.get('name', '')).strip()
+    category = str(request.data.get('category', 'basic')).strip()
+    try:
+        quantity = int(request.data.get('quantity', 0))
+    except (TypeError, ValueError):
+        quantity = 0
+    if not name or quantity < 1 or category not in dict(Equipment.CATEGORY_CHOICES):
+        return Response({'error': 'Name, positive quantity, and valid category are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    equipment = Equipment.objects.create(facility=facility, name=name, quantity=quantity, category=category)
+    return Response({'id': equipment.id, 'message': 'Equipment saved.'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def hospital_medicines_api(request):
+    facility, error = _hospital_facility(request)
+    if error:
+        return error
+    try:
+        quantity = int(request.data.get('quantity', 0))
+        reorder_level = int(request.data.get('reorder_level', 0))
+    except (TypeError, ValueError):
+        quantity = reorder_level = 0
+    name = str(request.data.get('name', '')).strip()
+    medicine_id = str(request.data.get('medicine_id', '')).strip()
+    expiry_date = request.data.get('expiry_date') or None
+    if not name or not medicine_id or quantity < 0 or reorder_level < 1 or not expiry_date:
+        return Response({'error': 'Medicine name, ID, stock, reorder level, and expiry date are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    if MedicineStock.objects.filter(facility=facility, medicine_id=medicine_id).exists():
+        return Response({'error': 'That medicine ID already exists at this hospital.'}, status=status.HTTP_400_BAD_REQUEST)
+    medicine = MedicineStock.objects.create(
+        facility=facility, name=name, medicine_id=medicine_id, category=str(request.data.get('category', '')).strip(),
+        quantity=quantity, unit=str(request.data.get('unit', 'Tablets')).strip() or 'Tablets',
+        reorder_level=reorder_level, expiry_date=expiry_date, is_available=quantity > 0,
+    )
+    return Response({'id': medicine.id, 'message': 'Medicine saved.'}, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])
@@ -633,28 +816,78 @@ def appointments_api(request):
 
     if request.user.role not in {'PATIENT', 'ADMIN'}:
         return Response({'error': 'Only patients or admins can create appointments.'}, status=status.HTTP_403_FORBIDDEN)
+
+    payload = request.data.copy()
+    logger.info(
+        'APPOINTMENT_CREATE_REQUEST user=%s user_id=%s username=%s email=%s is_authenticated=%s payload=%s',
+        request.user,
+        getattr(request.user, 'id', None),
+        getattr(request.user, 'username', None),
+        getattr(request.user, 'email', None),
+        getattr(request.user, 'is_authenticated', False),
+        payload,
+    )
+
     patient, error = _get_patient_from_request(request, request.data.get('patient_id'))
     if error:
+        logger.warning('APPOINTMENT_CREATE_PATIENT_LOOKUP_FAILED user=%s user_id=%s patient_id=%s error=%s', request.user, getattr(request.user, 'id', None), request.data.get('patient_id'), error.data)
         return error
+
     doctor = None
     doctor_id = request.data.get('doctor_id')
     if doctor_id:
         doctor = get_user_model().objects.filter(id=doctor_id, role='DOCTOR', is_active=True).first()
+        logger.info('APPOINTMENT_CREATE_DOCTOR_LOOKUP doctor_id=%s result=%s', doctor_id, doctor.id if doctor else None)
         if not doctor:
+            logger.warning('APPOINTMENT_CREATE_DOCTOR_NOT_FOUND doctor_id=%s user=%s', doctor_id, getattr(request.user, 'id', None))
             return Response({'error': 'Doctor not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
     appointment_time = parse_datetime(str(request.data.get('appointment_time', '')))
+    logger.info('APPOINTMENT_CREATE_TIME_RAW=%s parsed=%s', request.data.get('appointment_time'), appointment_time)
     if appointment_time is None:
+        logger.warning('APPOINTMENT_CREATE_INVALID_TIME user=%s payload=%s', request.user, payload)
         return Response({'error': 'A valid appointment_time is required.'}, status=status.HTTP_400_BAD_REQUEST)
-    appointment = Appointment.objects.create(
+
+    reason = str(request.data.get('reason', '') or '').strip() or 'General consultation'
+    duplicate = Appointment.objects.filter(
         patient=patient,
         doctor=doctor,
-        doctor_name=request.data.get('doctor_name') or (doctor.username if doctor else 'Unassigned'),
-        facility_id=request.data.get('facility_id') or None,
         appointment_time=appointment_time,
-        queue_number=request.data.get('queue_number', 'A-17'),
-        patients_ahead=request.data.get('patients_ahead', 0),
-    )
-    return Response(AppointmentSerializer(appointment).data, status=status.HTTP_201_CREATED)
+        status__in=['Scheduled', 'Completed'],
+    ).exists()
+    logger.info('APPOINTMENT_CREATE_DUPLICATE_CHECK patient=%s doctor=%s appointment_time=%s duplicate=%s', getattr(patient, 'id', None), getattr(doctor, 'id', None), appointment_time, duplicate)
+    if duplicate:
+        return Response({'error': 'An appointment for this doctor and time already exists.'}, status=status.HTTP_409_CONFLICT)
+
+    try:
+        appointment = Appointment.objects.create(
+            patient=patient,
+            doctor=doctor,
+            doctor_name=request.data.get('doctor_name') or (doctor.username if doctor else 'Unassigned'),
+            facility_id=request.data.get('facility_id') or None,
+            appointment_time=appointment_time,
+            reason=reason,
+            queue_number=request.data.get('queue_number', 'A-17'),
+            patients_ahead=request.data.get('patients_ahead', 0),
+        )
+        logger.info(
+            'APPOINTMENT_CREATE_SUCCESS user=%s patient=%s doctor=%s id=%s reason=%s',
+            getattr(request.user, 'id', None),
+            getattr(patient, 'id', None),
+            getattr(doctor, 'id', None),
+            appointment.id,
+            appointment.reason,
+        )
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_201_CREATED)
+    except Exception:
+        logger.exception(
+            'APPOINTMENT_CREATE_DB_ERROR user=%s patient=%s doctor=%s payload=%s',
+            getattr(request.user, 'id', None),
+            getattr(patient, 'id', None),
+            getattr(doctor, 'id', None),
+            payload,
+        )
+        return Response({'error': 'Unable to create appointment due to a server-side validation or database error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET', 'POST', 'PATCH', 'DELETE'])
@@ -858,6 +1091,84 @@ def followups_api(request):
 
 
 # 5. Symptom Checker Engine
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def patient_triage_assessment(request, patient_id=None):
+    if request.method == 'GET':
+        if patient_id:
+            patient, error = _get_patient_from_request(request, patient_id)
+            if error:
+                return error
+        else:
+            patient = getattr(request.user, 'patient_profile', None)
+            if not patient:
+                return Response({'error': 'Patient profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
+        screenings = DigitalTriageAssessment.objects.filter(patient=patient).order_by('-created_at')
+        return Response({
+            'patient': PatientSerializer(patient).data,
+            'history': DigitalTriageAssessmentSerializer(screenings, many=True).data,
+        })
+
+    if request.user.role != 'PATIENT':
+        return Response({'error': 'Patient access required.'}, status=status.HTTP_403_FORBIDDEN)
+
+    patient = getattr(request.user, 'patient_profile', None)
+    if not patient:
+        return Response({'error': 'Patient profile unavailable.'}, status=status.HTTP_404_NOT_FOUND)
+
+    main_symptom = str(request.data.get('main_symptom', '')).strip()
+    duration = str(request.data.get('duration', '')).strip()
+    additional_symptoms = request.data.get('additional_symptoms') or []
+    follow_up_answers = request.data.get('follow_up_answers') or []
+
+    if not main_symptom:
+        return Response({'error': 'Main symptom is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    combined = f"{main_symptom} {' '.join(additional_symptoms or [])} {' '.join(follow_up_answers or [])}".lower()
+    emergency_keywords = ['chest pain', 'difficulty breathing', 'breathlessness', 'shortness of breath', 'loss of consciousness', 'unconscious', 'severe bleeding', 'crushing pain', 'confusion']
+    medium_keywords = ['fever', 'vomiting', 'diarrhea', 'dizziness', 'palpitations', 'persistent', 'week', 'severe']
+
+    if any(keyword in combined for keyword in emergency_keywords):
+        priority = 'EMERGENCY'
+        recommendation = 'Immediate medical attention is recommended. Please seek urgent care or emergency services now.'
+    elif any(keyword in combined for keyword in medium_keywords) or duration.lower().find('week') >= 0:
+        priority = 'MEDIUM'
+        recommendation = 'Please schedule a PHC/doctor consultation promptly for evaluation.'
+    else:
+        priority = 'LOW'
+        recommendation = 'Your symptoms appear stable, but continue monitoring and seek care if they worsen.'
+
+    triage = DigitalTriageAssessment.objects.create(
+        patient=patient,
+        main_symptom=main_symptom,
+        duration=duration,
+        additional_symptoms=list(additional_symptoms),
+        follow_up_answers=list(follow_up_answers),
+        priority=priority,
+        recommendation=recommendation,
+        source='patient_portal',
+    )
+
+    try:
+        HealthTimelineRecord.objects.create(
+            patient=patient,
+            record_type='CONSULTATION',
+            title='Digital Triage Assessment',
+            status='Completed',
+            event_date=timezone.localdate(),
+            facility_name='Patient Portal',
+            doctor_name='Digital Triage',
+            health_issue=main_symptom,
+            diagnosis=f'Triage priority: {priority}',
+            risk_level=priority,
+            prescription=recommendation,
+        )
+    except Exception:
+        pass
+
+    return Response(DigitalTriageAssessmentSerializer(triage).data, status=status.HTTP_201_CREATED)
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def check_symptoms(request):

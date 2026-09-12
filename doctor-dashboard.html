@@ -181,10 +181,32 @@
         .profile-info {
             display: flex;
             flex-direction: column;
+            min-width: 0;
+            max-width: 220px;
         }
 
-        .profile-info .name { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
-        .profile-info .role { font-size: 0.75rem; color: var(--text-secondary); }
+        .profile-info .name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-info .role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-info .email {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         /* Mobile Nav Toggle */
         .mobile-toggle { display: none; }
@@ -609,15 +631,11 @@
                     <span style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #EF4444; border-radius: 50%; border: 2px solid white;"></span>
                 </a>
                 <a class="profile-trigger" href="/Consultation.html" aria-label="Doctor profile">
-                    <div class="avatar">AS</div>
+                    <div class="avatar" id="doctorAvatar">DR</div>
                     <div class="profile-info desktop-only">
-<<<<<<< HEAD
-                        <span class="name">Dr. Kranthi Prabha</span>
-                        <span class="role">General Physician</span>
-=======
                         <span id="doctorDisplayName" class="name">Loading...</span>
                         <span id="doctorDisplayRole" class="role">Doctor</span>
->>>>>>> f174809 (final)
+                        <span id="doctorDisplayEmail" class="email">Loading...</span>
                     </div>
                     <i data-lucide="chevron-down" size="14" color="#667085"></i>
                 </a>
@@ -630,11 +648,7 @@
         <section class="hero-section">
             <div class="welcome-card">
                 <div class="welcome-text">
-<<<<<<< HEAD
-                    <h1>Good morning, Dr. Kranthi Prabha</h1>
-=======
                     <h1 id="doctorGreeting">Good morning</h1>
->>>>>>> f174809 (final)
                     <p>Here's what's happening at your facility today.</p>
                 </div>
                 <div class="hero-visual">
@@ -945,9 +959,17 @@
             const response = await fetch('/api/v1/doctor/worklist', { credentials: 'same-origin' });
             if (!response.ok) return;
             const data = await response.json();
-            document.getElementById('doctorDisplayName').textContent = data.doctor.name;
-            document.getElementById('doctorDisplayRole').textContent = data.doctor.specialty;
-            document.getElementById('doctorGreeting').textContent = `Good morning, ${data.doctor.name}`;
+            const doctorName = data.doctor?.name || 'Doctor';
+            const doctorRole = data.doctor?.specialty || 'Doctor';
+            const doctorEmail = data.doctor?.email || data.doctor?.username || 'No email';
+            const hour = new Date().getHours();
+            const greetingPrefix = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+            document.getElementById('doctorDisplayName').textContent = doctorName;
+            document.getElementById('doctorDisplayRole').textContent = doctorRole;
+            document.getElementById('doctorDisplayEmail').textContent = doctorEmail;
+            document.getElementById('doctorGreeting').textContent = `${greetingPrefix}, ${doctorName}`;
+            document.getElementById('doctorAvatar').textContent = doctorName.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0].toUpperCase()).join('') || 'DR';
             document.getElementById('doctorAppointmentsCount').textContent = data.stats.appointments;
             document.getElementById('doctorConsultationsCount').textContent = data.stats.consultations;
             document.getElementById('doctorPatientsCount').textContent = data.stats.patients;
@@ -968,5 +990,6 @@
 
         loadDoctorDashboard().catch(() => {});
     </script>
+    <script src="/language.js"></script>
 </body>
 </html>

@@ -1492,11 +1492,13 @@
             const panel = document.getElementById('incoming-panel');
             if (!panel) return;
             panel.querySelectorAll('.referral-card').forEach(card => card.remove());
-            const cards = referrals.map(referral => `
+            const cards = referrals.map(referral => {
+                const patientName = referral.patient_name || referral.patient?.full_name || referral.patient?.name || 'Unknown patient';
+                return `
                 <div class="referral-card ${referral.status === 'Accepted' ? 'status-accepted' : ''}" data-referral-id="${referral.id}">
                     <div class="patient-info">
                         <span class="label">Patient Information</span>
-                        <span class="name">${referral.patient_id}</span>
+                        <span class="name">${patientName}</span>
                         <span class="meta">${referral.status}</span>
                     </div>
                     <div class="doc-info">
@@ -1515,7 +1517,8 @@
                     <div class="action-group">
                         ${referral.status === 'Pending' ? '<button class="btn-accept" type="button">Accept</button><button class="btn-decline" type="button">Decline</button>' : `<span class="accepted-badge">${referral.status}</span>`}
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
             panel.insertAdjacentHTML('beforeend', cards || '<p>No referrals have been recorded.</p>');
             panel.querySelectorAll('[data-referral-id] .btn-accept').forEach(button => {
                 button.addEventListener('click', () => updateReferral(button.closest('[data-referral-id]').dataset.referralId, 'Accepted'));
@@ -1534,17 +1537,35 @@
         }
 
         async function updateReferral(id, status) {
-            const response = await fetch(`/api/v1/referrals/${id}`, {
-                method: 'PATCH',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status })
-            });
-            if (!response.ok) {
-                window.alert('Unable to update referral status.');
-                return;
+            try {
+                const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+                const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
+                const response = await fetch(`/api/v1/referrals/${id}`, {
+                    method: 'PATCH',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ status })
+                });
+                const responseBody = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    console.error('Referral update failed', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        body: responseBody,
+                        id,
+                        status
+                    });
+                    window.alert(`Unable to update referral status. ${responseBody?.error || response.statusText || 'Please try again.'}`);
+                    return;
+                }
+                loadDatabaseReferrals();
+            } catch (error) {
+                console.error('Referral update request crashed:', error);
+                window.alert('Unable to update referral status. The request failed unexpectedly.');
             }
-            loadDatabaseReferrals();
         }
 
         async function loadDatabaseReferrals() {
@@ -1582,5 +1603,6 @@
         loadReferralTargets().catch(() => {});
     </script>
 
+    <script src="/language.js"></script>
 </body>
 </html>

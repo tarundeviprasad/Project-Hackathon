@@ -230,7 +230,6 @@
         .feat-queue { grid-column: span 3; }
         .feat-tele { grid-column: span 4; }
         .feat-symptom { grid-column: span 4; }
-        .feat-referral { grid-column: span 4; }
         .feat-meds { grid-column: span 6; }
         .feat-followup { grid-column: span 6; }
 
@@ -338,7 +337,7 @@
             .hero { grid-template-columns: 1fr; text-align: center; padding: 120px 24px 40px; }
             .hero-text p { margin: 0 auto 40px; }
             .snapshot-bar { flex-wrap: wrap; gap: 20px; padding: 24px; margin: 20px; }
-            .feat-records, .feat-apt, .feat-queue, .feat-tele, .feat-symptom, .feat-referral, .feat-meds, .feat-followup { grid-column: span 12; }
+            .feat-records, .feat-apt, .feat-queue, .feat-tele, .feat-symptom, .feat-meds, .feat-followup { grid-column: span 12; }
         }
     </style>
 </head>
@@ -348,11 +347,11 @@
         <a href="/index.html" class="logo" aria-label="AarogyaConnect home"><div class="logo-mark"><i data-lucide="plus"></i></div>
             AarogyaConnect</a>
         <div class="nav-links">
-            <a href="patient_portal.html" class="active" data-i18n="navDash">Dashboard</a>
-            <a href="booking_an_appointment.html" data-i18n="navApt">Appointments</a>
-            <a href="digital_health_record.html" data-i18n="navRec">Health Records</a>
-            <a href="symptom_checker.html" data-i18n="navRef">Referrals</a>
-            <a href="symptom_checker.html" data-i18n="navMed">Medicines</a>
+            <a href="/patient/dashboard/" class="active" data-i18n="navDash">Dashboard</a>
+            <a href="/booking_an_appointment.html" data-i18n="navApt">Appointments</a>
+            <a href="/digital_health_record.html" data-i18n="navRec">Health Records</a>
+            <a href="#medicine-availability" data-i18n="navMed">Medicines</a>
+            <a href="http://127.0.0.1:8001/" data-i18n="navTri">Digital Triage</a>
         </div>
         <div class="nav-right">
             <select id="portalLanguageSelector" onchange="updateLanguage(this.value)" style="border: none; background: transparent; font-weight: 600; cursor: pointer;">
@@ -375,7 +374,7 @@
         <div class="hero-text">
             <h2 id="patientGreeting" data-i18n="greeting">Good Morning, Patient</h2>
             <h1 data-i18n="heroTitle">Your healthcare, <br><span>connected</span> in one place.</h1>
-            <p data-i18n="heroDesc">Access your medical records, appointments, consultations, referrals, medicines and emergency support from one secure platform.</p>
+            <p data-i18n="heroDesc">Access your medical records, appointments, consultations, medicines and emergency support from one secure platform.</p>
         </div>
         <div class="visual-container">
             <div class="orb"></div>
@@ -394,11 +393,6 @@
         </div>
         <div class="snapshot-sep"></div>
         <div class="snapshot-item">
-            <span class="snapshot-label" data-i18n="activeRef">Active Referrals</span>
-            <span id="activeReferralsValue" class="snapshot-value">0</span>
-        </div>
-        <div class="snapshot-sep"></div>
-        <div class="snapshot-item">
             <span class="snapshot-label" data-i18n="recordsCount">Health Records</span>
             <span id="recordsCountValue" class="snapshot-value">0</span>
         </div>
@@ -412,7 +406,7 @@
             <div class="icon-box"><i data-lucide="calendar"></i></div>
             <h3 data-i18n="bookTitle">Book an Appointment</h3>
             <p data-i18n="bookDesc">Find the right doctor or healthcare centre and choose a convenient time.</p>
-            <button class="btn btn-white" type="button" onclick="window.location.href='booking_an_appointment.html'" data-i18n="bookBtn">Book Appointment</button>
+            <button class="btn btn-white" type="button" onclick="window.location.href='/booking_an_appointment.html'" data-i18n="bookBtn">Book Appointment</button>
         </div>
 
         <!-- Health Records -->
@@ -429,7 +423,7 @@
                     <span style="color: var(--slate-gray);">25 Aug</span>
                 </div>
             </div>
-            <a href="digital_health_record.html" class="btn btn-outline" data-i18n="viewRec">View Records →</a>
+            <a href="/digital_health_record.html" class="btn btn-outline" data-i18n="viewRec">View Records →</a>
         </div>
 
         <!-- Queue Status -->
@@ -446,48 +440,28 @@
             <div class="icon-box"><i data-lucide="video"></i></div>
             <h3 data-i18n="teleTitle">Teleconsultation</h3>
             <p data-i18n="teleDesc">Connect with a doctor without travelling long distances.</p>
-            <button class="btn btn-primary" type="button" onclick="window.location.href='symptom_checker.html'" data-i18n="teleBtn">Start Consultation</button>
+            <button class="btn btn-primary" type="button" onclick="window.location.href='/teleconsultation.html'" data-i18n="teleBtn">Start Consultation</button>
         </div>
 
-        <!-- Symptom Checker -->
+        <!-- Digital Triage -->
         <div class="card feat-symptom">
             <div class="icon-box"><i data-lucide="activity"></i></div>
-            <h3 data-i18n="sympTitle">Symptom Checker</h3>
+            <h3 data-i18n="sympTitle">Digital Triage</h3>
             <div style="background: var(--soft-ivory); border-radius: 12px; padding: 12px; margin-bottom: 16px;">
                 <p style="font-size: 0.75rem; margin: 0;" data-i18n="sympPrompt">Describe your symptoms...</p>
             </div>
-            <button class="btn btn-outline" type="button" onclick="window.location.href='symptom_checker.html'" data-i18n="sympBtn">Check Symptoms</button>
-        </div>
-
-        <!-- Referral Tracking -->
-        <div class="card feat-referral">
-            <div class="icon-box"><i data-lucide="git-branch"></i></div>
-            <h3 data-i18n="refTitle">Referral Progress</h3>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--rich-teal);"></div>
-                <div style="flex: 1; height: 2px; background: var(--deep-indigo);"></div>
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--deep-indigo);"></div>
-                <div style="flex: 1; height: 2px; background: var(--soft-border);"></div>
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--soft-border);"></div>
-            </div>
-            <p style="margin-top: 12px; font-weight: 700; color: var(--deep-indigo); font-size: 0.8rem;" data-i18n="refStatus">District Hospital</p>
+            <button class="btn btn-outline" type="button" onclick="window.location.href='http://127.0.0.1:8001/'" data-i18n="sympBtn">Open Digital Triage</button>
         </div>
 
         <!-- Medicine Availability -->
-        <div class="card feat-meds">
+        <div class="card feat-meds" id="medicine-availability">
             <div class="icon-box"><i data-lucide="pill"></i></div>
             <h3 data-i18n="medTitle">Medicine Availability</h3>
             <div style="display: flex; gap: 12px; margin-bottom: 20px;">
                 <input id="medicineSearchInput" type="text" placeholder="Search medicine..." style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--soft-border);">
             </div>
             <div id="medicineSearchResults" style="font-size: 0.85rem;">Search for a medicine to view availability.</div>
-            <button class="btn btn-outline" type="button" onclick="window.location.href='symptom_checker.html'" style="margin-top: 18px;">Check Medicines</button>
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--slate-gray);"></div>
-                    <span style="font-size: 0.85rem;" data-i18n="follow2">Blood pressure check (02 Sep)</span>
-                </div>
-            </div>
+            <button class="btn btn-outline" type="button" onclick="document.getElementById('medicineSearchInput').focus(); document.getElementById('medicineSearchInput').scrollIntoView({ behavior: 'smooth', block: 'center' });" style="margin-top: 18px;">Check Medicines</button>
         </div>
     </main>
 
@@ -526,55 +500,55 @@
         // --- Translation Engine ---
         const translations = {
             en: {
-                navDash: "Dashboard", navApt: "Appointments", navRec: "Health Records", navRef: "Referrals", navMed: "Medicines",
+                navDash: "Dashboard", navApt: "Appointments", navRec: "Health Records", navMed: "Medicines", navTri: "Digital Triage",
                 patient: "Patient", greeting: "Good Morning", heroTitle: "Your healthcare, connected in one place.",
-                heroDesc: "Access your medical records, appointments, consultations, referrals, medicines and emergency support from one secure platform.",
-                blood: "Blood Group", nextApt: "Next Appointment", aptDate: "Today, 10:30 AM", activeRef: "Active Referrals", recordsCount: "Health Records",
+                heroDesc: "Access your medical records, appointments, consultations, medicines and emergency support from one secure platform.",
+                blood: "Blood Group", nextApt: "Next Appointment", aptDate: "Today, 10:30 AM", recordsCount: "Health Records",
                 needToday: "What do you need today?", bookTitle: "Book an Appointment", bookDesc: "Find the right doctor or centre.", bookBtn: "Book Appointment",
                 recTitle: "Digital Health Records", viewRec: "View Records →", queueTitle: "Queue Status", queuePatients: "4 patients ahead",
                 teleTitle: "Teleconsultation", teleDesc: "Connect with a doctor remotely.", teleBtn: "Start Consultation",
-                sympTitle: "Symptom Checker", sympPrompt: "Describe symptoms...", sympBtn: "Check Symptoms",
-                refTitle: "Referral Progress", refStatus: "District Hospital", medTitle: "Medicine Availability", avail: "AVAILABLE",
-                followTitle: "Follow-up Reminders", follow1: "Take prescribed medicine (Tomorrow)", follow2: "Blood pressure check (02 Sep)",
+                sympTitle: "Digital Triage", sympPrompt: "Describe symptoms...", sympBtn: "Open Digital Triage",
+                medTitle: "Medicine Availability", avail: "AVAILABLE",
+                followTitle: "Follow-up Reminders", follow1: "Take prescribed medicine (Tomorrow)", follow2: "Follow-up check (02 Sep)",
                 sosTitle: "Emergency Assistance", sosDesc: "We use location to find help.", sosLoc: "Share My Location", sosCancel: "Cancel"
             },
             hi: {
-                navDash: "डैशबोर्ड", navApt: "अपॉइंटमेंट", navRec: "स्वास्थ्य रिकॉर्ड", navRef: "रेफरल", navMed: "दवाएं",
+                navDash: "डैशबोर्ड", navApt: "अपॉइंटमेंट", navRec: "स्वास्थ्य रिकॉर्ड", navMed: "दवाएं", navTri: "डिजिटल ट्रायाज",
                 patient: "मरीज", greeting: "सुप्रभात", heroTitle: "आपका स्वास्थ्य, एक स्थान पर जुड़ा हुआ।",
-                heroDesc: "एक सुरक्षित मंच से अपने मेडिकल रिकॉर्ड, अपॉइंटमेंट, परामर्श, रेफरल और आपातकालीन सहायता प्राप्त करें।",
-                blood: "रक्त समूह", nextApt: "अगला अपॉइंटमेंट", aptDate: "आज, 10:30 बजे", activeRef: "सक्रिय रेफरल", recordsCount: "स्वास्थ्य रिकॉर्ड",
+                heroDesc: "एक सुरक्षित मंच से अपने मेडिकल रिकॉर्ड, अपॉइंटमेंट, परामर्श, दवाएं और आपातकालीन सहायता प्राप्त करें।",
+                blood: "रक्त समूह", nextApt: "अगला अपॉइंटमेंट", aptDate: "आज, 10:30 बजे", recordsCount: "स्वास्थ्य रिकॉर्ड",
                 needToday: "आज आपको क्या चाहिए?", bookTitle: "अपॉइंटमेंट बुक करें", bookDesc: "सही डॉक्टर या केंद्र खोजें।", bookBtn: "अपॉइंटमेंट बुक करें",
                 recTitle: "डिजिटल स्वास्थ्य रिकॉर्ड", viewRec: "रिकॉर्ड देखें →", queueTitle: "कतार की स्थिति", queuePatients: "4 मरीज आगे हैं",
                 teleTitle: "टेली-परामर्श", teleDesc: "दूर से डॉक्टर से जुड़ें।", teleBtn: "परामर्श शुरू करें",
-                sympTitle: "लक्षण जांचक", sympPrompt: "लक्षणों का वर्णन करें...", sympBtn: "लक्षणों की जांच करें",
-                refTitle: "रेफरल प्रगति", refStatus: "जिला अस्पताल", medTitle: "दवा की उपलब्धता", avail: "उपलब्ध",
-                followTitle: "फॉलो-अप रिमाइंडर", follow1: "निर्धारित दवा लें (कल)", follow2: "रक्तचाप की जांच (02 सितंबर)",
+                sympTitle: "डिजिटल ट्रायाज", sympPrompt: "लक्षणों का वर्णन करें...", sympBtn: "डिजिटल ट्रायाज खोलें",
+                medTitle: "दवा की उपलब्धता", avail: "उपलब्ध",
+                followTitle: "फॉलो-अप रिमाइंडर", follow1: "निर्धारित दवा लें (कल)", follow2: "फॉलो-अप जाँच (02 सितंबर)",
                 sosTitle: "आपातकालीन सहायता", sosDesc: "मदद के लिए हम स्थान का उपयोग करते हैं।", sosLoc: "स्थान साझा करें", sosCancel: "रद्द करें"
             },
             te: {
-                navDash: "డ్యాష్‌బోర్డ్", navApt: "అపాయింట్‌మెంట్లు", navRec: "ఆరోగ్య రికార్డులు", navRef: "రిఫరల్స్", navMed: "మందులు",
+                navDash: "డ్యాష్‌బోర్డ్", navApt: "అపాయింట్‌మెంట్లు", navRec: "ఆరోగ్య రికార్డులు", navMed: "మందులు", navTri: "డిజిటల్ ట్రయేజ్",
                 patient: "రోగి", greeting: "శుభోదయం", heroTitle: "మీ ఆరోగ్యం, ఒకే చోట అనుసంధానించబడింది.",
-                heroDesc: "ఒకే సురక్షిత ప్లాట్‌ఫారమ్ నుండి మీ వైద్య రికార్డులు, అపాయింట్‌మెంట్లు, సంప్రదింపులు మరియు అత్యవసర సహాయాన్ని పొందండి.",
-                blood: "రక్త గ్రూపు", nextApt: "తదుపరి అపాయింట్‌మెంట్", aptDate: "ఈరోజు, 10:30 AM", activeRef: "క్రియాశీల రిఫరల్స్", recordsCount: "ఆరోగ్య రికార్డులు",
+                heroDesc: "ఒకే సురక్షిత ప్లాట్‌ఫారమ్ నుండి మీ వైద్య రికార్డులు, అపాయింట్‌మెంట్లు, సంప్రదింపులు, మందులు మరియు అత్యవసర సహాయం పొందండి.",
+                blood: "రక్త గ్రూపు", nextApt: "తదుపరి అపాయింట్‌మెంట్", aptDate: "ఈరోజు, 10:30 AM", recordsCount: "ఆరోగ్య రికార్డులు",
                 needToday: "ఈరోజు మీకు ఏమి కావాలి?", bookTitle: "అపాయింట్‌మెంట్ బుక్ చేయండి", bookDesc: "సరైన వైద్యుడిని కనుగొనండి.", bookBtn: "బుక్ చేయండి",
                 recTitle: "డిజిటల్ ఆరోగ్య రికార్డులు", viewRec: "రికార్డులు చూడండి →", queueTitle: "క్యూ స్థితి", queuePatients: "4 రోగులు ముందున్నారు",
                 teleTitle: "టెలికన్సల్టేషన్", teleDesc: "దూరం నుండి వైద్యుడిని సంప్రదించండి.", teleBtn: "ప్రారంభించండి",
-                sympTitle: "లక్షణాల తనిఖీ", sympPrompt: "లక్షణాలను వివరించండి...", sympBtn: "తనిఖీ చేయండి",
-                refTitle: "రిఫరల్ పురోగతి", refStatus: "జిల్లా ఆసుపత్రి", medTitle: "మందుల లభ్యత", avail: "అందుబాటులో ఉంది",
-                followTitle: "రిమైండర్లు", follow1: "మందులు తీసుకోండి (రేపు)", follow2: "బీపీ తనిఖీ (02 సెప్టెంబర్)",
+                sympTitle: "డిజిటల్ ట్రయేజ్", sympPrompt: "లక్షణాలను వివరించండి...", sympBtn: "డిజిటల్ ట్రయేజ్‌ను తెరవండి",
+                medTitle: "మందుల లభ్యత", avail: "అందుబాటులో ఉంది",
+                followTitle: "రిమైండర్లు", follow1: "మందులు తీసుకోండి (రేపు)", follow2: "ఫాలో-అప్ చెక్ (02 సెప్టెంబర్)",
                 sosTitle: "అత్యవసర సహాయం", sosDesc: "సహాయం కోసం స్థానాన్ని ఉపయోగిస్తాము.", sosLoc: "స్థానాన్ని షేర్ చేయండి", sosCancel: "రద్దు చేయి"
             },
             mr: {
-                navDash: "डॅशबोर्ड", navApt: "अपॉइंटमेंट्स", navRec: "आरोग्य रेकॉर्ड", navRef: "रेफरल", navMed: "औषधे",
+                navDash: "डॅशबोर्ड", navApt: "अपॉइंटमेंट्स", navRec: "आरोग्य रेकॉर्ड", navMed: "औषधे", navTri: "डिजिटल ट्रायाज",
                 patient: "रुग्ण", greeting: "नमस्कार", heroTitle: "तुमचे आरोग्य, एका ठिकाणी जोडलेले.",
-                heroDesc: "एका सुरक्षित प्लॅटफॉर्मवरून तुमचे वैद्यकीय रेकॉर्ड, अपॉइंटमेंट, सल्लामसलत, रेफरल आणि आपत्कालीन मदत मिळवा.",
-                blood: "रक्त गट", nextApt: "पुढील अपॉइंटमेंट", aptDate: "आज, 10:30 AM", activeRef: "सक्रिय रेफरल", recordsCount: "आरोग्य रेकॉर्ड",
+                heroDesc: "एका सुरक्षित प्लॅटफॉर्मवरून तुमचे वैद्यकीय रेकॉर्ड, अपॉइंटमेंट, सल्लामसलत, औषधे आणि आपत्कालीन मदत मिळवा.",
+                blood: "रक्त गट", nextApt: "पुढील अपॉइंटमेंट", aptDate: "आज, 10:30 AM", recordsCount: "आरोग्य रेकॉर्ड",
                 needToday: "आज तुम्हाला काय हवे आहे?", bookTitle: "अपॉइंटमेंट बुक करा", bookDesc: "योग्य डॉक्टर किंवा केंद्र निवडा.", bookBtn: "अपॉइंटमेंट बुक करा",
                 recTitle: "डिजिटल आरोग्य रेकॉर्ड", viewRec: "रेकॉर्ड पहा →", queueTitle: "क्यूप्रणाली", queuePatients: "4 रुग्ण पुढे आहेत",
                 teleTitle: "टेलिकॉन्सल्टेशन", teleDesc: "दूरवरून डॉक्टराशी संपर्क साधा.", teleBtn: "सल्लामसलत सुरू करा",
-                sympTitle: "लक्षण तपासणी", sympPrompt: "लक्षणे लिहा...", sympBtn: "लक्षण तपासा",
-                refTitle: "रेफरल प्रगती", refStatus: "जिल्हा रुग्णालय", medTitle: "औषध उपलब्धता", avail: "उपलब्ध",
-                followTitle: "फॉलो-अप रिमाइंडर", follow1: "निर्धारित औषध घ्या (उद्या)", follow2: "रक्तदाब तपासणी (02 सप्टेंबर)",
+                sympTitle: "डिजिटल ट्रायाज", sympPrompt: "लक्षणे लिहा...", sympBtn: "डिजिटल ट्रायाज उघडा",
+                medTitle: "औषध उपलब्धता", avail: "उपलब्ध",
+                followTitle: "फॉलो-अप रिमाइंडर", follow1: "निर्धारित औषध घ्या (उद्या)", follow2: "फॉलो-अप तपासणी (02 सप्टेंबर)",
                 sosTitle: "आपत्कालीन मदत", sosDesc: "मदतीसाठी आम्ही तुमचे स्थान वापरू.", sosLoc: "माझे स्थान शेअर करा", sosCancel: "रद्द करा"
             }
         };
@@ -668,23 +642,28 @@
 
         async function loadPatientDashboard() {
             const response = await fetch('/api/v1/patient/me/dashboard', { credentials: 'same-origin' });
-            if (!response.ok) return;
+            if (!response.ok) {
+                document.getElementById('patientDisplayName').textContent = 'Patient';
+                document.getElementById('patientGreeting').textContent = 'Good Morning, Patient';
+                document.getElementById('patientAvatar').textContent = 'P';
+                return;
+            }
             const data = await response.json();
-            const patient = data.patient;
-            const snapshot = data.snapshot;
-            document.getElementById('patientDisplayName').textContent = patient.full_name;
-            document.getElementById('patientGreeting').textContent = `Good Morning, ${patient.full_name}`;
-            document.getElementById('patientAvatar').textContent = patient.full_name
+            const patient = data.patient || {};
+            const snapshot = data.snapshot || {};
+            const fullName = patient.full_name || 'Patient';
+            document.getElementById('patientDisplayName').textContent = fullName;
+            document.getElementById('patientGreeting').textContent = `Good Morning, ${fullName}`;
+            document.getElementById('patientAvatar').textContent = fullName
                 .split(/\s+/)
                 .filter(Boolean)
                 .slice(0, 2)
                 .map(part => part[0].toUpperCase())
-                .join('') || '?';
+                .join('') || 'P';
             renderDoctorProfile(data.doctor);
-            document.getElementById('bloodGroupValue').textContent = patient.blood_group;
+            document.getElementById('bloodGroupValue').textContent = patient.blood_group || 'Not available';
             document.getElementById('nextAppointmentValue').textContent = snapshot.next_appointment || 'No appointment';
-            document.getElementById('activeReferralsValue').textContent = snapshot.active_referrals;
-            document.getElementById('recordsCountValue').textContent = snapshot.records_count;
+            document.getElementById('recordsCountValue').textContent = snapshot.records_count ?? 0;
             document.getElementById('queueTokenValue').textContent = snapshot.queue_token || 'No queue';
             document.getElementById('queuePatientsValue').textContent = snapshot.patients_ahead == null
                 ? 'No patients ahead'
@@ -704,5 +683,6 @@
         // Initialize Icons
         lucide.createIcons();
     </script>
+    <script src="/language.js"></script>
 </body>
 </html>

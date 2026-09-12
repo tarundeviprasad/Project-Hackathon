@@ -6,14 +6,15 @@ from django.urls import include, path
 from auth.dashboard import (
     admin_dashboard,
     asha_dashboard,
+    digital_triage_page,
     doctor_appointments,
     doctor_consultation,
     doctor_dashboard,
     doctor_patients,
     doctor_referrals,
+    hospital_admin_dashboard,
     patient_dashboard,
     phc_dashboard,
-    hospital_admin_dashboard,
 )
 
 ROOT_HTML_DIR = Path(__file__).resolve().parent.parent.parent
@@ -26,9 +27,17 @@ def serve_html(request, filename):
     raise Http404(f'{filename} not found')
 
 
+def serve_javascript(request, filename):
+    file_path = ROOT_HTML_DIR / filename
+    if file_path.exists() and file_path.suffix.lower() == '.js':
+        return FileResponse(file_path.open('rb'), content_type='application/javascript')
+    raise Http404(f'{filename} not found')
+
+
 urlpatterns = [
     path('', include('auth.urls')),
     path('index.html', lambda request: serve_html(request, 'index.html')),
+    path('language.js', lambda request: serve_javascript(request, 'language.js')),
     path('patient-login.html', lambda request: serve_html(request, 'patient-login.html')),
     path('doctor-login.html', lambda request: serve_html(request, 'doctor-login.html')),
     path('admin-login.html', lambda request: serve_html(request, 'admin-login.html')),
@@ -46,6 +55,8 @@ urlpatterns = [
     path('hospital/dashboard/', hospital_admin_dashboard, name='hospital_dashboard_page'),
     path('booking_an_appointment.html', lambda request: serve_html(request, 'booking_an_appointment.html')),
     path('digital_health_record.html', lambda request: serve_html(request, 'digital_health_record.html')),
+    path('teleconsultation.html', lambda request: serve_html(request, 'teleconsultation.html')),
+    path('digitaltriage.html', digital_triage_page, name='digital_triage_page'),
     path('symptom_checker.html', lambda request: serve_html(request, 'symptom_checker.html')),
     path('admin-login.html', lambda request: serve_html(request, 'admin-login.html')),
     path('registrationofpatient.html', lambda request: serve_html(request, 'registrationofpatient.html')),

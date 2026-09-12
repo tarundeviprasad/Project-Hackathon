@@ -87,6 +87,16 @@ urlpatterns = [
 
 
     # =========================
+    # ASHA DASHBOARD
+    # =========================
+    path(
+        "asha/dashboard/",
+        dashboard.asha_dashboard,
+        name="asha_dashboard"
+    ),
+
+
+    # =========================
     # ADMIN DASHBOARD
     # =========================
     path(

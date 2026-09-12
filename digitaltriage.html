@@ -204,7 +204,7 @@
 
     <!-- Footer -->
     <div class="triage-footer" id="triageFooter">
-        <button class="btn btn-outline" id="prevBtn" onclick="changeStep(-1)" style="visibility: hidden;">Back</button>
+        <a href="patient_portal.html" class="btn btn-outline" id="prevBtn" style="text-decoration: none; visibility: hidden;">Back</a>
         <button class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Continue</button>
     </div>
 </div>
@@ -212,6 +212,7 @@
 <script>
     let currentStep = 1;
     const totalSteps = 6;
+    let currentPatient = null;
     
     // Data Storage
     const triageData = {
@@ -369,41 +370,116 @@
         banner.className = "priority-banner";
         actions.innerHTML = "";
 
+        let resultButtons = `
+            <button class="btn btn-primary" onclick="window.location.href='patient_portal.html'">Return to Patient Portal</button>
+            <button class="btn btn-outline" onclick="location.reload()">Start New Triage</button>
+        `;
+
         if (priority === "EMERGENCY") {
             banner.innerText = "🔴 EMERGENCY";
             banner.classList.add("bg-emergency");
             document.getElementById('resultDesc').innerText = reason;
-            
-            actions.innerHTML = `
-                <button class="btn btn-primary" style="background:#DC2626" onclick="location.reload()">Find Nearest Emergency Care</button>
-                <button class="btn btn-outline" onclick="alert('Calling 102/108 Emergency Services...')">Call Ambulance (108)</button>
+            resultButtons = `
+                <button class="btn btn-primary" style="background:#DC2626" onclick="window.location.href='booking_an_appointment.html'">Book Emergency Appointment</button>
+                <button class="btn btn-outline" onclick="window.location.href='patient_portal.html'">Return to Patient Portal</button>
             `;
         } else if (priority === "MEDIUM") {
             banner.innerText = "🟠 MEDIUM PRIORITY";
             banner.classList.add("bg-medium");
             document.getElementById('resultDesc').innerText = reason;
-
-            actions.innerHTML = `
-                <button class="btn btn-primary" onclick="alert('Opening Booking Interface...')">Book PHC Appointment</button>
-                <button class="btn btn-outline" onclick="alert('Redirecting to Tele-consultation...')">Start Tele-Consultation</button>
+            resultButtons = `
+                <button class="btn btn-primary" onclick="window.location.href='booking_an_appointment.html'">Book PHC Appointment</button>
+                <button class="btn btn-outline" onclick="window.location.href='patient_portal.html'">Return to Patient Portal</button>
             `;
         } else {
             banner.innerText = "🟢 LOW PRIORITY";
             banner.classList.add("bg-low");
             document.getElementById('resultDesc').innerText = reason;
-
-            actions.innerHTML = `
-                <button class="btn btn-primary" onclick="location.reload()">Return to Dashboard</button>
-                <button class="btn btn-outline" onclick="alert('Self-care guide opened.')">View Self-Care Advice</button>
-            `;
         }
+
+        actions.innerHTML = resultButtons;
 
         // Summary Details
         document.getElementById('resSymptom').innerText = triageData.mainSymptom;
         document.getElementById('resDuration').innerText = triageData.duration;
         document.getElementById('resOthers').innerText = triageData.others.join(", ");
     }
+
+    async function loadCurrentPatient() {
+        try {
+            const response = await fetch('/api/v1/patient/me/dashboard', {
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    document.getElementById('nextBtn').disabled = true;
+                    document.getElementById('nextBtn').textContent = 'Please log in as a patient';
+                    return;
+                }
+                throw new Error('Unable to load patient');
+            }
+            const data = await response.json();
+            currentPatient = data.patient || null;
+        } catch (error) {
+            console.error('Patient session load failed:', error);
+        }
+    }
+
+    async function submitTriageAssessment() {
+        const payload = {
+            main_symptom: triageData.mainSymptom,
+            duration: triageData.duration,
+            additional_symptoms: triageData.others,
+            follow_up_answers: triageData.followUps
+        };
+
+        try {
+            const csrfResponse = await fetch('/csrf/', { credentials: 'same-origin' });
+            const csrfToken = csrfResponse.ok ? (await csrfResponse.json()).csrfToken : '';
+
+            const response = await fetch('/api/v1/patient/me/triage', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(result.error || 'Digital Triage could not be saved.');
+            }
+
+            if (result.priority) {
+                document.getElementById('resSymptom').innerText = result.main_symptom || triageData.mainSymptom;
+                document.getElementById('resDuration').innerText = result.duration || triageData.duration;
+                document.getElementById('resOthers').innerText = (result.additional_symptoms || triageData.others).join(', ');
+                document.getElementById('resultDesc').innerText = result.recommendation || document.getElementById('resultDesc').innerText;
+            }
+
+            return result;
+        } catch (error) {
+            console.error('Triage submission failed:', error);
+            alert(error.message || 'Triage submission failed. Please try again.');
+            return null;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCurrentPatient();
+    });
+
+    const originalDisplayResult = displayResult;
+    displayResult = function(priority, reason) {
+        originalDisplayResult(priority, reason);
+        submitTriageAssessment();
+    };
 </script>
 
+    <script src="/language.js"></script>
 </body>
 </html>
