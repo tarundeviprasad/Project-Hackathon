@@ -59,6 +59,42 @@
         }
 
         .header-controls { display: flex; gap: 12px; }
+        .language-selector-wrap { position: relative; }
+        .language-selector {
+            appearance: none;
+            -webkit-appearance: none;
+            background: var(--pure-white);
+            border: 1px solid var(--soft-gray);
+            border-radius: 12px;
+            padding: 10px 38px 10px 40px;
+            color: var(--primary-indigo);
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .language-selector-wrap::before {
+            content: "";
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            transform: translateY(-50%);
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231E2A5A' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='2' y1='12' x2='22' y2='12'/%3E%3Cpath d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/%3E%3C/svg%3E") center / contain no-repeat;
+            pointer-events: none;
+        }
+        .language-selector-wrap::after {
+            content: "▾";
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-indigo);
+            pointer-events: none;
+        }
+        .language-selector:hover { border-color: var(--healthcare-teal); transform: translateY(-1px); }
         .btn-header {
             background: var(--pure-white);
             border: 1px solid var(--soft-gray);
@@ -317,8 +353,15 @@
             </div>
         </a>
         <div class="header-controls">
-            <button class="btn-header"><i data-lucide="globe" size="16"></i> English</button>
-            <a href="/index.html" class="btn-header"><i data-lucide="arrow-left" size="16"></i> Back to Home</a>
+            <div class="language-selector-wrap">
+                <select id="languageSelector" class="language-selector" aria-label="Select language">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="te">తెలుగు</option>
+                    <option value="mr">मराठी</option>
+                </select>
+            </div>
+            <a href="/index.html" class="btn-header"><i data-lucide="arrow-left" size="16"></i> <span data-i18n="backToHome">Back to Home</span></a>
         </div>
     </header>
 
@@ -326,13 +369,13 @@
         <div class="master-grid">
             <!-- LEFT -->
             <section class="content-left">
-                <div class="badge">Authorized Personnel Only</div>
+                <div class="badge" data-i18n="authorizedPersonnel">Authorized Personnel Only</div>
                 <h1 class="asha-title">
-                    <span class="title-top">ASHA</span>
-                    <span class="title-bottom">Portal</span>
+                    <span class="title-top" data-i18n="ashaTitle">ASHA</span>
+                    <span class="title-bottom" data-i18n="portalTitle">Portal</span>
                 </h1>
-                <p class="headline">Empowering community healthcare, one connection at a time.</p>
-                <p class="description">
+                <p class="headline" data-i18n="ashaHeadline">Empowering community healthcare, one connection at a time.</p>
+                <p class="description" data-i18n="ashaDescription">
                     AarogyaConnect helps ASHA workers connect communities with essential healthcare services, patient follow-ups, and coordinated care through one secure digital platform.
                 </p>
 
@@ -352,40 +395,40 @@
             <section class="content-right">
                 <div class="login-card">
                     <div class="card-header">
-                        <span class="eyebrow">Authorized Access</span>
-                        <h2>ASHA Login</h2>
-                        <p>Sign in with your authorized credentials.</p>
+                        <span class="eyebrow" data-i18n="authorizedAccess">Authorized Access</span>
+                        <h2 data-i18n="ashaLogin">ASHA Login</h2>
+                        <p data-i18n="signInDescription">Sign in with your authorized credentials.</p>
                     </div>
 
                     <form id="ashaLoginForm">
                         <div class="field">
-                            <label>ASHA Login ID</label>
+                            <label data-i18n="ashaLoginId">ASHA Login ID</label>
                             <div class="input-wrapper">
                                 <i data-lucide="user" class="input-icon"></i>
-                                <input type="text" id="ashaId" placeholder="Enter your ASHA Login ID" required>
+                                <input type="text" id="ashaId" data-i18n-placeholder="ashaLoginIdPlaceholder" placeholder="Enter your ASHA Login ID" required>
                             </div>
                         </div>
 
                         <div class="field">
-                            <label>Password</label>
+                            <label data-i18n="password">Password</label>
                             <div class="input-wrapper">
                                 <i data-lucide="lock" class="input-icon"></i>
-                                <input type="password" id="password" placeholder="Enter your password" required>
+                                <input type="password" id="password" data-i18n-placeholder="passwordPlaceholder" placeholder="Enter your password" required>
                                 <button type="button" class="password-toggle" id="togglePass">
                                     <i data-lucide="eye" size="18"></i>
                                 </button>
                             </div>
-                            <a href="#" class="forgot-pw" onclick="handleHelp()">Forgot password?</a>
+                            <a href="#" class="forgot-pw" data-i18n="forgotPassword" onclick="handleHelp()">Forgot password?</a>
                         </div>
 
                         <button type="submit" class="btn-login" id="loginBtn">
-                            Login <i data-lucide="arrow-right" size="18"></i>
+                            <span data-i18n="login">Login</span> <i data-lucide="arrow-right" size="18"></i>
                         </button>
                     </form>
 
                     <div class="security-footer">
                         <i data-lucide="shield-check" size="20"></i>
-                        <span>Authorized ASHA Personnel Access</span>
+                        <span data-i18n="authorizedAshaAccess">Authorized ASHA Personnel Access</span>
                     </div>
                 </div>
             </section>
@@ -393,6 +436,62 @@
     </main>
 
     <script>
+        const translations = {
+            en: {
+                authorizedPersonnel: 'Authorized Personnel Only', ashaTitle: 'ASHA', portalTitle: 'Portal',
+                ashaHeadline: 'Empowering community healthcare, one connection at a time.',
+                ashaDescription: 'AarogyaConnect helps ASHA workers connect communities with essential healthcare services, patient follow-ups, and coordinated care through one secure digital platform.',
+                authorizedAccess: 'Authorized Access', ashaLogin: 'ASHA Login',
+                signInDescription: 'Sign in with your authorized credentials.', ashaLoginId: 'ASHA Login ID',
+                ashaLoginIdPlaceholder: 'Enter your ASHA Login ID', password: 'Password',
+                passwordPlaceholder: 'Enter your password', forgotPassword: 'Forgot password?',
+                login: 'Login', authorizedAshaAccess: 'Authorized ASHA Personnel Access', backToHome: 'Back to Home'
+            },
+            hi: {
+                authorizedPersonnel: 'केवल अधिकृत कर्मियों के लिए', ashaTitle: 'आशा', portalTitle: 'पोर्टल',
+                ashaHeadline: 'एक समय में एक कनेक्शन के साथ सामुदायिक स्वास्थ्य सेवा को सशक्त बनाना।',
+                ashaDescription: 'आरोग्यकनेक्ट आशा कार्यकर्ताओं को एक सुरक्षित डिजिटल मंच के माध्यम से समुदायों को आवश्यक स्वास्थ्य सेवाओं, मरीजों के फॉलो-अप और समन्वित देखभाल से जोड़ने में सहायता करता है।',
+                authorizedAccess: 'अधिकृत एक्सेस', ashaLogin: 'आशा लॉगिन',
+                signInDescription: 'अपने अधिकृत क्रेडेंशियल से साइन इन करें।', ashaLoginId: 'आशा लॉगिन आईडी',
+                ashaLoginIdPlaceholder: 'अपनी आशा लॉगिन आईडी दर्ज करें', password: 'पासवर्ड',
+                passwordPlaceholder: 'अपना पासवर्ड दर्ज करें', forgotPassword: 'पासवर्ड भूल गए?',
+                login: 'लॉगिन', authorizedAshaAccess: 'अधिकृत आशा कर्मी एक्सेस', backToHome: 'होम पर वापस जाएं'
+            },
+            te: {
+                authorizedPersonnel: 'అధీకృత సిబ్బందికి మాత్రమే', ashaTitle: 'ఆశా', portalTitle: 'పోర్టల్',
+                ashaHeadline: 'ఒక్కో అనుసంధానంతో సముదాయ ఆరోగ్య సేవలను బలోపేతం చేయడం.',
+                ashaDescription: 'ఆరోగ్యకనెక్ట్ సురక్షితమైన డిజిటల్ వేదిక ద్వారా ఆశా కార్యకర్తలు సముదాయాలను అవసరమైన ఆరోగ్య సేవలు, రోగుల ఫాలో-అప్‌లు మరియు సమన్వయ సంరక్షణతో అనుసంధానించడంలో సహాయపడుతుంది.',
+                authorizedAccess: 'అధీకృత యాక్సెస్', ashaLogin: 'ఆశా లాగిన్',
+                signInDescription: 'మీ అధీకృత ఆధారాలతో సైన్ ఇన్ చేయండి.', ashaLoginId: 'ఆశా లాగిన్ ఐడీ',
+                ashaLoginIdPlaceholder: 'మీ ఆశా లాగిన్ ఐడీని నమోదు చేయండి', password: 'పాస్‌వర్డ్',
+                passwordPlaceholder: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి', forgotPassword: 'పాస్‌వర్డ్ మర్చిపోయారా?',
+                login: 'లాగిన్', authorizedAshaAccess: 'అధీకృత ఆశా సిబ్బంది యాక్సెస్', backToHome: 'హోమ్‌కు తిరిగి వెళ్ళండి'
+            },
+            mr: {
+                authorizedPersonnel: 'फक्त अधिकृत कर्मचाऱ्यांसाठी', ashaTitle: 'आशा', portalTitle: 'पोर्टल',
+                ashaHeadline: 'एका वेळी एका जोडणीद्वारे समुदाय आरोग्य सेवेला सक्षम करणे.',
+                ashaDescription: 'आरोग्यकनेक्ट आशा कार्यकर्त्यांना एका सुरक्षित डिजिटल व्यासपीठाद्वारे समुदायांना आवश्यक आरोग्य सेवा, रुग्ण फॉलो-अप आणि समन्वित काळजीशी जोडण्यास मदत करते.',
+                authorizedAccess: 'अधिकृत प्रवेश', ashaLogin: 'आशा लॉगिन',
+                signInDescription: 'आपल्या अधिकृत क्रेडेन्शियल्सने साइन इन करा.', ashaLoginId: 'आशा लॉगिन आयडी',
+                ashaLoginIdPlaceholder: 'आपला आशा लॉगिन आयडी प्रविष्ट करा', password: 'पासवर्ड',
+                passwordPlaceholder: 'आपला पासवर्ड प्रविष्ट करा', forgotPassword: 'पासवर्ड विसरलात?',
+                login: 'लॉगिन', authorizedAshaAccess: 'अधिकृत आशा कर्मचारी प्रवेश', backToHome: 'होमवर परत जा'
+            }
+        };
+
+        function updateLanguage(language) {
+            const dictionary = translations[language] || translations.en;
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const value = dictionary[element.dataset.i18n];
+                if (value) element.textContent = value;
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+                const value = dictionary[element.dataset.i18nPlaceholder];
+                if (value) element.placeholder = value;
+            });
+            document.documentElement.lang = language;
+        }
+
         // Init Icons
         lucide.createIcons();
 
@@ -432,7 +531,8 @@
                 window.location.assign(result.redirect);
             } catch (error) {
                 window.alert(error.message);
-                btn.innerHTML = 'Login <i data-lucide="arrow-right" size="18"></i>';
+                btn.innerHTML = '<span data-i18n="login">Login</span> <i data-lucide="arrow-right" size="18"></i>';
+                updateLanguage(localStorage.getItem('selectedLanguage') || 'en');
                 btn.disabled = false;
                 btn.style.opacity = '1';
                 lucide.createIcons();

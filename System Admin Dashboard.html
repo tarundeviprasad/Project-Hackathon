@@ -60,16 +60,33 @@
         }
 
         .logo-mark {
-            width: 32px;
-            height: 32px;
-            color: var(--primary);
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 26px;
+            font-weight: 500;
         }
 
         .brand-name {
-            font-size: 22px;
+            display: flex;
+            gap: 4px;
+            font-size: 18px;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .brand-name .aarogya {
             color: var(--primary);
-            letter-spacing: -0.5px;
+        }
+
+        .brand-name .connect {
+            color: var(--accent);
         }
 
         .nav-center {
@@ -103,6 +120,27 @@
             display: flex;
             align-items: center;
             gap: 20px;
+        }
+
+        .language-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 36px;
+            padding: 8px 14px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .language-display svg {
+            width: 16px;
+            height: 16px;
+            flex: 0 0 auto;
         }
 
         .status-pill {
@@ -653,29 +691,25 @@
     <!-- --- TOP NAVIGATION --- -->
     <nav class="top-nav">
         <a class="nav-left" href="/index.html" aria-label="AarogyaConnect home" style="text-decoration: none;">
-            <svg class="logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M24 2C26.2 15.8 31.9 21.6 46 24C31.9 26.4 26.2 32.2 24 46C21.8 32.2 16.1 26.4 2 24C16.1 21.6 21.8 15.8 24 2Z" fill="currentColor"/>
-                <circle cx="24" cy="24" r="4" fill="#0F766E"/>
-            </svg>
-            <span class="brand-name">AarogyaConnect</span>
+            <div class="logo-mark">+</div>
+            <span class="brand-name">
+                <span class="aarogya">Aarogya</span>
+                <span class="connect">Connect</span>
+            </span>
         </a>
 
         <div class="nav-center">
-            <a onclick="switchView('dashboard')" class="nav-link active" data-i18n="Dashboard">Dashboard</a>
-            <a onclick="switchView('hospitals')" class="nav-link" data-i18n="Hospitals">Hospitals</a>
-            <a onclick="switchView('doctors')" class="nav-link" data-i18n="Doctors">Doctors</a>
-            <a onclick="switchView('admins')" class="nav-link" data-i18n="Hospital Admins">Hospital Admins</a>
-            <a onclick="switchView('credentials')" class="nav-link">Credentials</a>
-            <a onclick="switchView('reports')" class="nav-link">Reports</a>
         </div>
 
         <div class="nav-right">
-            <select id="languageSelector" aria-label="Select language" onchange="updateLanguage(this.value)" style="border: 1px solid var(--border); border-radius: 10px; padding: 8px; font-family: inherit;">
-                <option value="en">English</option>
-                <option value="hi">हिन्दी</option>
-                <option value="te">తెలుగు</option>
-                <option value="mr">मराठी</option>
-            </select>
+            <div class="language-display" aria-label="Current language: English">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span>English</span>
+            </div>
             <div class="status-pill">
                 <div class="status-dot"></div>
                 System Online
@@ -1273,7 +1307,6 @@
             document.getElementById('languageSelector').value = lang;
         }
 
-        updateLanguage(localStorage.getItem('selectedLanguage') || 'en');
         loadHospitalAdmins();
 
         // Close modal on escape
@@ -1284,6 +1317,5 @@
             }
         });
     </script>
-    <script src="/language.js"></script>
 </body>
 </html>

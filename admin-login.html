@@ -352,7 +352,7 @@
   <div class="page">
     <header class="topbar">
       <div class="brand">
-        <div class="logo">A</div>
+        <div class="logo">+</div>
         <div>
           <h2>AarogyaConnect</h2>
           <small>Admin Portal</small>
@@ -395,13 +395,13 @@
 
           <div class="field">
             <label for="admin-password">Password</label>
-            <span class="icon-wrap">🔒</span>
+            <span class="icon-wrap" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="10" width="16" height="10" rx="2"></rect>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+              </svg>
+            </span>
             <input id="admin-password" name="password" type="password" placeholder="Enter your password" required>
-          </div>
-
-          <div class="inline-row">
-            <label><input type="checkbox"> Trusted device</label>
-            <a href="#">Need support?</a>
           </div>
 
           <button class="primary" type="submit">Access Admin Console</button>
@@ -484,6 +484,5 @@
       });
     }
   </script>
-  <script src="/language.js"></script>
 </body>
 </html>
