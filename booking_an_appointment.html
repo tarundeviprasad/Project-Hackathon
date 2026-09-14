@@ -332,8 +332,8 @@
         .doc-main-info .spec { color: var(--rich-teal); font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
         .doc-main-info .hosp-loc { color: var(--slate-gray); font-size: 0.85rem; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
         
-        .doc-stats { display: flex; gap: 20px; border-top: 1px solid var(--soft-border); padding-top: 16px; }
-        .doc-stats-item { display: flex; flex-direction: column; }
+        .doc-stats { display: flex; gap: 12px; border-top: 1px solid var(--soft-border); padding-top: 16px; }
+        .doc-stats-item { display: flex; flex: 1; min-width: 0; flex-direction: column; }
         .doc-stats-item .val { font-weight: 700; color: var(--deep-indigo); font-size: 0.9rem; }
         .doc-stats-item .lbl { font-size: 0.7rem; color: var(--slate-gray); text-transform: uppercase; font-weight: 700; }
 
@@ -772,6 +772,18 @@
             `).join('');
         }
 
+        function facilityMetric(doc, fieldNames) {
+            const sources = [doc, doc.facility].filter(Boolean);
+            for (const source of sources) {
+                for (const fieldName of fieldNames) {
+                    if (source[fieldName] !== undefined && source[fieldName] !== null && source[fieldName] !== '') {
+                        return source[fieldName];
+                    }
+                }
+            }
+            return 'N/A';
+        }
+
         function renderDoctors(docs) {
             const list = document.getElementById('doctorList');
             const noRes = document.getElementById('noResults');
@@ -804,12 +816,20 @@
                                 <span class="lbl">Exp</span>
                             </div>
                             <div class="doc-stats-item">
-                                <span class="val">⭐ ${doc.rating}</span>
-                                <span class="lbl">Rating</span>
+                                <span class="val"><i data-lucide="bed" size="14"></i> ${facilityMetric(doc, ['beds_available', 'available_beds'])}</span>
+                                <span class="lbl">Beds Available</span>
                             </div>
                             <div class="doc-stats-item">
-                                <span class="val">₹${doc.fee}</span>
-                                <span class="lbl">Fee</span>
+                                <span class="val"><i data-lucide="flask-conical" size="14"></i> ${facilityMetric(doc, ['lab_services', 'has_lab_services'])}</span>
+                                <span class="lbl">Lab Services</span>
+                            </div>
+                            <div class="doc-stats-item">
+                                <span class="val"><i data-lucide="hospital" size="14"></i> ${facilityMetric(doc, ['medical_facilities', 'has_medical_facilities'])}</span>
+                                <span class="lbl">Medical Facilities</span>
+                            </div>
+                            <div class="doc-stats-item">
+                                <span class="val"><i data-lucide="map-pin" size="14"></i> ${facilityMetric(doc, ['distance_km', 'facility_distance_km'])}${facilityMetric(doc, ['distance_km', 'facility_distance_km']) !== 'N/A' ? ' km' : ''}</span>
+                                <span class="lbl">Distance</span>
                             </div>
                         </div>
                     </div>
@@ -1098,6 +1118,11 @@
                     name: doctor.name,
                     spec: doctor.specialty,
                     hosp: doctor.facility_name || 'Assigned facility',
+                    facility: doctor.facility,
+                    beds_available: doctor.beds_available,
+                    lab_services: doctor.lab_services,
+                    medical_facilities: doctor.medical_facilities,
+                    distance_km: doctor.distance_km,
                     exp: doctor.experience_years,
                     rating: Number(doctor.rating),
                     initial: (doctor.name || 'D').charAt(0).toUpperCase(),
